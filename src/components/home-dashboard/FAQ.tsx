@@ -96,12 +96,13 @@ class FAQ extends Component<IProps> {
               }
             />
           </Left>
-          <Body style={{ flex: 1 }} />
+          <Body style={{ flex: 1 }}/>
           <Right style={{ flex: 1 }} />
         </Header>
         <Content
           contentContainerStyle={{
             alignItems: "stretch",
+            alignContent: "center",
           }}
         >
           <View style={styles.container}>
@@ -115,9 +116,25 @@ class FAQ extends Component<IProps> {
                         //   backgroundColor: i % 2 == 0 ? "pink" : "purple",
                         // }}
                         contentVisible={false}
-                        visibleElement={<Image source={IC_ARR_UP} />}
-                        invisibleElement={
-                          <Image source={IC_ARR_DOWN} />
+                        visibleElement={<Image source={IC_ARR_UP} 
+                        style = {{
+                          position: 'absolute',
+                          alignSelf: 'flex-end',
+                          marginTop: 10,
+                        }}/>}
+                        
+                        invisibleElement={<Image source={IC_ARR_DOWN} 
+                        style = {{
+                          marginRight: 10,
+                          position: 'absolute',
+                          alignSelf: 'flex-end',
+                          marginTop: 10,
+                        }}/>
+                        
+                        //testing 
+
+
+
                           //   <Icon
                           //     name="chevron-down"
                           //     type="font-awesome"
@@ -133,8 +150,11 @@ class FAQ extends Component<IProps> {
                             style={{
                               fontSize: 20,
                               color: "white",
-                              height: 40,
+                              height: 50,
                               fontWeight: "bold",
+                              marginLeft: 10,
+                              marginTop: 10,
+
                               //   backgroundColor: "red",
                             }}
                           >
@@ -162,13 +182,15 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#101726",
+    position: 'relative',
+
+
   },
   header: {
     width: "100%",
     flexWrap: "wrap",
     flexDirection: "row",
     alignItems: "center",
-    marginLeft: 15,
     alignContent: "center",
   },
   headerTxt: {
