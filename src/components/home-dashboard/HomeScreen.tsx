@@ -22,6 +22,8 @@ import styles from "styles/Styles";
 import * as Constants from "constants/Constants";
 import db from "db/User";
 import LearningModule from "components/home-dashboard/LearningModule";
+import Module from "components/home-dashboard/Module";
+import Quiz from "components/home-dashboard/Quiz";
 import Support from "components/home-dashboard/Support";
 import { PROFILE_PIC } from "images/Images";
 
@@ -41,6 +43,7 @@ export default class HomeScreen extends Component<IProps, IState> {
   }
 
   componentDidMount() {
+    //Display initials
     db.grabUserDetails().then((data) => {
       if (data != null) {
         let user = data.rows.item(0);
@@ -49,13 +52,41 @@ export default class HomeScreen extends Component<IProps, IState> {
         });
       }
     });
+
+    //fetch learning modules.
+    this.fetchLeaningModules();
+  }
+
+  async fetchLeaningModules() {
+    //let learningModulesAsList = await db.checkForLearningModules(Constants.PENTECH_LEARNING_MODULES.m1); //prettier-ignore
+    console.log(
+      "\n\n\n\n**************************************************************************\nSTART"
+    );
+    //we first check if we have pre-existing learning modules
+    let checkForLearningModules = await db.checkForLearningModuleData();
+    console.log("checkForLearningModules = " + checkForLearningModules);
+    if (!checkForLearningModules) {
+      //drop the create the tables.
+      await db.setUpLearningModules();
+
+      //fetch learning modules data
+      let jsonData = await db.fetchLearningModulesData(); //fetch then save the data
+
+      //save learning modules data
+      await db.saveLearningModulesData(JSON.parse(jsonData));
+
+      //display learning module
+    }
+    console.log(
+      "END\n**************************************************************************"
+    );
   }
 
   fetchUserInitials = () => {
     if (this.state.initials != "") {
       return <>{"Hello " + this.state.initials + "!"}</>;
     } else {
-      return <></>;
+      return <>{"Hello There!"}</>;
     }
   };
 
@@ -97,18 +128,17 @@ export default class HomeScreen extends Component<IProps, IState> {
             colors={["#522154", "#5f1f4a", "#721937"]}
             style={styles.homeDashboardGreeterContainer}
           >
-            <Left style={styles.homeDashboardGreeterLeftContent}>
-              <Text style={styles.homeDashboardContent}>{"1000 points"}</Text>
-            </Left>
             <Right style={styles.homeDashboardGreeterRightContent}>
               <Text style={styles.homeDashboardContent}>
                 <this.fetchUserInitials />
               </Text>
             </Right>
           </LinearGradient>
+
           <View style={{ paddingBottom: 10, width: "100%" }}>
             <Text style={styles.homeDashboardHeader}>{"Engage"}</Text>
           </View>
+
           {this.PAGES.map((page, x) => (
             <TouchableOpacity
               key={x}
@@ -128,6 +158,7 @@ export default class HomeScreen extends Component<IProps, IState> {
         </View>
       );
     };
+
     return (
       <Container style={styles.bgPurple1}>
         <Content contentContainerStyle={styles.rneContentHomeDashboard}>
@@ -145,6 +176,16 @@ export default class HomeScreen extends Component<IProps, IState> {
             <Stack.Screen
               name={Constants.HOME_SCREEN_LEARNING_MODULES}
               component={LearningModule}
+              options={this.learningModuleHeaderOptions}
+            />
+            <Stack.Screen
+              name={Constants.MODULE}
+              component={Module}
+              options={this.learningModuleHeaderOptions}
+            />
+            <Stack.Screen
+              name={Constants.QUIZZES}
+              component={Quiz}
               options={this.learningModuleHeaderOptions}
             />
             {/* <Stack.Screen

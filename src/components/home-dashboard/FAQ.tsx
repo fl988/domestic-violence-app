@@ -96,7 +96,7 @@ class FAQ extends Component<IProps> {
               }
             />
           </Left>
-          <Body style={{ flex: 1 }}/>
+          <Body style={{ flex: 1 }} />
           <Right style={{ flex: 1 }} />
         </Header>
         <Content
@@ -116,34 +116,26 @@ class FAQ extends Component<IProps> {
                         //   backgroundColor: i % 2 == 0 ? "pink" : "purple",
                         // }}
                         contentVisible={false}
-                        visibleElement={<Image source={IC_ARR_UP} 
-                        style = {{
-                          position: 'absolute',
-                          alignSelf: 'flex-end',
-                          marginTop: 10,
-                        }}/>}
-                        
-                        invisibleElement={<Image source={IC_ARR_DOWN} 
-                        style = {{
-                          marginRight: 10,
-                          position: 'absolute',
-                          alignSelf: 'flex-end',
-                          marginTop: 10,
-                        }}/>
-                        
-                        //testing 
-
-
-
-                          //   <Icon
-                          //     name="chevron-down"
-                          //     type="font-awesome"
-                          //     color="white"
-                          //     style={{
-                          //       backgroundColor: "blue",
-                          //       alignSelf: "center",
-                          //     }}
-                          //   />
+                        visibleElement={
+                          <Image
+                            source={IC_ARR_UP}
+                            style={{
+                              position: "absolute",
+                              alignSelf: "flex-end",
+                              marginTop: 10,
+                            }}
+                          />
+                        }
+                        invisibleElement={
+                          <Image
+                            source={IC_ARR_DOWN}
+                            style={{
+                              marginRight: 10,
+                              position: "absolute",
+                              alignSelf: "flex-end",
+                              marginTop: 10,
+                            }}
+                          />
                         }
                         header={
                           <Text
@@ -182,9 +174,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#101726",
-    position: 'relative',
-
-
+    position: "relative",
   },
   header: {
     width: "100%",

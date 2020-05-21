@@ -102,7 +102,7 @@ export default class HomeDashboard extends React.Component<IProps> {
                   color="white"
                 />
                 <Text style={{ color: Constants.COLOUR_WHITE, paddingLeft: 8 }}>
-                  {"FAQ"}
+                  {"Frequently Asked Questions"}
                 </Text>
               </View>
             ),

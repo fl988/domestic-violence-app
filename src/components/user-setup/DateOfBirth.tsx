@@ -24,7 +24,7 @@ const DateOfBirth = (props) => {
     setDatePickerVisibility(false);
   };
 
-  const handleConfirm = (date) => {
+  const handleConfirm = (date: Date) => {
     //console.warn("A date has been picked: ", date);
     hideDatePicker();
 

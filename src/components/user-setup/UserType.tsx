@@ -66,6 +66,7 @@ const UserType = (props) => {
         leftIconColor={"white"} //you can put simple color words or hex or rgb.
         textInputPlaceholder={"Just Learning"}
         textInputPlaceholderColor={"white"}
+        disableRightComponent={true}
         value={null}
       />
 
@@ -79,6 +80,7 @@ const UserType = (props) => {
         leftIconColor={"white"} //you can put simple color words or hex or rgb.
         textInputPlaceholder={"A Parent / Guardian"}
         textInputPlaceholderColor={"white"}
+        disableRightComponent={true}
         value={null}
       />
 
@@ -92,6 +94,7 @@ const UserType = (props) => {
         leftIconColor={"white"} //you can put simple color words or hex or rgb.
         textInputPlaceholder={"An AVO Holder"}
         textInputPlaceholderColor={"white"}
+        disableRightComponent={true}
         value={null}
       />
     </View>

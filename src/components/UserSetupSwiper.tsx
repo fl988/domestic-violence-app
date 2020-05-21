@@ -59,7 +59,7 @@ export default class UserSetupSwiper extends Component<IProps, IState> {
   modalVisibleHandler = (showModal: boolean) => {
     this.setState({
       modalVisible: showModal,
-      userDetails: "",
+      userDetails: React.Component,
     });
     if (showModal) {
       this.readUserDetails();

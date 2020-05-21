@@ -78,3 +78,5 @@ export const HOME_SCREEN_LEARNING_MODULES    = "Learning Modules"; // prettier-i
 export const HOME_SCREEN_INTERACTIVE_STORIES = "Interactive Stories"; // prettier-ignore
 export const HOME_SCREEN_STATISTICS          = "Statistics"; // prettier-ignore
 export const HOME_SCREEN_SUPPORT             = "Support"; // prettier-ignore
+export const MODULE                          = "Module"; // prettier-ignore
+export const QUIZZES                         = "Quizzes"; // prettier-ignore

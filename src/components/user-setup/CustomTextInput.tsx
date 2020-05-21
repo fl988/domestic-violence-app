@@ -8,12 +8,10 @@ import { LinearGradient } from "expo-linear-gradient";
 import styles from "styles/Styles";
 
 const CustomTextInput = (props) => {
-  return (
-    <TouchableOpacity onPress={props.onPress}>
-      <LinearGradient
-        colors={["#522154", "#5f1f4a", "#721937"]}
-        style={styles.sectionStyle}
-      >
+  const leftIconComponent = () => {
+    let c = <Left />;
+    if (props.leftIcon != null) {
+      c = (
         <Left style={{ flex: 1, alignItems: "center" }}>
           <Icon
             name={props.leftIcon}
@@ -21,16 +19,77 @@ const CustomTextInput = (props) => {
             color={props.leftIconColor}
           />
         </Left>
-        <Body style={{ flex: 2, alignItems: "flex-start" }}>
-          <TextInput
-            style={{ paddingLeft: 5, textAlign: "center", color: "#fff" }}
-            placeholder={props.textInputPlaceholder}
-            placeholderTextColor={props.textInputPlaceholderColor}
-            editable={props.editable}
-            value={props.value}
+      );
+    }
+    return c;
+  };
+  const rightIconComponent = () => {
+    let c = <Right />;
+    if (props.rightIcon != null) {
+      c = (
+        <Right style={{ flex: 1, alignItems: "center" }}>
+          <Icon
+            name={props.rightIcon}
+            type={props.rightIconType}
+            color={props.rightIconColor}
           />
-        </Body>
+        </Right>
+      );
+    }
+    return c;
+  };
+  const bodyComponent = () => {
+    return (
+      <Body style={{ flex: 2, alignItems: "flex-start" }}>
+        <TextInput
+          style={{ textAlign: "center", color: "#fff" }}
+          placeholder={props.textInputPlaceholder}
+          placeholderTextColor={props.textInputPlaceholderColor}
+          editable={props.editable}
+          onChangeText={props.initialsInputHandler}
+          value={props.value}
+        />
+      </Body>
+    );
+  };
+  const finalComponent = () => {
+    let colors = ["#522154", "#5f1f4a", "#721937"];
+    let final = (
+      <>
+        {leftIconComponent()}
+        {bodyComponent()}
+        {rightIconComponent()}
+      </>
+    );
+    if (props.disableRightComponent) {
+      final = (
+        <>
+          {leftIconComponent()}
+          {bodyComponent()}
+        </>
+      );
+    } else if (props.disableLeftComponent) {
+      final = (
+        <>
+          {bodyComponent()}
+          {rightIconComponent()}
+        </>
+      );
+    }
+
+    return (
+      <LinearGradient
+        colors={props.colors != null ? props.colors : colors}
+        style={styles.sectionStyle}
+      >
+        {final}
       </LinearGradient>
+    );
+  };
+
+  return (
+    <TouchableOpacity onPress={props.onPress}>
+      {finalComponent()}
     </TouchableOpacity>
   );
 };

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { LinearGradient } from "expo-linear-gradient";
 import {
   View,
   Text,
@@ -10,6 +11,7 @@ import {
 import db from "db/User";
 // Styles
 import myStyles from "styles/Styles";
+import * as Constants from "constants/Constants";
 
 const InitialsInput = (props) => {
   /***********************************************************************************/
@@ -51,15 +53,20 @@ const InitialsInput = (props) => {
   // The returning component
   return (
     <View style={myStyles.frame}>
-      <TextInput
-        underlineColorAndroid="transparent"
-        placeholder="Leave blank to remain anonymous"
-        // selectionColor={"#428AF8"}
-        placeholderTextColor="#464950"
-        style={myStyles.input}
-        onChangeText={initialsInputHandler} //For every key strokes, this will invoke initialsInputHandler.
-        value={getInitialsEntered}
-      />
+      <LinearGradient
+        colors={["#522154", "#5f1f4a", "#721937"]}
+        style={myStyles.sectionStyle}
+      >
+        <TextInput
+          underlineColorAndroid="transparent"
+          placeholder="Leave blank to remain anonymous"
+          // selectionColor={"#428AF8"}
+          placeholderTextColor={Constants.COLOUR_WHITE}
+          style={myStyles.input2}
+          onChangeText={initialsInputHandler} //For every key strokes, this will invoke initialsInputHandler.
+          value={getInitialsEntered}
+        />
+      </LinearGradient>
 
       <View>
         <TouchableOpacity

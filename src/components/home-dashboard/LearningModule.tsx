@@ -1,9 +1,9 @@
 /* *************************************** */
 // Import Modules
-import React, { Component } from "react";
-import { View, Text, Image, TouchableOpacity } from "react-native";
+import React, { Component, ReactComponentElement, ReactFragment } from "react";
+import { View, Text, Image, TouchableOpacity, Alert } from "react-native";
 import { Container, Header, Content, Left, Right, Body } from "native-base";
-// import { Icon } from "react-native-elements";
+import { Icon } from "react-native-elements";
 // import { DrawerActions } from "@react-navigation/native";
 import {
   NavigationState,
@@ -17,52 +17,112 @@ import * as Constants from "constants/Constants";
 import styles from "styles/Styles";
 import db from "db/User";
 import CircularProgress from "components/home-dashboard/CircularProgress";
+import CustomModal from "components/user-setup/CustomModal";
 import { PROFILE_PIC } from "images/Images";
 
 /* *************************************** */
 // Interface
+interface enumJsonObj {
+  progressGauge: ReactFragment;
+  learningModuleId: number;
+  moduleTitle: string;
+  moduleSummary: string;
+  quizTopic: string;
+  moduleContent: string;
+  locked: boolean;
+}
+interface enumJsonArr extends Array<enumJsonObj> {}
+
 interface IProps {
   navigation: NavigationScreenProp<NavigationState, NavigationParams>;
 }
-interface IState {}
+
+interface IState {
+  modalVisible: boolean;
+  pages: enumJsonArr;
+}
 
 export default class LearningModule extends Component<IProps, IState> {
-  static navigationOptions = {
-    drawerIcon: (
-      <Image source={PROFILE_PIC} style={{ height: 50, width: 50 }} />
-    ),
-  };
+  lockIcon = (
+    <Icon
+      name="lock"
+      type="font-awesome"
+      color={Constants.COLOUR_EBONY}
+      reverse
+      style={{
+        backgroundColor: "blue",
+        alignSelf: "center",
+        justifyContent: "center",
+      }}
+    />
+  );
+
+  constructor(props: IProps) {
+    super(props);
+    this.state = {
+      modalVisible: false,
+      pages: [
+        {
+          progressGauge: <></>,
+          learningModuleId: 0,
+          moduleTitle: "Title",
+          moduleSummary: "Summary Title",
+          quizTopic: "Topic",
+          moduleContent: "Contents",
+          locked: true,
+        },
+      ],
+    };
+  }
 
   componentDidMount() {
     this.init();
   }
 
   async init() {
-    //let learningModulesAsList = await db.checkForLearningModules(Constants.PENTECH_LEARNING_MODULES.m1); //prettier-ignore
+    let rsLM = await db.grabAllLearningModulesData(); //prettier-ignore
+    if (rsLM != null && rsLM.rows.length > 0) {
+      let pagesObjArr = [];
+      for (let x = 0; x < rsLM.rows.length; x++) {
+        let item: any = rsLM.rows.item(x);
+
+        pagesObjArr.push({
+          progressGauge: <CircularProgress percent={5} />, //TODO: Make this guage dynamic.
+          learningModuleId: item.learningModuleId,
+          moduleTitle: item.moduleTitle,
+          moduleSummary: item.moduleSummary,
+          quizTopic: item.quizTopic,
+          moduleContent: item.moduleContent,
+          locked: false,
+        });
+      }
+
+      this.setState({
+        pages: pagesObjArr,
+      });
+    }
   }
 
-  rand = () => {
-    return Math.floor(Math.random() * 100) + 1;
+  someAction = () => {};
+
+  modalVisibleHandler = (showModal: boolean) => {
+    this.setState({
+      modalVisible: showModal,
+    });
   };
 
-  PAGES = [
-    {
-      progressGauge: <CircularProgress percent={100} />,
-      title: "Module",
-    },
-    {
-      progressGauge: <CircularProgress percent={90} />,
-      title: "Module",
-    },
-    {
-      progressGauge: <CircularProgress percent={80} />,
-      title: "Module",
-    },
-    {
-      progressGauge: <CircularProgress percent={70} />,
-      title: "Module",
-    },
-  ];
+  moduleHandler = (pageItem: enumJsonObj) => {
+    if (!pageItem.locked) {
+      this.props.navigation.navigate(Constants.MODULE, {
+        learningModuleId: pageItem.learningModuleId,
+        moduleTitle: pageItem.moduleTitle,
+        moduleSummary: pageItem.moduleSummary,
+        quizTopic: pageItem.quizTopic,
+        moduleContent: pageItem.moduleContent,
+        locked: pageItem.locked,
+      });
+    }
+  };
 
   render() {
     return (
@@ -71,22 +131,37 @@ export default class LearningModule extends Component<IProps, IState> {
           {/* *************************** */}
           {/* START */}
           <View style={{ paddingTop: 10 }}>{/* Empty Space */}</View>
-          {this.PAGES.map((page, x) => (
+          {this.state.pages.map((page, x) => (
             <View key={x} style={styles.learningModuleItem}>
               <Left style={styles.learningModuleItemLeft}>
                 {page.progressGauge}
               </Left>
               <Body style={styles.learningModuleItemBody}>
-                <TouchableOpacity style={styles.learningModuleItemBodyContents}>
+                <TouchableOpacity
+                  style={styles.learningModuleItemBodyContents}
+                  onPress={() => {
+                    this.modalVisibleHandler(page.locked);
+                    this.moduleHandler(page);
+                  }}
+                >
                   <Body>
-                    <Text style={styles.lmText}>
-                      {page.title + " " + (x + 1)}
-                    </Text>
+                    <Text style={styles.lmText}>{page.moduleTitle}</Text>
+                    <Text style={styles.lmText}>{page.quizTopic}</Text>
                   </Body>
                 </TouchableOpacity>
               </Body>
             </View>
           ))}
+          <CustomModal
+            action={this.someAction}
+            modalVisible={this.state.modalVisible}
+            modalVisibleHandler={this.modalVisibleHandler}
+            modalHeader={"Confirmation"}
+            modalBody={
+              "\n\n\nYou have not completed the previous module yet.\n\n\n\n\n"
+            }
+            styleVersion={2}
+          />
           {/* END */}
           {/* *************************** */}
         </Content>

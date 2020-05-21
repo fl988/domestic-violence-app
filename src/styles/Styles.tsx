@@ -130,6 +130,11 @@ export default StyleSheet.create({
     justifyContent: "center",
     textAlign: "center",
   },
+  input2: {
+    color: Constants.COLOUR_WHITE,
+    justifyContent: "center",
+    textAlign: "center",
+  },
   button: {
     backgroundColor: "rgba(0,0,0, 0.3)",
     position: "absolute",
@@ -329,6 +334,61 @@ export default StyleSheet.create({
     fontWeight: "bold",
     alignSelf: "center",
     justifyContent: "center",
+  },
+
+  //learning module page 2
+  learningModulePageContainer: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "flex-start",
+  },
+  learningModulePageContent: {
+    // flex: 1, //this will fill out the remaining spaces, don't need it for now.
+    marginTop: 12,
+    marginRight: 24,
+    marginLeft: 24,
+    borderRadius: 8,
+    height: PAGE_HEIGHT / 1.2,
+    width: PAGE_WIDTH - 36, // Page width / 2 then we take the margin into consideration which in this case is on the left. We want 3 of them which is 12 * 3 = 36.
+    backgroundColor: Constants.COLOUR_EAST_BAY, //"rgba(255,255,255, 0.3)",
+  },
+  learningModulePageHeader: {
+    color: Constants.COLOUR_WHITE,
+    paddingTop: 16,
+    paddingLeft: 16,
+    paddingBottom: 16,
+    fontSize: 21,
+    fontWeight: "bold",
+    // alignSelf: "flex-start",
+    // justifyContent: "flex-start",
+  },
+  learningModulePageBody: {
+    color: Constants.COLOUR_WHITE,
+    fontSize: 18,
+    // textAlign: "justify",
+    lineHeight: 30,
+    paddingTop: 8,
+    paddingRight: 16,
+    paddingLeft: 16,
+    paddingBottom: 16,
+    // alignSelf: "flex-start",
+    // justifyContent: "space-between",
+    borderTopColor: "black",
+    borderTopWidth: 1,
+    // textAlign: "justify",
+  },
+  learningModulePageButton: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    margin: 8,
+    paddingLeft: 20,
+    paddingRight: 20,
+    backgroundColor: Constants.COLOUR_TOPAZ, //"rgba(255,255,255, 0.3)",
+    borderRadius: 8,
+    height: PAGE_HEIGHT / 11,
+    width: PAGE_WIDTH / 1.15,
   },
   /*************************************/
 

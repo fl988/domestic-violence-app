@@ -37,7 +37,7 @@ export default class CircularProgress extends Component<IProps, IState> {
           this.rand();
         }}
       >
-        <View>
+        <View style={{ marginLeft: 10 }}>
           <ProgressCircle
             percent={this.state.percent}
             radius={radius}
