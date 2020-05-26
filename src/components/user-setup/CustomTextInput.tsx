@@ -1,11 +1,12 @@
 import React from "react";
-import { View, TouchableOpacity, TextInput } from "react-native";
+import { TouchableOpacity, TextInput } from "react-native";
 import { Icon } from "react-native-elements";
 import { Left, Right, Body } from "native-base";
 import { LinearGradient } from "expo-linear-gradient";
 
 // Styles
 import styles from "styles/Styles";
+import * as Constants from "constants/Constants";
 
 const CustomTextInput = (props) => {
   const leftIconComponent = () => {
@@ -53,7 +54,6 @@ const CustomTextInput = (props) => {
     );
   };
   const finalComponent = () => {
-    let colors = ["#522154", "#5f1f4a", "#721937"];
     let final = (
       <>
         {leftIconComponent()}
@@ -79,7 +79,9 @@ const CustomTextInput = (props) => {
 
     return (
       <LinearGradient
-        colors={props.colors != null ? props.colors : colors}
+        colors={
+          props.colors != null ? props.colors : Constants.LINEAR_GRADIENT_MAIN
+        }
         style={styles.sectionStyle}
       >
         {final}

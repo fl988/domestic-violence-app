@@ -74,13 +74,11 @@ export default class UserSetupSwiper extends Component<IProps, IState> {
       if (rsCond != null) {
         for (let x = 0; x < rsCond.rows.length; x++) {
           let condItem = rsCond.rows.item(x);
+          let condSum = " (" + condItem.conditionSummary + ")";
+
           if (condItem.conditionSelected) {
             component +=
-              "\n\t- Condition " +
-              condItem.conditionNumber +
-              " (" +
-              condItem.conditionSummary +
-              ")";
+              "\n\t- Condition " + condItem.conditionNumber + condSum;
           }
         }
       }
@@ -150,7 +148,7 @@ export default class UserSetupSwiper extends Component<IProps, IState> {
         index={0}
         scrollEnabled={false}
       >
-        {/* We map the pages, which works like loops. */}
+        {/* We map the pages. */}
         {this.PAGES.map((page, i) => (
           <View key={i} style={{ flex: 1, backgroundColor: page.bgColor }}>
             <View style={[styles.card]}>

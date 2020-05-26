@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { View, Text, Dimensions, TouchableWithoutFeedback } from "react-native";
 import ProgressCircle from "react-native-progress-circle"; //https://www.npmjs.com/package/react-native-progress-circle
 import styles from "styles/Styles";
+import * as Constants from "constants/Constants";
 
 const { width } = Dimensions.get("window");
 const size = width / 2;
@@ -32,19 +33,15 @@ export default class CircularProgress extends Component<IProps, IState> {
 
   render() {
     return (
-      <TouchableWithoutFeedback
-        onPress={() => {
-          this.rand();
-        }}
-      >
+      <TouchableWithoutFeedback>
         <View style={{ marginLeft: 10 }}>
           <ProgressCircle
             percent={this.state.percent}
             radius={radius}
             borderWidth={10}
-            color="#2A1D59"
+            color={Constants.COLOUR_DODGER_BLUE}
             shadowColor="#999"
-            bgColor="#78738C"
+            bgColor={Constants.COLOUR_TAWNY_PORT}
           >
             <Text style={styles.gaugeText}>{this.state.percent + "%"}</Text>
           </ProgressCircle>

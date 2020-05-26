@@ -1,13 +1,21 @@
 /* *************************************** */
 // Import Modules
 import React, { Component } from "react";
-import { View, Image, TouchableOpacity } from "react-native";
+import { View, Image, TouchableOpacity, AppState } from "react-native";
 import { Container, Header, Content, Left, Right, Body } from "native-base";
 import { Icon, Text } from "react-native-elements";
 import { NavigationContainer, DrawerActions } from "@react-navigation/native";
 import { LinearGradient } from "expo-linear-gradient";
-import { createStackNavigator } from "@react-navigation/stack";
+import {
+  createStackNavigator,
+  TransitionPresets,
+} from "@react-navigation/stack";
 const Stack = createStackNavigator();
+// const forFade = ({ current, closing }) => ({
+//   // cardStyle: {
+//   //   opacity: current.progress,
+//   // },
+// });
 
 import {
   NavigationState,
@@ -21,11 +29,11 @@ import {
 import styles from "styles/Styles";
 import * as Constants from "constants/Constants";
 import db from "db/User";
-import LearningModule from "components/home-dashboard/LearningModule";
-import Module from "components/home-dashboard/Module";
-import Quiz from "components/home-dashboard/Quiz";
+import MyAVO from "components/home-dashboard/my-avo/MyAVO";
+import LearningModule from "components/home-dashboard/learning-modules/LearningModule";
+import Module from "components/home-dashboard/learning-modules/Module";
+import Quiz from "components/home-dashboard/learning-modules/Quiz";
 import Support from "components/home-dashboard/Support";
-import { PROFILE_PIC } from "images/Images";
 
 /* *************************************** */
 // Interface
@@ -34,15 +42,23 @@ interface IProps {
 }
 interface IState {
   initials?: string;
+  numberOfModules: number;
+  appState?: any;
 }
 
 export default class HomeScreen extends Component<IProps, IState> {
   constructor(props: IProps) {
     super(props);
-    this.state = { initials: "" };
+    this.state = {
+      initials: "",
+      numberOfModules: 0,
+      appState: AppState.currentState,
+    };
   }
 
   componentDidMount() {
+    AppState.addEventListener("change", this._handleAppStateChange);
+
     //Display initials
     db.grabUserDetails().then((data) => {
       if (data != null) {
@@ -57,11 +73,28 @@ export default class HomeScreen extends Component<IProps, IState> {
     this.fetchLeaningModules();
   }
 
+  componentWillUnmount() {
+    AppState.removeEventListener("change", this._handleAppStateChange);
+  }
+
+  _handleAppStateChange = (nextAppState) => {
+    this.grabCurrentDate();
+    if (
+      this.state.appState.match(/inactive|background/) &&
+      nextAppState === "active"
+    ) {
+      console.log("App has come to the foreground!. save this time");
+    }
+    console.log("App sent to the background!. save this time. ");
+    /// difference between both the times is the time spent by user on app
+    this.setState({ appState: nextAppState });
+  };
+
+  async grabCurrentDate() {
+    await db.getCurrentTime();
+  }
+
   async fetchLeaningModules() {
-    //let learningModulesAsList = await db.checkForLearningModules(Constants.PENTECH_LEARNING_MODULES.m1); //prettier-ignore
-    console.log(
-      "\n\n\n\n**************************************************************************\nSTART"
-    );
     //we first check if we have pre-existing learning modules
     let checkForLearningModules = await db.checkForLearningModuleData();
     console.log("checkForLearningModules = " + checkForLearningModules);
@@ -74,12 +107,12 @@ export default class HomeScreen extends Component<IProps, IState> {
 
       //save learning modules data
       await db.saveLearningModulesData(JSON.parse(jsonData));
-
-      //display learning module
     }
-    console.log(
-      "END\n**************************************************************************"
-    );
+
+    let rsLM = await db.grabAllLearningModulesData();
+    this.setState({
+      numberOfModules: rsLM.rows.length,
+    });
   }
 
   fetchUserInitials = () => {
@@ -125,7 +158,7 @@ export default class HomeScreen extends Component<IProps, IState> {
           }}
         >
           <LinearGradient
-            colors={["#522154", "#5f1f4a", "#721937"]}
+            colors={Constants.LINEAR_GRADIENT_MAIN}
             style={styles.homeDashboardGreeterContainer}
           >
             <Right style={styles.homeDashboardGreeterRightContent}>
@@ -145,11 +178,12 @@ export default class HomeScreen extends Component<IProps, IState> {
               onPress={() => navigation.navigate(page.screenName)}
             >
               <LinearGradient
-                colors={["#522154", "#5f1f4a", "#721937"]}
+                colors={Constants.LINEAR_GRADIENT_MAIN}
                 style={styles.homeDashboardItems}
               >
                 {page.icon}
                 <Text style={styles.homeDashboardContent}>
+                  {/* {page.numberOfModules} */}
                   {page.screenName}
                 </Text>
               </LinearGradient>
@@ -164,14 +198,24 @@ export default class HomeScreen extends Component<IProps, IState> {
         <Content contentContainerStyle={styles.rneContentHomeDashboard}>
           {/* *************************** */}
           {/* START */}
-          {/* <View style={{ paddingBottom: 10, width: "100%" }}>
-            <Text> </Text>
-          </View> */}
-          <Stack.Navigator>
+          <Stack.Navigator
+            // Makes the transition be like cards
+            screenOptions={() => ({
+              cardStyle: { backgroundColor: "transparent" },
+              cardOverlayEnabled: true,
+              ...TransitionPresets.SlideFromRightIOS,
+            })}
+            mode="modal"
+          >
             <Stack.Screen
-              name={Constants.HOME_SCREEN_MY_AVO}
+              name={Constants.HOME_SCREEN_MAIN}
               component={homeScreenLinkComponents}
               options={this.homeScreenHeaderOptions}
+            />
+            <Stack.Screen
+              name={Constants.HOME_SCREEN_MY_AVO}
+              component={MyAVO}
+              options={this.learningModuleHeaderOptions}
             />
             <Stack.Screen
               name={Constants.HOME_SCREEN_LEARNING_MODULES}
@@ -188,16 +232,6 @@ export default class HomeScreen extends Component<IProps, IState> {
               component={Quiz}
               options={this.learningModuleHeaderOptions}
             />
-            {/* <Stack.Screen
-              name={Constants.HOME_SCREEN_INTERACTIVE_STORIES}
-              component={LearningModule}
-              options={this.learningModuleHeaderOptions}
-            /> */}
-            {/* <Stack.Screen
-              name={Constants.HOME_SCREEN_STATISTICS}
-              component={LearningModule}
-              options={this.learningModuleHeaderOptions}
-            /> */}
             <Stack.Screen
               name={Constants.HOME_SCREEN_SUPPORT}
               component={Support}
@@ -213,6 +247,8 @@ export default class HomeScreen extends Component<IProps, IState> {
 
   //* *************************************** */
   // Below are the header options used for => <Stack.Screen options={myCustomOptions}>
+
+  //Constants.HOME_SCREEN_MAIN
   homeScreenHeaderOptions = ({ navigation }) => ({
     headerStyle: { backgroundColor: Constants.COLOUR_EBONY },
     headerTitleAllowFontScaling: true,
@@ -234,12 +270,32 @@ export default class HomeScreen extends Component<IProps, IState> {
     ),
   });
 
+  //Constants.HOME_SCREEN_LEARNING_MODULES
   learningModuleHeaderOptions = ({}) => ({
     headerStyle: { backgroundColor: Constants.COLOUR_EBONY },
     headerTintColor: "white",
     headerTitleStyle: {
       color: "white",
     },
+  });
+
+  //Constants.MODULE
+  moduleHeaderOptions = ({ navigation }) => ({
+    headerStyle: { backgroundColor: Constants.COLOUR_EBONY },
+    headerTintColor: "white",
+    headerTitleStyle: {
+      color: "white",
+    },
+    headerLeft: () => (
+      <View style={{ marginLeft: 10 }}>
+        <Icon
+          name="arrow-left"
+          type="material-community"
+          color="white"
+          onPress={() => navigation.goBack()}
+        />
+      </View>
+    ),
   });
 }
 

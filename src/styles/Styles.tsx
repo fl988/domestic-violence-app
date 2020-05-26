@@ -390,6 +390,69 @@ export default StyleSheet.create({
     height: PAGE_HEIGHT / 11,
     width: PAGE_WIDTH / 1.15,
   },
+
+  // Question
+  quizzesPageContainer: {
+    display: "flex",
+    alignContent: "center",
+    justifyContent: "center",
+    alignItems: "center",
+    paddingBottom: 10,
+  },
+  quizzesPageContent: {
+    // flex: 1, //this will fill out the remaining spaces, don't need it for now.
+    flex: 1,
+    marginTop: 12,
+    borderRadius: 8,
+    height: "auto",
+    width: PAGE_WIDTH - 36, // Page width / 2 then we take the margin into consideration which in this case is on the left. We want 3 of them which is 12 * 3 = 36.
+    backgroundColor: Constants.COLOUR_EAST_BAY, //"rgba(255,255,255, 0.3)",
+  },
+  learningModulePageContainer2: {
+    marginTop: 12,
+    borderRadius: 8,
+    height: "auto",
+    width: PAGE_WIDTH - 36,
+    backgroundColor: Constants.COLOUR_EAST_BAY,
+  },
+  learningModulePageContent2: {
+    display: "flex",
+    flexDirection: "row",
+    margin: 8,
+    paddingLeft: 20,
+    paddingRight: 20,
+  },
+  quizzesPageHeader: {
+    color: Constants.COLOUR_WHITE,
+    paddingTop: 16,
+    paddingLeft: 16,
+    paddingBottom: 16,
+    fontSize: PAGE_WIDTH / 18,
+    fontWeight: "bold",
+    // alignSelf: "flex-start",
+    // justifyContent: "flex-start",
+  },
+  quizzesPageBody: {
+    color: Constants.COLOUR_WHITE,
+    fontSize: PAGE_WIDTH / 21,
+    // textAlign: "justify",
+    lineHeight: 30,
+    paddingTop: 8,
+    paddingRight: 16,
+    paddingLeft: 16,
+    paddingBottom: 16,
+    // alignSelf: "flex-start",
+    // justifyContent: "space-between",
+    // borderTopColor: "black",
+    // borderTopWidth: 1,
+    // textAlign: "justify",
+  },
+  textFormatCentre: {
+    color: Constants.COLOUR_WHITE,
+    fontSize: PAGE_WIDTH / 21,
+    lineHeight: 30,
+    textAlign: "center",
+  },
   /*************************************/
 
   /*************************************/

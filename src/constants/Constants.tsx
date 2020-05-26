@@ -12,6 +12,18 @@ export const COLOUR_TOPAZ = "#78738C";
 export const COLOUR_EAST_BAY = "#3f4283";
 export const COLOUR_WINE_BERRY = "#56203b";
 export const COLOUR_DOVE_GRAY = "#707070";
+export const COLOUR_DODGER_BLUE = "#2196f3";
+export const COLOUR_FERN = "#5cb85c";
+export const COLOUR_JELLY_BEAN = "#d9534f";
+export const COLOUR_BOSSANOVA = "#522154";
+export const COLOUR_TAWNY_PORT = "#5f1f4a";
+export const COLOUR_CLARET = "#721937";
+
+export const LINEAR_GRADIENT_MAIN = [
+  COLOUR_BOSSANOVA,
+  COLOUR_TAWNY_PORT,
+  COLOUR_CLARET,
+];
 
 /****************************************************************************************************************************/
 // AVO User Type Const
@@ -72,7 +84,13 @@ export const PENTECH_LEARNING_MODULES = {
 };
 
 /****************************************************************************************************************************/
+// Learning Modules
+export const QTYPE_TRUE_OR_FALSE             = 1; // prettier-ignore
+export const QTYPE_MULTIPLE_CHOICE           = 2; // prettier-ignore
+
+/****************************************************************************************************************************/
 // Home Screen
+export const HOME_SCREEN_MAIN                = "Home Dashboard"; // prettier-ignore
 export const HOME_SCREEN_MY_AVO              = "My AVO"; // prettier-ignore
 export const HOME_SCREEN_LEARNING_MODULES    = "Learning Modules"; // prettier-ignore
 export const HOME_SCREEN_INTERACTIVE_STORIES = "Interactive Stories"; // prettier-ignore

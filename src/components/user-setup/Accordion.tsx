@@ -11,9 +11,11 @@ import db from "db/User";
 import styles from "styles/Styles";
 
 interface IProps {
+  checkBoxDisabled?: boolean;
   conditionNumber?: number;
   title?: string;
   data?: string;
+  alreadySelected?: boolean;
   mandatory?: boolean;
   specialCondition?: boolean;
   onPressTest?: FunctionComponent;
@@ -58,6 +60,25 @@ export default class Accordion extends Component<IProps, IState> {
     // db.grabUserDetailsOnConsole();
   };
 
+  checkBoxComponent = () => {
+    if (this.props.checkBoxDisabled) {
+      return;
+    }
+    return (
+      <CheckBox
+        title="Click Here"
+        onClick={() => {
+          this.setState({
+            isChecked: !this.state.isChecked,
+          });
+          this.conditionKeyHandler(this.state.conditionNumber);
+        }}
+        isChecked={this.props.mandatory ? true : this.state.isChecked}
+        checkBoxColor="#fff"
+      />
+    );
+  };
+
   render() {
     return (
       <View style={{ paddingBottom: 8 }}>
@@ -76,20 +97,10 @@ export default class Accordion extends Component<IProps, IState> {
           }}
           onPress={() => {
             this.toggleExpand();
-            this.props.onPressTest(!this.state.expanded);
+            // this.props.onPressTest(!this.state.expanded);
           }}
         >
-          <CheckBox
-            title="Click Here"
-            onClick={() => {
-              this.setState({
-                isChecked: !this.state.isChecked,
-              });
-              this.conditionKeyHandler(this.state.conditionNumber);
-            }}
-            isChecked={this.props.mandatory ? true : this.state.isChecked}
-            checkBoxColor="#fff"
-          />
+          {this.checkBoxComponent()}
           {/* styles.font is still empty */}
           <Text
             style={[styles.accordionTitle, { color: Constants.COLOUR_WHITE }]}

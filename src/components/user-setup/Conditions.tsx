@@ -50,6 +50,8 @@ export default class Conditions extends Component<IProps, IState> {
     let isUserAlreadySet = await db.checkUserSetUp();
 
     if (!isUserAlreadySet) {
+      let count = await db.getConditionRecordCount();
+      count > 9 ? await db.deleteCondition() : "";
       for (let x = 0; x < Constants.CONT_PENTECH_CONDITIONS_ARR.length; x++) {
         const apiKey = Constants.CONT_PENTECH_CONDITIONS_ARR[x];
 
@@ -70,18 +72,13 @@ export default class Conditions extends Component<IProps, IState> {
         //   });
         // }
 
-        //get the current row count of 'condition' table. Wait query to finish then continue loop.
-        let count = await db.getConditionRecordCount();
-        if (count <= 9) {
-          //we insert the data that we got from the api. Only 10 conditions currently exist.
-          await db.insertConditionRecord(
-            data.conditionNumber,
-            data.conditionSummary,
-            data.conditionText,
-            x == 0, // 1st condition is always true
-            x == 0 // 1st condition is always mandatory
-          );
-        }
+        await db.insertConditionRecord(
+          data.conditionNumber,
+          data.conditionSummary,
+          data.conditionText,
+          x == 0, // 1st condition is always true
+          x == 0 // 1st condition is always mandatory
+        );
       }
     }
   }
@@ -94,9 +91,11 @@ export default class Conditions extends Component<IProps, IState> {
       // loop through each of the condition.
       for (let x = 0; x < rsCond.rows.length; x++) {
         let item = rsCond.rows.item(x);
+        let condSum = item.conditionSummary;
+        if (condSum.length > 18) condSum = condSum.slice(0, 15) + "...";
         conditionsArr[x] = {
           conditionNumber: item.conditionNumber,
-          title: "\tCondition " + item.conditionNumber,
+          title: "\tCondition " + item.conditionNumber + " ( " + condSum + " )", //prettier-ignore
           data: (
             <>
               <Text style={{ fontWeight: "bold" }}>
@@ -105,6 +104,7 @@ export default class Conditions extends Component<IProps, IState> {
               <Text>{item.conditionText}</Text>
             </>
           ),
+          alreadySelected: item.conditionSelected,
           mandatory: item.conditionMandatory,
         };
       }
@@ -132,12 +132,14 @@ export default class Conditions extends Component<IProps, IState> {
         items.push(
           <Accordion
             key={x}
+            checkBoxDisabled={false}
             conditionNumber={avoConditions[x].conditionNumber}
             title={avoConditions[x].title}
             data={avoConditions[x].data}
+            alreadySelected={avoConditions[x].alreadySelected}
             mandatory={avoConditions[x].mandatory}
             specialCondition={avoConditions[x].specialCondition}
-            onPressTest={this.scrollOnChange}
+            // onPressTest={this.scrollOnChange}
           />
         );
       }

@@ -1,8 +1,16 @@
 /* *************************************** */
 // Import Modules
 import React, { Component, ReactComponentElement, ReactFragment } from "react";
-import { View, Text, Image, TouchableOpacity, Alert } from "react-native";
+import {
+  View,
+  Text,
+  ScrollView,
+  TouchableOpacity,
+  Dimensions,
+  ActivityIndicator,
+} from "react-native";
 import { Container, Header, Content, Left, Right, Body } from "native-base";
+import { LinearGradient } from "expo-linear-gradient";
 import { Icon } from "react-native-elements";
 // import { DrawerActions } from "@react-navigation/native";
 import {
@@ -10,15 +18,16 @@ import {
   NavigationParams,
   NavigationScreenProp,
 } from "react-navigation"; //React Navigation with TypeScript => https://dev.to/andreasbergqvist/react-navigation-with-typescript-29ka
-
+import { useNavigation, useNavigationState } from "@react-navigation/native";
 /* *************************************** */
 // Import Custom Components
 import * as Constants from "constants/Constants";
 import styles from "styles/Styles";
 import db from "db/User";
-import CircularProgress from "components/home-dashboard/CircularProgress";
+import CircularProgress from "components/home-dashboard/learning-modules/CircularProgress";
 import CustomModal from "components/user-setup/CustomModal";
-import { PROFILE_PIC } from "images/Images";
+
+const PAGE_WIDTH = Dimensions.get("window").width;
 
 /* *************************************** */
 // Interface
@@ -76,6 +85,9 @@ export default class LearningModule extends Component<IProps, IState> {
   }
 
   componentDidMount() {
+    this.props.navigation.addListener("focus", () => {
+      this.reRenderComponentWhenBack();
+    });
     this.init();
   }
 
@@ -86,8 +98,13 @@ export default class LearningModule extends Component<IProps, IState> {
       for (let x = 0; x < rsLM.rows.length; x++) {
         let item: any = rsLM.rows.item(x);
 
+        let progress = await db.grabLearningModuleProgress(item.learningModuleId); //prettier-ignore
+        if (!item.finished && progress == 100) {
+          progress = parseFloat((progress - progress / (rsLM.rows.length + 1)).toFixed(0)); //prettier-ignore
+        }
+
         pagesObjArr.push({
-          progressGauge: <CircularProgress percent={5} />, //TODO: Make this guage dynamic.
+          progressGauge: <CircularProgress percent={progress} />, //TODO: Make this guage dynamic.
           learningModuleId: item.learningModuleId,
           moduleTitle: item.moduleTitle,
           moduleSummary: item.moduleSummary,
@@ -102,6 +119,23 @@ export default class LearningModule extends Component<IProps, IState> {
       });
     }
   }
+
+  reRenderComponentWhenBack = () => {
+    this.setState({
+      pages: [
+        {
+          progressGauge: <></>,
+          learningModuleId: 0,
+          moduleTitle: "Title",
+          moduleSummary: "Summary Title",
+          quizTopic: "Topic",
+          moduleContent: "Contents",
+          locked: true,
+        },
+      ],
+    });
+    this.init();
+  };
 
   someAction = () => {};
 
@@ -124,46 +158,67 @@ export default class LearningModule extends Component<IProps, IState> {
     }
   };
 
+  mainComponent = () => {
+    let component: any = <ActivityIndicator></ActivityIndicator>;
+    if (this.state.pages[0].learningModuleId != 0) {
+      component = this.state.pages.map((page, x) => (
+        <LinearGradient
+          key={x}
+          colors={Constants.LINEAR_GRADIENT_MAIN}
+          style={styles.learningModulePageContainer2}
+        >
+          <View style={styles.learningModulePageContent2}>
+            <Left style={styles.learningModuleItemLeft}>
+              {page.progressGauge}
+            </Left>
+            <Body style={styles.learningModuleItemBody}>
+              <TouchableOpacity
+                style={styles.learningModuleItemBodyContents}
+                onPress={() => {
+                  this.modalVisibleHandler(page.locked);
+                  this.moduleHandler(page);
+                }}
+              >
+                <Body>
+                  <Text style={styles.lmText}>{page.moduleTitle}</Text>
+                  <Text style={styles.lmText}>{page.quizTopic}</Text>
+                </Body>
+              </TouchableOpacity>
+            </Body>
+          </View>
+        </LinearGradient>
+      ));
+    }
+
+    return component;
+  };
+
   render() {
     return (
       <Container style={styles.bgPurple1}>
         <Content contentContainerStyle={styles.rneContent}>
           {/* *************************** */}
           {/* START */}
-          <View style={{ paddingTop: 10 }}>{/* Empty Space */}</View>
-          {this.state.pages.map((page, x) => (
-            <View key={x} style={styles.learningModuleItem}>
-              <Left style={styles.learningModuleItemLeft}>
-                {page.progressGauge}
-              </Left>
-              <Body style={styles.learningModuleItemBody}>
-                <TouchableOpacity
-                  style={styles.learningModuleItemBodyContents}
-                  onPress={() => {
-                    this.modalVisibleHandler(page.locked);
-                    this.moduleHandler(page);
-                  }}
-                >
-                  <Body>
-                    <Text style={styles.lmText}>{page.moduleTitle}</Text>
-                    <Text style={styles.lmText}>{page.quizTopic}</Text>
-                  </Body>
-                </TouchableOpacity>
-              </Body>
-            </View>
-          ))}
-          <CustomModal
-            action={this.someAction}
-            modalVisible={this.state.modalVisible}
-            modalVisibleHandler={this.modalVisibleHandler}
-            modalHeader={"Confirmation"}
-            modalBody={
-              "\n\n\nYou have not completed the previous module yet.\n\n\n\n\n"
-            }
-            styleVersion={2}
-          />
+
           {/* END */}
           {/* *************************** */}
+
+          <ScrollView
+            contentContainerStyle={styles.learningModulePageContainer}
+          >
+            <View style={{ paddingTop: 10 }}>{/*SPACING*/}</View>
+            {this.mainComponent()}
+            <CustomModal
+              action={this.someAction}
+              modalVisible={this.state.modalVisible}
+              modalVisibleHandler={this.modalVisibleHandler}
+              modalHeader={"Confirmation"}
+              modalBody={
+                "\n\n\nYou have not completed the previous module yet.\n\n\n\n\n"
+              }
+              styleVersion={2}
+            />
+          </ScrollView>
         </Content>
       </Container>
     );

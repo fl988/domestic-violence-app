@@ -54,7 +54,7 @@ const InitialsInput = (props) => {
   return (
     <View style={myStyles.frame}>
       <LinearGradient
-        colors={["#522154", "#5f1f4a", "#721937"]}
+        colors={Constants.LINEAR_GRADIENT_MAIN}
         style={myStyles.sectionStyle}
       >
         <TextInput

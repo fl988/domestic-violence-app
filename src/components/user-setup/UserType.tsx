@@ -44,18 +44,6 @@ const UserType = (props) => {
   return (
     <View style={styles.frame}>
       {/***********************************************************************************************/}
-      {/* MODAL */}
-      <CustomModal
-        modalVisible={modalVisible}
-        modalVisibleHandler={modalVisibleHandler}
-        modalHeader={"Confirmation"}
-        modalBody={
-          "Could you please confirm if your details below are all correct. \n\n" +
-          getUserDetails
-        }
-      />
-
-      {/***********************************************************************************************/}
       {/* JUST LEARNING BUTTON */}
 
       <CustomTextInput

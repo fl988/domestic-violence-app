@@ -1,9 +1,22 @@
 // import React, { Component } from "react";
-import { Text, RecyclerViewBackedScrollView } from "react-native";
+import { Text } from "react-native";
 import * as Constants from "constants/Constants";
+import * as Helper from "components/Helper";
 import { openDatabase } from "expo-sqlite";
-import { ContentfulClient, ContentfulProvider } from "react-contentful";
-const db = openDatabase("dbUser1");
+const db = openDatabase("dbUser79");
+
+interface questionJSONStructure {
+  userAnswerCorrect: boolean;
+  finished: boolean;
+  questionNumber: number;
+  learningModuleId: number;
+  questionId: number;
+  qType: number;
+  question: string;
+  formHorizontal: boolean;
+  radio_props: any;
+}
+interface questionJSONArray extends Array<questionJSONStructure> {}
 
 class User {
   /****************************************************************************************************************************************************/
@@ -12,7 +25,7 @@ class User {
   //   // This API call will request an entry with the specified ID from the space defined at the top, using a space-specific access token. ie. the Conditions.
   //   // We then start building our own custom json object array.
 
-  async fetchData(apiKey: String) {
+  async fetchData(apiKey: String): Promise<any> {
     const contentful = require("contentful/dist/contentful.browser.min.js");
     const client = contentful.createClient({
       space: Constants.AUTH_PENTECH_SPACE_ID,
@@ -94,17 +107,28 @@ class User {
     qType: number,
     questionLabel: string,
     questionStatement: string,
-    questionAnswer: string,
+    questionAnswer: boolean,
     question: string,
     answer: string
   ): Promise<number> {
     return new Promise((resolve, reject) => {
       try {
-        let thisQuestion = questionStatement, thisAnswer = questionAnswer; //prettier-ignore
+        let parameters = [
+          learningModuleId,
+          qType,
+          questionLabel,
+          questionStatement,
+          questionAnswer,
+        ];
         let questionField = "questionStatement", answerField = "questionAnswer"; //prettier-ignore
-        if (questionStatement == "") {
-          thisQuestion = question;
-          thisAnswer = answer;
+        if (qType == Constants.QTYPE_MULTIPLE_CHOICE) {
+          parameters = [
+            learningModuleId,
+            qType,
+            questionLabel,
+            question,
+            answer,
+          ];
           questionField = "question";
           answerField = "answer";
         }
@@ -114,10 +138,10 @@ class User {
             "INSERT INTO " +
               " questions(learningModuleId, qType, questionLabel, " + questionField + ", " + answerField + ") " +
               " VALUES(?,?,?,?,?)",
-            [learningModuleId, qType, questionLabel, thisQuestion, thisAnswer],
-            function(tx, success) { console.log("insertQuestion SUCCESS!") /* success */}, // prettier-ignore
-            function (tx, error) {
-              console.log("error insertConditionRecord");
+            parameters,
+          (tx, success) => { console.log("insertQuestion SUCCESS!") /* success */}, // prettier-ignore
+            (tx, error) => {
+              console.log("error insertConditionRecord = " + error);
               return false;
             }
           ); //prettier-ignore
@@ -188,12 +212,27 @@ class User {
     });
   }
 
+  grabLearningModuleById(learningModuleId: number): Promise<SQLResultSet> {
+    return new Promise((resolve, reject) => {
+      try {
+        db.transaction((tx) => {
+          tx.executeSql(
+            "SELECT * FROM learningModules WHERE learningModuleId = ? ;",
+            [learningModuleId],
+            (trans, rs) => { resolve(rs); }, // prettier-ignore
+            (tx, error) => { console.log("learningModules does NOT EXIST!."); return false;} // prettier-ignore
+          );
+        });
+      } catch (error) {}
+    });
+  }
+
   grabAllLearningModulesData(): Promise<SQLResultSet> {
     return new Promise((resolve, reject) => {
       try {
         db.transaction((tx) => {
           tx.executeSql(
-            "SELECT * FROM learningModules;",
+            "SELECT * FROM learningModules ORDER by learningModuleId DESC;",
             [],
             (trans, rs) => { resolve(rs); }, // prettier-ignore
             (tx, error) => {console.log("learningModules does NOT EXIST!."); return false;} // prettier-ignore
@@ -203,18 +242,223 @@ class User {
     });
   }
 
+  grabLearningModuleQuestionItemsAsArray(
+    learningModuleId: number,
+    finished: boolean
+  ): Promise<questionJSONArray> {
+    return new Promise(async (resolve, reject) => {
+      try {
+        let questionItemsArr = [], existingRecord = true; //prettier-ignore
+
+        let rs = await this.grabExistingLearningModuleQuestionsById(learningModuleId); //prettier-ignore
+        if (rs == null) {
+          //If no existing learning module questions, we then just grab all questions without any answers yet.
+          rs = await this.grabLearningModuleQuestionsById(learningModuleId); //prettier-ignore
+          existingRecord = false;
+        }
+
+        //Start for Loop
+        //Firstly check for existing learning module questions that already has some user answers.
+        for (let x = 0; x < rs.rows.length; x++) {
+          let item: any = rs.rows.item(x);
+          let question = "", choices = [{}], questionNumber = -1, qTypeInt = parseInt(item.qType); //prettier-ignore
+
+          if (existingRecord) {
+            if (qTypeInt == Constants.QTYPE_TRUE_OR_FALSE) {
+              questionNumber = item.questionNumber;
+              question = item.questionStatement;
+              choices = [
+                { label: "True", value: 1 },
+                { label: "False", value: 0 },
+              ];
+            } else {
+              question = item.question;
+              let rsAnswers = await this.grabQuestionAnswersByIdAndQType(item.questionId, qTypeInt); //prettier-ignore
+              if (rsAnswers != null && rsAnswers.rows.length > 0) {
+                for (let y = 0; y < rsAnswers.rows.length; y++) {
+                  let answerItem = rsAnswers.rows.item(y);
+                  if (item.userAnswer == answerItem.answer) {
+                    questionNumber = y;
+                  }
+                  choices[y] = { label: answerItem.answer, value: answerItem.answer }; //prettier-ignore
+                }
+              }
+            }
+          } else {
+            let rsUserAnswer = await this.grabUserAnswerByIdAndQId( learningModuleId, item.questionId ); //prettier-ignore
+            if (qTypeInt == Constants.QTYPE_TRUE_OR_FALSE) {
+              if (rsUserAnswer.rows.length > 0) {
+                questionNumber = Helper.ctb(rsUserAnswer.rows.item(0).questionNumber); //prettier-ignore
+              }
+              question = item.questionStatement;
+              choices = [
+                { label: "True", value: 1 },
+                { label: "False", value: 0 },
+              ];
+            } else {
+              question = item.question;
+              let rsAnswers = await this.grabQuestionAnswersByIdAndQType(item.questionId, qTypeInt); //prettier-ignore
+              if (rsAnswers != null && rsAnswers.rows.length > 0) {
+                for (let y = 0; y < rsAnswers.rows.length; y++) {
+                  let answerItem = rsAnswers.rows.item(y);
+                  if (rsUserAnswer.rows.length > 0 && rsUserAnswer.rows.item(0).questionNumber == y) {
+                  questionNumber = rsUserAnswer.rows.item(0).questionNumber;
+                } //prettier-ignore
+                  choices[y] = { label: answerItem.answer, value: answerItem.answer, }; //prettier-ignore
+                }
+              }
+            }
+          }
+
+          questionItemsArr.push({
+            userAnswerCorrect: item.userAnswerCorrect,
+            finished: finished,
+            questionNumber: questionNumber,
+            learningModuleId: item.learningModuleId,
+            questionId: item.questionId,
+            qType: qTypeInt,
+            question: question,
+            formHorizontal: qTypeInt == Constants.QTYPE_TRUE_OR_FALSE,
+            radio_props: choices,
+          });
+        } //End for Loop
+
+        resolve(questionItemsArr);
+      } catch (err) {}
+    });
+  }
+
+  grabExistingLearningModuleQuestionsById(
+    learningModuleId: number
+  ): Promise<SQLResultSet> {
+    return new Promise(async (resolve, reject) => {
+      try {
+        let rsUserAnswer = await this.grabUserAnswerById(learningModuleId);
+        let rsQuestions = await this.grabQuestionsById(learningModuleId);
+        if (rsUserAnswer.rows.length > 0 && (rsUserAnswer.rows.length == rsQuestions.rows.length)) {
+          let existingLMQWUA = await this.grabExistingLearningModuleQuestionsWithUserAnswers(learningModuleId);
+          resolve(existingLMQWUA);
+        } else {
+          resolve(null);
+        } //prettier-ignore
+      } catch (error) {}
+    });
+  }
+
   grabLearningModuleQuestionsById(
+    learningModuleId: number
+  ): Promise<SQLResultSet> {
+    return new Promise((resolve, reject) => {
+      db.transaction((tx) => {
+        tx.executeSql(
+          "SELECT lm.learningModuleId, q.questionId, q.questionStatement, q.questionAnswer, q.question, q.answer, q.qType " +
+            "FROM learningModules lm JOIN questions q " +
+            "ON lm.learningModuleId = q.learningModuleId " +
+            "WHERE lm.learningModuleId = ? ;",
+          [learningModuleId],
+          (trans, rs) => {
+            resolve(rs);
+          },
+          (tx, error) => {console.log("either learningModules or questions does NOT EXIST!. " + error); return false;} // prettier-ignore
+        );
+      });
+    });
+  }
+
+  grabExistingLearningModuleQuestionsWithUserAnswers(
     learningModuleId: number
   ): Promise<SQLResultSet> {
     return new Promise((resolve, reject) => {
       try {
         db.transaction((tx) => {
           tx.executeSql(
-            "SELECT * FROM learningModules lm JOIN questions q ON lm.learningModuleId = q.learningModuleId " +
-              "WHERE lm.learningModuleId = ? ;",
+            "SELECT lm.learningModuleId, q.questionId, q.questionStatement, q.questionAnswer, q.question, q.answer, q.qType, ua.userAnswer, ua.questionNumber, ua.userAnswerCorrect " +
+              "FROM learningModules lm JOIN questions q " +
+              "ON lm.learningModuleId = q.learningModuleId " +
+              "JOIN userAnswer ua ON ua.questionId = q.questionId " +
+              "WHERE lm.learningModuleId = ? ORDER BY q.questionId ASC;",
+            [learningModuleId],
+            (trans, rs) => {
+              resolve(rs);
+            },
+            (tx, error) => {console.log("either learningModules or questions does NOT EXIST!. " + error); return false;} // prettier-ignore
+          );
+        });
+      } catch (err) {}
+    });
+  }
+
+  grabExistingLearningModuleQuestionsWithUserAnswersSingle(
+    learningModuleId: number,
+    qId: number
+  ): Promise<SQLResultSet> {
+    return new Promise((resolve, reject) => {
+      try {
+        db.transaction((tx) => {
+          tx.executeSql(
+            "SELECT lm.learningModuleId, q.questionId, q.questionStatement, q.questionAnswer, q.question, q.answer, q.qType, ua.userAnswer, ua.questionNumber, ua.userAnswerCorrect " +
+              "FROM learningModules lm JOIN questions q " +
+              "ON lm.learningModuleId = q.learningModuleId " +
+              "JOIN userAnswer ua ON ua.questionId = q.questionId " +
+              "WHERE lm.learningModuleId = ? AND q.questionId = ? ;",
+            [learningModuleId, qId],
+            (trans, rs) => {
+              resolve(rs);
+            },
+            (tx, error) => {console.log("either learningModules or questions does NOT EXIST!. " + error); return false;} // prettier-ignore
+          );
+        });
+      } catch (err) {}
+    });
+  }
+
+  grabQuestionsById(learningModuleId: number): Promise<SQLResultSet> {
+    return new Promise((resolve, reject) => {
+      try {
+        db.transaction((tx) => {
+          tx.executeSql(
+            "SELECT * FROM questions WHERE learningModuleId = ? ;",
             [learningModuleId],
             (trans, rs) => { resolve(rs); }, // prettier-ignore
-            (tx, error) => {console.log("either learningModules or questions does NOT EXIST!."); return false;} // prettier-ignore
+            (tx, error) => {console.log("answers table does NOT EXIST!. " + error); return false;} // prettier-ignore
+          );
+        });
+      } catch (error) {}
+    });
+  }
+
+  grabQuestionsByLMIDAndQID(
+    learningModuleId: number,
+    questionId: number
+  ): Promise<SQLResultSet> {
+    return new Promise((resolve, reject) => {
+      try {
+        db.transaction((tx) => {
+          tx.executeSql(
+            "SELECT * FROM questions WHERE learningModuleId = ? AND questionId = ? ORDER BY questionId ASC;",
+            [learningModuleId, questionId],
+            (trans, rs) => { resolve(rs); }, // prettier-ignore
+            (tx, error) => { console.log("answers table does NOT EXIST!. " + error); return false;} // prettier-ignore
+          );
+        });
+      } catch (error) {}
+    });
+  }
+
+  grabQuestionAnswersByIdAndQType(
+    questionId: number,
+    qType: number
+  ): Promise<SQLResultSet> {
+    return new Promise((resolve, reject) => {
+      try {
+        db.transaction((tx) => {
+          tx.executeSql(
+            "SELECT * " +
+              "FROM answers " +
+              "WHERE questionId = ? AND qType = ? ;",
+            [questionId, qType],
+            (trans, rs) => { resolve(rs); }, // prettier-ignore
+            (tx, error) => {console.log("answers table does NOT EXIST!. " + error); return false;} // prettier-ignore
           );
         });
       } catch (error) {}
@@ -313,14 +557,14 @@ class User {
           console.log(jd[x].moduleTitle + " has a total of " + qs.length + " quizzes.") //prettier-ignore
           for (let y = 0; y < qs.length; y++) {
             let questionId: number = 0;
-            if (qs[y].qType == 1) {
+            if (qs[y].qType == Constants.QTYPE_TRUE_OR_FALSE) {
               //T or F question type
               questionId = await this.insertQuestion(
                 learningModuleId,
                 qs[y].qType,
                 qs[y].questionLable,
-                jd[x].questionStatement,
-                jd[x].questionAnswer,
+                qs[y].questionStatement,
+                qs[y].questionAnswer,
                 "",
                 ""
               );
@@ -338,9 +582,9 @@ class User {
                 qs[y].qType,
                 qs[y].questionLable,
                 "",
-                "",
-                jd[x].question,
-                jd[x].answer
+                null,
+                qs[y].question,
+                qs[y].answer
               );
 
               //Loop through Answers
@@ -363,6 +607,23 @@ class User {
   /****************************************************************************************************************************************************/
 
   /****************************************************************************************************************************************************/
+
+  /****************************************************************************************************************************************************/
+  getCurrentTime(): Promise<SQLResultSet> {
+    return new Promise((resolve, reject) => {
+      try {
+        db.transaction((tx) => {
+          tx.executeSql(
+            "SELECT strftime('%Y','now') as year, strftime( '%m','now' ) as month;",
+            [],
+            (trans, rs) => { resolve(rs)}, // prettier-ignore
+            (tx, error) => { return false;} // prettier-ignore
+          );
+        });
+      } catch (error) {}
+    });
+  }
+  /****************************************************************************************************************************************************/
   //Checks if a user has already done their personal set up. Returns a boolean;
   checkUserSetUp() {
     return new Promise((resolve, reject) => {
@@ -372,7 +633,7 @@ class User {
             "SELECT userSetUp FROM user;",
             [],
             (trans, rs) => { resolve(rs.rows.item(0).userSetUp == true); }, // prettier-ignore
-            (tx, error) => { resolve(false); return false;} // prettier-ignore
+            (tx, error) => { console.log("checkUserSetUp FAIL = " + error); resolve(false); return false;} // prettier-ignore
           );
         });
       } catch (error) {}
@@ -390,6 +651,29 @@ class User {
             [],
             (trans, rs) => { resolve(rs.rows.item(0).completeOnboarding == true); }, // prettier-ignore
             (tx, error) => { resolve(false); return false; } // prettier-ignore
+          );
+        });
+      } catch (error) {}
+    });
+  }
+
+  /****************************************************************************************************************************************************/
+  //Reads user's condition from 'user' table. Returns an array of conditions;
+  grabUserCondition(): Promise<SQLResultSet> {
+    return new Promise((resolve, reject) => {
+      try {
+        db.transaction((tx) => {
+          tx.executeSql(
+            "SELECT * FROM user u JOIN condition c ON u.userId = c.userId WHERE c.conditionSelected = 1; ",
+            [],
+            (trans, rs) => {
+              // console.log(rs);
+              resolve(rs);
+            },
+            (tx, error) => {
+              console.log("error grabUserConditionsAsArray = " + error);
+              return false;
+            }
           );
         });
       } catch (error) {}
@@ -499,7 +783,7 @@ class User {
       db.transaction((tx) => {
         tx.executeSql(
           "CREATE TABLE IF NOT EXISTS user (" +
-            "id INTEGER PRIMARY KEY NOT NULL, " +
+            "userId INTEGER PRIMARY KEY NOT NULL, " +
             "initials TEXT DEFAULT 'XX', " +
             "dob TEXT DEFAULT (datetime('now')), " +
             "userTypeId INT DEFAULT 0, " +
@@ -522,12 +806,14 @@ class User {
       db.transaction((tx) => {
         tx.executeSql(
           "CREATE TABLE IF NOT EXISTS condition (" +
-            "id INTEGER PRIMARY KEY NOT NULL, " +
+            "conditionId INTEGER PRIMARY KEY NOT NULL, " +
+            "userId INT NULL DEFAULT 1, " +
             "conditionNumber INT DEFAULT 0, " +
             "conditionSummary TEXT DEFAULT '', " +
             "conditionText TEXT DEFAULT '', " +
             "conditionSelected BOOLEAN DEFAULT 0, " +
-            "conditionMandatory BOOLEAN DEFAULT 0 " +
+            "conditionMandatory BOOLEAN DEFAULT 0, " +
+            "FOREIGN KEY(userId) REFERENCES user(userId) " +
             ");",
           [],
           (tx, success) => {console.log("SUCCESS createCondition! = " + success)/* success */}, // prettier-ignore
@@ -567,8 +853,8 @@ class User {
             " user(initials, dob, userTypeId) " +
             " VALUES('','','')",
           [],
-          function(tx, success) {/* success */}, // prettier-ignore
-          function (tx, error) {
+          (tx, success) => {/* success */}, // prettier-ignore
+          (tx, error) => {
             console.log("error insertUserDefaultRecord = " + error);
             return false;
           }
@@ -593,9 +879,9 @@ class User {
             " condition(conditionNumber, conditionSummary, conditionText, conditionSelected, conditionMandatory) " +
             " VALUES(?,?,?,?,?)",
           [condNumber, condSummary, condText, conditionSelected, condMandatory],
-          function(tx, success) {/* success */}, // prettier-ignore
-          function (tx, error) {
-            console.log("error insertConditionRecord");
+          (tx, success) => {console.log("SUCCESS")/* success */}, // prettier-ignore
+          (tx, error) => {
+            console.log("error insertConditionRecord = " + error);
             return false;
           }
         );
@@ -609,7 +895,10 @@ class User {
         db.transaction((tx) => {
           tx.executeSql("SELECT * FROM condition;", [], (trans, rs) => {
             resolve(rs.rows.length);
-          });
+          }),
+            (tx, error) => {
+              console.log("checkUserSetUp FAIL = " + error);
+            };
         });
       } catch (error) {}
     });
@@ -704,6 +993,8 @@ class User {
     await this.createQuestions();
     await this.createQuestionType();
     await this.createAnswers();
+    await this.createUserAnswer();
+    await this.createUserPerformance();
 
     await this.insertQuestionTypeRecord();
     console.log("+++++++++++++ END SET UP +++++++++++++");
@@ -750,7 +1041,7 @@ class User {
               "qType INT DEFAULT 0, " +
               "questionLabel TEXT DEFAULT '', " +
               "questionStatement TEXT DEFAULT '', " +
-              "questionAnswer TEXT DEFAULT '', " +
+              "questionAnswer BOOLEAN DEFAULT '', " +
               "question TEXT DEFAULT '', " +
               "answer TEXT DEFAULT '', " +
               "FOREIGN KEY(learningModuleId) REFERENCES learningModules(learningModuleId)" +
@@ -801,6 +1092,56 @@ class User {
             [],
             (tx, success) => {console.log("createAnswers SUCCESS!"); resolve(true);/* success */}, // prettier-ignore
             (tx, error) => { console.log("error createAnswers = " + error); return false; } // prettier-ignore
+          );
+        });
+      } catch (error) {}
+    });
+  }
+
+  createUserAnswer() {
+    return new Promise((resolve, reject) => {
+      try {
+        // db.transaction((tx) => {
+        //   tx.executeSql("DROP TABLE IF EXISTS learningModules");
+        // });
+        db.transaction((tx) => {
+          tx.executeSql(
+            "CREATE TABLE IF NOT EXISTS userAnswer (" +
+              "userAnswerId INTEGER PRIMARY KEY NOT NULL, " +
+              "learningModuleId INT DEFAULT 0, " +
+              "questionId INT DEFAULT 0, " +
+              "qType INT DEFAULT 0, " +
+              "userAnswer TEXT DEFAULT '', " +
+              "questionNumber INT DEFAULT -1, " +
+              "userAnswerCorrect BOOLEAN DEFAULT 0, " +
+              "FOREIGN KEY(learningModuleId) REFERENCES learningModules(learningModuleId), " +
+              "FOREIGN KEY(questionId) REFERENCES questions(questionId) " +
+              ");",
+            [],
+            (tx, success) => {console.log("createUserAnswer SUCCESS!"); resolve(true);/* success */}, // prettier-ignore
+            (tx, error) => { console.log("error createUserAnswer = " + error); return false; } // prettier-ignore
+          );
+        });
+      } catch (error) {}
+    });
+  }
+
+  createUserPerformance() {
+    return new Promise((resolve, reject) => {
+      try {
+        db.transaction((tx) => {
+          tx.executeSql(
+            "CREATE TABLE IF NOT EXISTS userPerformance (" +
+              "userPerformanceId INTEGER PRIMARY KEY NOT NULL, " +
+              "learningModuleId INT DEFAULT 0, " +
+              "userScoreNume INT DEFAULT 0, " +
+              "userScoreDeno INT DEFAULT 0, " +
+              "userScoreValue DOUBLE DEFAULT 0, " +
+              "FOREIGN KEY(learningModuleId) REFERENCES learningModules(learningModuleId) " +
+              ");",
+            [],
+            (tx, success) => {console.log("createUserPerformance SUCCESS!"); resolve(true);/* success */}, // prettier-ignore
+            (tx, error) => { console.log("error createUserPerformance = " + error); return false; } // prettier-ignore
           );
         });
       } catch (error) {}
@@ -929,7 +1270,7 @@ class User {
   updateUserInitials(v: String) {
     try {
       db.transaction((tx) => {
-        tx.executeSql("UPDATE USER SET initials = ? WHERE id = 1;", [v]);
+        tx.executeSql("UPDATE USER SET initials = ? WHERE userId = 1;", [v]);
       });
     } catch (error) {}
   }
@@ -937,7 +1278,7 @@ class User {
   updateUserDOB(v: String) {
     try {
       db.transaction((tx) => {
-        tx.executeSql("UPDATE USER SET dob = ? WHERE id = 1;", [v]);
+        tx.executeSql("UPDATE USER SET dob = ? WHERE userId = 1;", [v]);
       });
     } catch (error) {}
   }
@@ -945,7 +1286,7 @@ class User {
   updateUserType(v: number) {
     try {
       db.transaction((tx) => {
-        tx.executeSql("UPDATE USER SET userTypeId = ? WHERE id = 1;", [v]);
+        tx.executeSql("UPDATE USER SET userTypeId = ? WHERE userId = 1;", [v]);
       });
     } catch (error) {}
   }
@@ -963,8 +1304,8 @@ class User {
         tx.executeSql(
           "UPDATE condition SET conditionSelected = ? WHERE conditionNumber = ?;",
           [!conditionValue, conditionNum]
-          // function(tx, success) {console.log("updateUserConditions success: " + success);}, // prettier-ignore
-          // function (tx, error) {console.log("updateUserConditions error: " + error);/* fail */ return false;} // prettier-ignore
+          //(tx, success) => {console.log("updateUserConditions success: " + success);}, // prettier-ignore
+          // (tx, error) => {console.log("updateUserConditions error: " + error);/* fail */ return false;} // prettier-ignore
         );
       });
     } catch (error) {}
@@ -975,10 +1316,10 @@ class User {
     try {
       db.transaction((tx) => {
         tx.executeSql(
-          "UPDATE USER SET userSetUp = 1 WHERE id = 1;",
+          "UPDATE USER SET userSetUp = 1 WHERE userId = 1;",
           [],
-          function(tx, success) {/* success */}, // prettier-ignore
-          function (tx, error) {/* fail */ return false;} // prettier-ignore
+          (tx, success) => {/* success */}, // prettier-ignore
+          (tx, error) => {/* fail */ console.log("updateUserSetUp FAIL!" + error); return false;} // prettier-ignore
         );
       });
     } catch (error) {}
@@ -989,14 +1330,14 @@ class User {
     try {
       db.transaction((tx) => {
         tx.executeSql(
-          "UPDATE USER SET completeOnboarding = 1 WHERE id = 1;",
+          "UPDATE USER SET completeOnboarding = 1 WHERE userId = 1;",
           [],
-          function (tx, success) {
+          (tx, success) => {
             /* success */
             console.log(success);
             return true;
           },
-          function (tx, error) {
+          (tx, error) => {
             /* fail */
             console.log(error);
             return false;
@@ -1006,6 +1347,507 @@ class User {
     } catch (error) {}
   }
 
+  grabUserAnswerById(learningModuleId: number): Promise<SQLResultSet> {
+    return new Promise((resolve, reject) => {
+      try {
+        db.transaction((tx) => {
+          tx.executeSql(
+            "SELECT * from userAnswer WHERE learningModuleId = ?;",
+            [learningModuleId],
+            (trans, rs) => {
+              resolve(rs);
+            },
+            (tx, error) => {console.log("grabUserAnswerById error: " + error);/* fail */ return false;} // prettier-ignore
+          );
+        });
+      } catch (err) {}
+    });
+  }
+
+  grabUserAnswerByIdAndQId(
+    learningModuleId: number,
+    questionId: number
+  ): Promise<SQLResultSet> {
+    return new Promise((resolve, reject) => {
+      try {
+        db.transaction((tx) => {
+          tx.executeSql(
+            "SELECT * from userAnswer WHERE learningModuleId = ? AND questionId = ? ORDER BY questionId ASC;",
+            [learningModuleId, questionId],
+            (trans, rs) => {
+              resolve(rs);
+            },
+            (tx, error) => {console.log("grabUserAnswerById error: " + error);/* fail */ return false;} // prettier-ignore
+          );
+        });
+      } catch (err) {}
+    });
+  }
+
+  deleteUserAnswerById(learningModuleId: number): Promise<boolean> {
+    return new Promise(async (resolve, reject) => {
+      try {
+        await this.deleteUserPerformanceById(learningModuleId);
+        db.transaction((tx) => {
+          tx.executeSql(
+            "DELETE from userAnswer WHERE learningModuleId = ? ;",
+            [learningModuleId],
+            (trans, rs) => {
+              resolve(true);
+            },
+            (tx, error) => {console.log("deleteUserAnswerById error: " + error);/* fail */ return false;} // prettier-ignore
+          );
+        });
+      } catch (err) {}
+    });
+  }
+
+  deleteCondition(): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      try {
+        db.transaction((tx) => {
+          tx.executeSql(
+            "DELETE from condition ;",
+            [],
+            (trans, rs) => {
+              resolve(true);
+            },
+            (tx, error) => {console.log("deleteCondition error: " + error);/* fail */ return false;} // prettier-ignore
+          );
+        });
+      } catch (err) {}
+    });
+  }
+
+  deleteUserPerformanceById(learningModuleId: number): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      try {
+        db.transaction((tx) => {
+          tx.executeSql(
+            "DELETE from userPerformance WHERE learningModuleId = ? ;",
+            [learningModuleId],
+            (trans, rs) => {
+              resolve(true);
+            },
+            (tx, error) => {console.log("deleteUserPerformanceById error: " + error);/* fail */ return false;} // prettier-ignore
+          );
+        });
+      } catch (err) {}
+    });
+  }
+
+  updateUserAnswer(
+    userAnswer: any,
+    lmId: number,
+    qId: number,
+    qType: number,
+    qNum: number
+  ): Promise<boolean> {
+    return new Promise(async (resolve, reject) => {
+      try {
+        let thisUserAnswer: any;
+        if (typeof userAnswer == "number") {
+          thisUserAnswer = Helper.ctb(userAnswer).toString(); //boolean value for T or F
+        } else {
+          thisUserAnswer = userAnswer; //string value for Multiple choice
+        }
+
+        let isSameAnswer = await this.comparePrevAndCurrentAnswers(thisUserAnswer, lmId, qId, qType); //prettier-ignore
+        if (isSameAnswer) {
+          resolve(false);
+          return false;
+        }
+
+        //we'll update the user's answer if there is an existing record of their answer based on a specific learning module and question.
+        db.transaction((tx) => {
+          tx.executeSql(
+            "UPDATE userAnswer SET userAnswer = ?, questionNumber = ? " +
+              "WHERE learningModuleId = ? AND questionId = ? AND qType = ? ;",
+            [thisUserAnswer, qNum, lmId, qId, qType],
+            (tx, success) => {},
+            (tx, error) => {console.log("updateUserAnswer ERROR!: " + error);/* fail */ return false;} // prettier-ignore
+          );
+
+          //Above code will somehow always execute even if there are no existing record(s),
+          //so we do a select statement and see if it actually exists.
+          //If it returns null or nothing then we will insert this as a new record.
+          tx.executeSql(
+            "SELECT * from userAnswer WHERE learningModuleId = ? AND questionId = ? AND qType = ? ;",
+            [lmId, qId, qType],
+            async (trans, rs) => {
+              if (rs == null || rs.rows.length == 0) {
+                let insertUserAnswer = await this.insertUserAnswer(userAnswer, lmId, qId, qType, qNum); // prettier-ignore
+              }
+              let isAnswerCorrect = await this.checkUserAnswersV2(lmId, qId);
+              let updateUserAnswer = await this.updateUserAnswerV2(isAnswerCorrect, lmId, qId, qType); // prettier-ignore
+
+              await this.markingQuizScoreProcess(lmId, false);
+              resolve(true);
+            },
+            (tx, error) => {console.log("updateUserAnswer select ERROR: " + error);/* fail */ return false;} // prettier-ignore
+          );
+        }, null);
+      } catch (error) {}
+    });
+  }
+
+  updateUserAnswerV2(
+    userAnswerCorrect: boolean,
+    lmId: number,
+    qId: number,
+    qType: number
+  ): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      try {
+        db.transaction((tx) => {
+          tx.executeSql(
+            "UPDATE userAnswer SET userAnswerCorrect = ? " +
+              "WHERE learningModuleId = ? AND questionId = ? AND qType = ? ;",
+            [userAnswerCorrect, lmId, qId, qType],
+            (tx, success) => {
+              resolve(true);
+            },
+            (tx, error) => {console.log("updateUserAnswer ERROR!: " + error);/* fail */ return false;} // prettier-ignore
+          );
+        });
+      } catch (err) {}
+    });
+  }
+
+  insertUserAnswer(
+    userAnswer: any,
+    lmId: number,
+    qId: number,
+    qType: number,
+    qNum: number
+  ): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      try {
+        db.transaction((tx) => {
+          tx.executeSql(
+            "INSERT INTO userAnswer(userAnswer, learningModuleId, questionId, qType, questionNumber) " +
+              "VALUES(?,?,?,?,?); ",
+            [userAnswer, lmId, qId, qType, qNum],
+            (trans, rs) => {
+              resolve(true);
+            },
+            (trans, err) => {
+              console.log("updateUserAnswer insert ERROR!: " + err);
+              return false;
+            }
+          );
+        });
+      } catch (err) {}
+    });
+  }
+
+  comparePrevAndCurrentAnswers(
+    userAnswer: any,
+    learningModuleId: number,
+    questionId: number,
+    qType: number
+  ): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      try {
+        db.transaction((tx) => {
+          tx.executeSql(
+            "SELECT * from userAnswer WHERE learningModuleId = ? AND questionId = ? AND qType = ? ;",
+            [learningModuleId, questionId, qType],
+            (trans, rs) => {
+              if (rs.rows.length > 0) {
+                for (let x = 0; x < rs.rows.length; x++) {
+                  let item = rs.rows.item(x);
+                  let thisUserAnswer: any;
+                  if (item.qType == Constants.QTYPE_TRUE_OR_FALSE) {
+                    thisUserAnswer = Helper.ctb(userAnswer).toString(); //boolean value for T or F
+                  } else {
+                    thisUserAnswer = userAnswer; //string value for Multiple choice
+                  }
+                  resolve(thisUserAnswer == item.userAnswer);
+                }
+              }
+
+              resolve(false);
+            },
+            (tx, error) => {console.log("updateUserAnswer select ERROR: " + error);/* fail */ return false;} // prettier-ignore
+          );
+        });
+      } catch (err) {}
+    });
+  }
+
+  //compare the total number of questions the user has answered vs the total number of questions of the module
+  checkIfAllQuestionsAreAnswered(learningModuleId: number): Promise<boolean> {
+    return new Promise(async (resolve, reject) => {
+      try {
+        let rsUA = await this.grabUserAnswerByLeaningModuleId(learningModuleId); //prettier-ignore
+        let rsLMQ = await this.grabLearningModuleQuestionsById(learningModuleId); //prettier-ignore
+
+        resolve(rsUA.rows.length == rsLMQ.rows.length);
+      } catch (err) {}
+    });
+  }
+
+  grabUserAnswerByLeaningModuleId(
+    learningModuleId: number
+  ): Promise<SQLResultSet> {
+    return new Promise((resolve, reject) => {
+      try {
+        db.transaction((tx) => {
+          tx.executeSql(
+            "SELECT * from userAnswer WHERE learningModuleId = ? ;",
+            [learningModuleId],
+            (trans, rs) => {
+              resolve(rs);
+            },
+            (tx, error) => {console.log("updateUserAnswer error: " + error);/* fail */ return false;} // prettier-ignore
+          );
+        });
+      } catch (err) {}
+    });
+  }
+
+  grabLearningModuleProgress(learningModuleId: number): Promise<number> {
+    return new Promise((resolve, reject) => {
+      try {
+        db.transaction((tx) => {
+          tx.executeSql(
+            "SELECT userScoreValue from userPerformance WHERE learningModuleId = ? ;",
+            [learningModuleId],
+            (tx, rs) => {
+              if (rs.rows.length > 0) {
+                if (parseInt(rs.rows.item(0).userScoreValue) > 0.0) {
+                  resolve(parseInt(rs.rows.item(0).userScoreValue));
+                } else {
+                  resolve(0);
+                }
+              } else {
+                resolve(0);
+              }
+            },
+            (tx, error) => {
+              return false;
+            }
+          );
+        });
+      } catch (err) {}
+    });
+  }
+
+  markingQuizScoreProcess(
+    learningModuleId: number,
+    userFullyCompleteAllQuiz: boolean
+  ): Promise<boolean> {
+    return new Promise(async (resolve, reject) => {
+      try {
+        let rsUserAnswers = await this.grabExistingLearningModuleQuestionsWithUserAnswers( learningModuleId ); //prettier-ignore
+        let rsQuestions = await this.grabQuestionsById( learningModuleId ); //prettier-ignore
+        if (rsUserAnswers != null && rsUserAnswers.rows.length > 0) {
+          //Firstly, we want to know if the user has either fully or partially completed the module questions.
+          let userScore = rsQuestions.rows.length - rsUserAnswers.rows.length;
+          if (userScore == 0) {
+            //this means the user has fully completed the module's questions.
+            userScore = rsQuestions.rows.length;
+
+            //User request to complete the form, we now check if the user got all of their answer(s) correct.
+            if (userFullyCompleteAllQuiz) {
+              //We now calculate & check each of user's answer(s) vs the question's correct answer(s)
+              await this.checkUserAnswers(
+                learningModuleId,
+                rsUserAnswers,
+                rsQuestions
+              );
+              //We now check if the user's answer are all correct.
+              if (userScore == rsQuestions.rows.length) {
+                //if all are correct we then set the module to finished.
+                await this.updateLearningModuleCompletion(true, learningModuleId); //prettier-ignore
+                resolve(true);
+              }
+            } else {
+              await this.checkUserAnswers(
+                learningModuleId,
+                rsUserAnswers,
+                rsQuestions
+              );
+              await this.updateLearningModuleCompletion(false, learningModuleId); //prettier-ignore
+              resolve(true);
+            }
+          } else {
+            //this means the user has partially completed the module's questions.
+            await this.checkUserAnswers(
+              learningModuleId,
+              rsUserAnswers,
+              rsQuestions
+            );
+            resolve(true);
+          }
+        }
+      } catch (err) {}
+    });
+  }
+
+  checkUserAnswers(
+    learningModuleId: number,
+    rsUserAnswers: SQLResultSet,
+    rsQuestions: SQLResultSet
+  ): Promise<boolean> {
+    return new Promise(async (resolve, reject) => {
+      try {
+        console.log("Checking Answers");
+        let userScore = 0;
+        for (let x = 0; x < rsUserAnswers.rows.length; x++) {
+          let item = rsUserAnswers.rows.item(x);
+          let answerIsCorrect = false;
+
+          if (item.qType == Constants.QTYPE_TRUE_OR_FALSE) {
+            //True or False
+            if (Helper.ctb(item.userAnswer) == Helper.ctb(item.questionAnswer)){
+              answerIsCorrect = true;
+              userScore++;
+            } //prettier-ignore
+          } else {
+            //Multiple Choice
+            if (item.userAnswer == item.answer) {
+              answerIsCorrect = true;
+              userScore++;
+            }
+          }
+
+          // Save into userPerformance
+          let scoringComplete = await this.updateUserPerformance(
+            learningModuleId,
+            userScore,
+            rsQuestions.rows.length
+            // answerIsCorrect
+          );
+        }
+
+        resolve(true);
+      } catch (err) {}
+    });
+  }
+
+  checkUserAnswersV2(lmId: number, qId: number): Promise<boolean> {
+    return new Promise(async (resolve, reject) => {
+      try {
+        let rsUserAnswers = await this.grabExistingLearningModuleQuestionsWithUserAnswersSingle( lmId, qId ); //prettier-ignore
+        if (rsUserAnswers.rows.length > 0) {
+          let item = rsUserAnswers.rows.item(0);
+          let isAnswerCorrect = false;
+          if (item.qType == Constants.QTYPE_TRUE_OR_FALSE) {
+            //True or False
+            if (Helper.ctb(item.userAnswer) == Helper.ctb(item.questionAnswer)){
+              isAnswerCorrect = true;
+            } //prettier-ignore
+          } else {
+            //Multiple Choice
+            if (item.userAnswer == item.answer) {
+              isAnswerCorrect = true;
+            }
+          }
+
+          resolve(isAnswerCorrect);
+        } else {
+          resolve(false);
+        }
+      } catch (err) {}
+    });
+  }
+
+  updateLearningModuleCompletion(
+    finished: boolean,
+    learningModuleId: number
+  ): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      try {
+        console.log("updateLearningModuleCompletion finished = " + finished);
+        db.transaction((tx) => {
+          tx.executeSql(
+            "UPDATE learningModules SET finished = ? " +
+              "WHERE learningModuleId = ? ;",
+            [finished, learningModuleId],
+            (tx, success) => {
+              resolve(true);
+            },
+            (tx, error) => {console.log("updateLearningModuleCompletion ERROR!: " + error);/* fail */ return false;} // prettier-ignore
+          );
+        });
+      } catch (err) {}
+    });
+  }
+
+  updateUserPerformance(
+    learningModuleId: number,
+    userScoreNume: number,
+    userScoreDeno: number
+  ): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      try {
+        db.transaction((tx) => {
+          let userScoreValue = (userScoreNume / userScoreDeno) * 100;
+          tx.executeSql(
+            "UPDATE userPerformance SET userScoreNume = ?, userScoreDeno = ?, userScoreValue = ? " +
+              "WHERE learningModuleId = ? ;",
+            [userScoreNume, userScoreDeno, userScoreValue, learningModuleId],
+            (tx, success) => {
+              console.log(
+                "updateUserPerformance SUCCESS!: " + success.rows.length
+              );
+            },
+            (tx, error) => {console.log("updateUserPerformance ERROR!: " + error);/* fail */ return false;} // prettier-ignore
+          );
+
+          tx.executeSql(
+            "SELECT * from userPerformance WHERE learningModuleId = ? ;",
+            [learningModuleId],
+            (trans, rs) => {
+              if (rs == null || rs.rows.length == 0) {
+                console.log(
+                  "EITHER EMPTY or NO RECORD FOUND ON userPerformance."
+                );
+                db.transaction((tx) => {
+                  tx.executeSql(
+                    "INSERT INTO " +
+                      " userPerformance(learningModuleId, userScoreNume, userScoreDeno, userScoreValue) " +
+                      " VALUES(?,?,?,?)",
+                    [
+                      learningModuleId,
+                      userScoreNume,
+                      userScoreDeno,
+                      userScoreValue,
+                    ],
+                    (tx, success) => { resolve(true);}, // prettier-ignore
+                    (tx, error) => { console.log("updateUserAnswer insert ERROR!"); return false; } // prettier-ignore
+                  );
+                });
+              } else {
+                // console.log(rs);
+                resolve(true);
+              }
+            },
+            (tx, error) => {console.log("updateUserPerformance select ERROR: " + error);/* fail */ return false;} // prettier-ignore
+          );
+        });
+      } catch (err) {}
+    });
+  }
+
+  grabUserPerformance(learningModuleId: number): Promise<SQLResultSet> {
+    return new Promise((resolve, reject) => {
+      try {
+        db.transaction((tx) => {
+          tx.executeSql(
+            "SELECT * from userPerformance WHERE learningModuleId = ? ;",
+            [learningModuleId],
+            (trans, rs) => {
+              resolve(rs);
+            },
+            (tx, error) => {console.log("grabUserPerformance select ERROR: " + error);/* fail */ return false;} // prettier-ignore
+          );
+        });
+      } catch (err) {}
+    });
+  }
   /****************************************************************************************************************************************************/
   /****************************************************************************************************************************************************/
   /****************************************************************************************************************************************************/

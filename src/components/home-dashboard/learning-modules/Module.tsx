@@ -1,14 +1,14 @@
 /* *************************************** */
 // Import Modules
 import React, { Component } from "react";
-import { View, Text, ScrollView, Alert } from "react-native";
-import { Container, Header, Content, Left, Right, Body } from "native-base";
+import { View, Text, ScrollView } from "react-native";
+import { Container, Header, Content, Left, Body } from "native-base";
 import { LinearGradient } from "expo-linear-gradient";
-import { Icon, Button } from "react-native-elements";
+import { Icon } from "react-native-elements";
 import CustomTextInput from "components/user-setup/CustomTextInput";
 
-// import { DrawerActions } from "@react-navigation/native";
 import {
+  NavigationBackAction,
   NavigationState,
   NavigationParams,
   NavigationScreenProp,
@@ -19,7 +19,6 @@ import {
 // Import Custom Components
 import * as Constants from "constants/Constants";
 import styles from "styles/Styles";
-import db from "db/User";
 
 /* *************************************** */
 // Interface
@@ -48,8 +47,6 @@ export default class Module extends Component<IProps, IState> {
       locked,
     } = props.route.params;
 
-    // props.navigation.setParams({ name: "HELLO" });
-
     this.state = {
       learningModuleId: learningModuleId,
       moduleTitle: moduleTitle,
@@ -60,45 +57,44 @@ export default class Module extends Component<IProps, IState> {
     };
   }
 
-  componentDidMount() {
-    this.init();
-  }
+  // static navigationOptions = ({ navigation }) => {
+  //   return {
+  //     headerLeft: () => (
+  //       <View style={{ marginLeft: 10 }}>
+  //         <Icon
+  //           name="arrow-left"
+  //           type="font-awesome"
+  //           color="white"
+  //           // onPress={()=>{navigation.state.params.on}
+  //           // onPress={() => this.props.navigation.goBack()}
+  //         />
+  //       </View>
+  //     ),
+  //   };
+  // };
 
-  async init() {
-    let rs = await db.grabLearningModuleQuestionsById(this.state.learningModuleId); //prettier-ignore
-    if (rs != null && rs.rows.length > 0) {
-      let pagesObjArr = [];
-      for (let x = 0; x < rs.rows.length; x++) {
-        let item: any = rs.rows.item(x);
+  // componentDidMount() {
+  //   this.props.route.params.onNavigateBack();
+  // }
+  // componentDidUpdate() {
+  //   this.props.route.params.onNavigateBack();
+  // }
 
-        // pagesObjArr.push({
-        //   progressGauge: <CircularProgress percent={5} />, //TODO: Make this guage dynamic.
-        //   moduleTitle: item.moduleTitle,
-        //   learningModuleId: item.learningModuleId,
-        //   quizTopic: item.quizTopic,
-        //   locked: false,
-        // });
-      }
-
-      // this.setState({
-      //   pages: pagesObjArr,
-      // });
-    }
-  }
-
-  // moduleHandler = (pageItem: enumJsonObj) => {
-  quizHandler = () => {
-    // console.log("NAVIGATING");
-    this.props.navigation.navigate(Constants.QUIZZES);
-    // this.props.navigation.navigate(Constants.QUIZZES, {
-    //   TODO1: 1,
-    //   TODO2: "",
-    //   TODO3: "",
-    //   TODO4: "",
-    //   TODO5: "",
-    //   TODO6: false,
-    // });
+  quizHandler = async () => {
+    this.props.navigation.navigate(Constants.QUIZZES, {
+      learningModuleId: this.state.learningModuleId,
+    });
   };
+
+  // testBegin = () => {
+  //   console.log("testBegin");
+  //   this.test(this.props.navigation);
+  // };
+  // test = (navigation: any) => {
+  //   console.log("TESTING THIS YO");
+  //   console.log(this.props.navigation.state);
+  //   console.log(this.props.navigation.state.params);
+  // };
 
   render() {
     return (
@@ -109,7 +105,7 @@ export default class Module extends Component<IProps, IState> {
           <View style={{ paddingTop: 10 }}>{/* Empty Space */}</View>
 
           <LinearGradient
-            colors={["#522154", "#5f1f4a", "#721937"]}
+            colors={Constants.LINEAR_GRADIENT_MAIN}
             style={[styles.learningModulePageContent]}
           >
             <Left>
@@ -119,10 +115,7 @@ export default class Module extends Component<IProps, IState> {
               <Body>
                 <ScrollView>
                   <Text style={styles.learningModulePageBody}>
-                    {/* {this.state.moduleContent} */}
-                    {
-                      "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged."
-                    }
+                    {this.state.moduleContent}
                   </Text>
                   <CustomTextInput
                     editable={false}
