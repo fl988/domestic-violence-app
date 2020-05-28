@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { StyleSheet, View, StatusBar } from "react-native";
+import { StyleSheet, View, StatusBar, ActivityIndicator } from "react-native";
 import db from "db/User";
 import styles from "styles/Styles";
 import SplashScreen from "components/SplashScreen";
@@ -17,8 +17,6 @@ export default class App extends Component {
   };
   //"componentDidMount" will execute automatically before render()
   componentDidMount() {
-    db.setUpUserTable();
-    db.setUpConditionTable();
     this.checkUser();
   }
 
@@ -34,15 +32,23 @@ export default class App extends Component {
   };
 
   //This will delete the whole "user" table. That means you will be able to mock up the registration process again and again
-  deleteAccountHandler = () => {
-    db.dropUser(); //delete user table.
-    db.dropCondtion();
-    db.setUpUserTable(); //set-up user table.
-    db.setUpConditionTable();
+  deleteAccountHandler = async () => {
+    await db.dropLearningModules();
+    await db.dropUser(); //delete user table.
+    await db.dropCondtion();
+    await db.setUpUserTable(); //set-up user table.
+    await db.setUpConditionTable();
     this.checkUser(); //check which component should the user see.
   };
 
   async checkUser() {
+    this.setState({
+      userLanding: <View style={[styles.container,styles.bgPurple1]}><ActivityIndicator/></View> //prettier-ignore
+    });
+
+    await db.setUpUserTable();
+    await db.setUpConditionTable();
+
     let isUserAlreadySet = await db.checkUserSetUp();
     let isUserCompleteOnboarding = await db.checkUserOnboarding();
 

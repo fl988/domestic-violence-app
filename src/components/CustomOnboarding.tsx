@@ -1,5 +1,6 @@
-import { Alert, StatusBar, Image, View } from "react-native";
+import { StatusBar, View } from "react-native";
 import React from "react";
+import * as Constants from "constants/Constants";
 
 import { Button, Icon } from "react-native-elements";
 import Onboarding from "react-native-onboarding-swiper";
@@ -20,19 +21,19 @@ const CustomOnboarding = (props) => {
     {
       title: "Hey!",
       subtitle: "Welcome to the App!",
-      backgroundColor: "#003c8f",
+      backgroundColor: Constants.COLOUR_SMALT,
       image: <Icon name="hand-peace-o" type="font-awesome" size={100} color="white" /> // prettier-ignore
     },
     {
       title: "Send Messages",
       subtitle: "You can reach everybody with us",
-      backgroundColor: "#003c8f",
+      backgroundColor: Constants.COLOUR_SMALT,
       image: <Icon name="paper-plane-o" type="font-awesome" size={100} color="white" /> //prettier-ignore
     },
     {
       title: "Get Notified",
       subtitle: "We will send you notification as soon as something happened",
-      backgroundColor: "#003c8f",
+      backgroundColor: Constants.COLOUR_SMALT,
       image: <Icon name="bell-o" type="font-awesome" size={100} color="white" /> //prettier-ignore
     },
     {
@@ -46,7 +47,7 @@ const CustomOnboarding = (props) => {
           }}
         />
       ),
-      backgroundColor: "#003c8f",
+      backgroundColor: Constants.COLOUR_SMALT,
       image: <Icon name="rocket" type="font-awesome" size={100} color="white" /> //prettier-ignore
     },
   ];

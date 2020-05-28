@@ -34,25 +34,25 @@ export default class UserSetupSwiper extends Component<IProps, IState> {
       title: "What are your Intitials?",
       description: "Since this is your first time, we'll need to know a little bit about you.", // prettier-ignore
       bgColor: Constants.COLOUR_EBONY,
-      component: <InitialsInput onNext={() => this.swiper.scrollBy(1)} />,
+      mainComponent: <InitialsInput onNext={() => this.swiper.scrollBy(1)} />,
     },
     {
       title: "What is your date of birth?",
       description: "Please select.",
       bgColor: Constants.COLOUR_EBONY,
-      component: <DateOfBirth onNext={() => this.swiper.scrollBy(1)} /> // prettier-ignore
+      mainComponent: <DateOfBirth onNext={() => this.swiper.scrollBy(1)} /> // prettier-ignore
     },
     {
       title: "What type of user are you?",
       description: "Please choose one.",
       bgColor: Constants.COLOUR_EBONY,
-      component: <UserType onNext={() => this.swiper.scrollBy(1)} />,
+      mainComponent: <UserType onNext={() => this.swiper.scrollBy(1)} />,
     },
     {
       title: "Please check which conditions apply to you.",
       //   description: "Please choose one.",
       bgColor: Constants.COLOUR_EBONY,
-      component: <Conditions />,
+      mainComponent: <Conditions />,
     },
   ];
 
@@ -150,12 +150,24 @@ export default class UserSetupSwiper extends Component<IProps, IState> {
       >
         {/* We map the pages. */}
         {this.PAGES.map((page, i) => (
-          <View key={i} style={{ flex: 1, backgroundColor: page.bgColor }}>
-            <View style={[styles.card]}>
-              <Text style={styles.title}>{page.title}</Text>
+          <View
+            key={i}
+            style={{
+              flex: 1,
+              backgroundColor: page.bgColor,
+              // alignItems: "center",
+            }}
+          >
+            <View style={styles.card}>
+              <Text
+                style={styles.title}
+                onPress={() => this.swiper.scrollBy(1)}
+              >
+                {page.title}
+              </Text>
               <Text style={styles.desc}>{page.description}</Text>
             </View>
-            {page.component}
+            {page.mainComponent}
             {this.screenNavButtonsHandler(i)}
             {this.confirmModal(i, this.PAGES.length - 1)}
           </View>

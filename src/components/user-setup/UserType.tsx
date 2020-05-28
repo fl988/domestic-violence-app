@@ -42,49 +42,51 @@ const UserType = (props) => {
   }
 
   return (
-    <View style={styles.frame}>
-      {/***********************************************************************************************/}
-      {/* JUST LEARNING BUTTON */}
+    <View>
+      <View style={styles.innerFrame}>
+        {/***********************************************************************************************/}
+        {/* JUST LEARNING BUTTON */}
 
-      <CustomTextInput
-        editable={false}
-        onPress={() => userTypeHandler(Constants.USER_TYPE_LEARNING)}
-        leftIcon={"graduation-cap"}
-        leftIconType={"font-awesome"} //the type of the icon you're using.
-        leftIconColor={"white"} //you can put simple color words or hex or rgb.
-        textInputPlaceholder={"Just Learning"}
-        textInputPlaceholderColor={"white"}
-        disableRightComponent={true}
-        value={null}
-      />
+        <CustomTextInput
+          editable={false}
+          onPress={() => userTypeHandler(Constants.USER_TYPE_LEARNING)}
+          leftIcon={"graduation-cap"}
+          leftIconType={"font-awesome"} //the type of the icon you're using.
+          leftIconColor={"white"} //you can put simple color words or hex or rgb.
+          textInputPlaceholder={"Just Learning"}
+          textInputPlaceholderColor={"white"}
+          disableRightComponent={true}
+          value={null}
+        />
 
-      {/***********************************************************************************************/}
-      {/* PARENT / GUARDIAN BUTTON */}
-      <CustomTextInput
-        editable={false}
-        onPress={() => userTypeHandler(Constants.USER_TYPE_PARENT_GUARDIAN)}
-        leftIcon={"users"}
-        leftIconType={"font-awesome"} //the type of the icon you're using.
-        leftIconColor={"white"} //you can put simple color words or hex or rgb.
-        textInputPlaceholder={"A Parent / Guardian"}
-        textInputPlaceholderColor={"white"}
-        disableRightComponent={true}
-        value={null}
-      />
+        {/***********************************************************************************************/}
+        {/* PARENT / GUARDIAN BUTTON */}
+        <CustomTextInput
+          editable={false}
+          onPress={() => userTypeHandler(Constants.USER_TYPE_PARENT_GUARDIAN)}
+          leftIcon={"users"}
+          leftIconType={"font-awesome"} //the type of the icon you're using.
+          leftIconColor={"white"} //you can put simple color words or hex or rgb.
+          textInputPlaceholder={"A Parent / Guardian"}
+          textInputPlaceholderColor={"white"}
+          disableRightComponent={true}
+          value={null}
+        />
 
-      {/***********************************************************************************************/}
-      {/* AVO HOLDER BUTTON */}
-      <CustomTextInput
-        editable={false}
-        onPress={() => userTypeHandler(Constants.USER_TYPE_AVO_HOLDER)}
-        leftIcon={"balance-scale"}
-        leftIconType={"font-awesome"} //the type of the icon you're using.
-        leftIconColor={"white"} //you can put simple color words or hex or rgb.
-        textInputPlaceholder={"An AVO Holder"}
-        textInputPlaceholderColor={"white"}
-        disableRightComponent={true}
-        value={null}
-      />
+        {/***********************************************************************************************/}
+        {/* AVO HOLDER BUTTON */}
+        <CustomTextInput
+          editable={false}
+          onPress={() => userTypeHandler(Constants.USER_TYPE_AVO_HOLDER)}
+          leftIcon={"balance-scale"}
+          leftIconType={"font-awesome"} //the type of the icon you're using.
+          leftIconColor={"white"} //you can put simple color words or hex or rgb.
+          textInputPlaceholder={"An AVO Holder"}
+          textInputPlaceholderColor={"white"}
+          disableRightComponent={true}
+          value={null}
+        />
+      </View>
     </View>
   );
 };

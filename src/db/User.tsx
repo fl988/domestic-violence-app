@@ -20,40 +20,6 @@ interface questionJSONArray extends Array<questionJSONStructure> {}
 
 class User {
   /****************************************************************************************************************************************************/
-  // START API CALLS
-  // grabUserConditionsAPI() {
-  //   // This API call will request an entry with the specified ID from the space defined at the top, using a space-specific access token. ie. the Conditions.
-  //   // We then start building our own custom json object array.
-
-  async fetchData(apiKey: String): Promise<any> {
-    const contentful = require("contentful/dist/contentful.browser.min.js");
-    const client = contentful.createClient({
-      space: Constants.AUTH_PENTECH_SPACE_ID,
-      accessToken: Constants.AUTH_PENTECH_ACCESS_TOKEN_DELIVERY,
-    });
-
-    return new Promise((resolve, reject) => {
-      var conditionsArr = {};
-      client
-        .getEntry(apiKey)
-        .then((entry) => {
-          conditionsArr = {
-            conditionNumber: entry.fields.conditionNumber,
-            conditionSummary: entry.fields.conditionSummary,
-            conditionText: entry.fields.conditionText,
-            keyTerms: entry.fields.keyTerms,
-          };
-
-          resolve(conditionsArr);
-        })
-        .catch((err) => {
-          console.log("fetchData ERROR = " + err);
-          resolve(err);
-        });
-    });
-  }
-
-  /****************************************************************************************************************************************************/
   // START LEARNING MODULES
 
   // INSERT STATEMENTS
@@ -205,7 +171,7 @@ class User {
             "SELECT * FROM learningModules;",
             [],
             (trans, rs) => {console.log("learningModules exist "+ (rs.rows.length > 0 ? "" : "but EMPTY! ") +": " + rs.rows.length); resolve(rs.rows.length > 0); }, // prettier-ignore
-            (tx, error) => {console.log("learningModules does NOT EXIST!."); resolve(false); return false;} // prettier-ignore
+            (tx, error) => {console.log("learningModules checkForLearningModuleData does NOT EXIST!."); resolve(false); return false;} // prettier-ignore
           );
         });
       } catch (error) {}
@@ -220,7 +186,7 @@ class User {
             "SELECT * FROM learningModules WHERE learningModuleId = ? ;",
             [learningModuleId],
             (trans, rs) => { resolve(rs); }, // prettier-ignore
-            (tx, error) => { console.log("learningModules does NOT EXIST!."); return false;} // prettier-ignore
+            (tx, error) => { console.log("learningModules grabLearningModuleById does NOT EXIST!."); return false;} // prettier-ignore
           );
         });
       } catch (error) {}
@@ -235,7 +201,7 @@ class User {
             "SELECT * FROM learningModules ORDER by learningModuleId DESC;",
             [],
             (trans, rs) => { resolve(rs); }, // prettier-ignore
-            (tx, error) => {console.log("learningModules does NOT EXIST!."); return false;} // prettier-ignore
+            (tx, error) => {console.log("learningModules grabAllLearningModulesData does NOT EXIST!."); return false;} // prettier-ignore
           );
         });
       } catch (error) {}
@@ -468,6 +434,8 @@ class User {
   async fetchLearningModulesData() {
     try {
       console.log("---- No learning modules data found. ----") //prettier-ignore
+      let rsUser = await this.grabUserType();
+      let userTypeId = rsUser.rows.item(0).userTypeId;
       console.log("---- fetching new learning modules from contentful");
 
       const contentful = require("contentful/dist/contentful.browser.min.js");
@@ -482,44 +450,45 @@ class User {
         .getEntries() //grab all of the entries
         .then((res) => {
           //we'll loop through each entry
-          res.items.forEach((element) => {
+          let x = 0;
+          res.items.forEach(async (element) => {
             let item = element.fields;
 
-            if (typeof item.moduleTitle !== "undefined") {
+            let isAParent = userTypeId == Constants.USER_TYPE_PARENT_GUARDIAN;
+            let isOther =
+              userTypeId == Constants.USER_TYPE_AVO_HOLDER ||
+              userTypeId == Constants.USER_TYPE_LEARNING;
+
+            let isAModuleQuiz = typeof item.moduleQuiz !== "undefined";
+            let isAParentGuardianContentType =
+              element.sys.contentType.sys.id ==
+              "learningModuleForParentAndGuardian";
+
+            if (isAModuleQuiz && isAParentGuardianContentType && isAParent) {
               // we found a module.
               // we can only use these => moduleTitle,moduleSummary
-
-              // BUILD QUESTIONS
-              let quizzesArr = [];
-              item.moduleQuiz.fields.quizQuestions.forEach((qe) => {
-                //question element
-                let quizObj = {};
-                if (typeof qe.fields.questionAnswer !== "undefined") {
-                  //it's a T or F type of question.
-                  quizObj = {
-                    qType: 1,
-                    questionLable: qe.fields.questionLabel,
-                    questionStatement: qe.fields.questionStatement,
-                    questionAnswer: qe.fields.questionAnswer,
-                  };
-                } else {
-                  //it's a multiple choice type of question.
-                  let answerArr = [];
-                  qe.fields.answers.forEach((ae, i) => {
-                    answerArr.push(ae);
-                  });
-
-                  quizObj = {
-                    qType: 2,
-                    questionLable: qe.fields.questionLabel,
-                    question: qe.fields.question,
-                    answer: qe.fields.answer,
-                    answers: answerArr,
-                  };
-                }
-                quizzesArr.push(quizObj);
-              });
-
+              let quizzesArr = await this.questionBuilder(
+                item.moduleQuiz.fields.quizQuestions
+              );
+              jsonObj = {
+                moduleTitle: item.moduleTitle,
+                moduleSummary: item.moduleSummary,
+                moduleContent: item.moduleContent.content[0].content[0].value,
+                quizTopic: item.moduleQuiz.fields.quizTopic,
+                quizzes: quizzesArr,
+              };
+              jsonArr.push(jsonObj);
+            } else if (
+              isAModuleQuiz &&
+              isOther &&
+              !isAParent &&
+              !isAParentGuardianContentType
+            ) {
+              // we found a module.
+              // we can only use these => moduleTitle,moduleSummary
+              let quizzesArr = await this.questionBuilder(
+                item.moduleQuiz.fields.quizQuestions
+              );
               jsonObj = {
                 moduleTitle: item.moduleTitle,
                 moduleSummary: item.moduleSummary,
@@ -535,6 +504,44 @@ class User {
 
       return JSON.stringify(jsonArr);
     } catch (error) {}
+  }
+
+  questionBuilder(quizQuestions: any): Promise<any> {
+    return new Promise((resolve, reject) => {
+      try {
+        // BUILD QUESTIONS
+        let quizzesArr = [];
+        quizQuestions.forEach((qe) => {
+          //question element
+          let quizObj = {};
+          if (typeof qe.fields.questionAnswer !== "undefined") {
+            //it's a T or F type of question.
+            quizObj = {
+              qType: 1,
+              questionLable: qe.fields.questionLabel,
+              questionStatement: qe.fields.questionStatement,
+              questionAnswer: qe.fields.questionAnswer,
+            };
+          } else {
+            //it's a multiple choice type of question.
+            let answerArr = [];
+            qe.fields.answers.forEach((ae, i) => {
+              answerArr.push(ae);
+            });
+
+            quizObj = {
+              qType: 2,
+              questionLable: qe.fields.questionLabel,
+              question: qe.fields.question,
+              answer: qe.fields.answer,
+              answers: answerArr,
+            };
+          }
+          quizzesArr.push(quizObj);
+        });
+        resolve(quizzesArr);
+      } catch (err) {}
+    });
   }
 
   saveLearningModulesData(jsonData: any) {
@@ -778,89 +785,118 @@ class User {
 
   /****************************************************************************************************************************************************/
   //Create Table 'user'. No return;
-  createUser() {
-    try {
-      db.transaction((tx) => {
-        tx.executeSql(
-          "CREATE TABLE IF NOT EXISTS user (" +
-            "userId INTEGER PRIMARY KEY NOT NULL, " +
-            "initials TEXT DEFAULT 'XX', " +
-            "dob TEXT DEFAULT (datetime('now')), " +
-            "userTypeId INT DEFAULT 0, " +
-            "userSetUp BOOLEAN DEFAULT 0, " +
-            "completeOnboarding BOOLEAN DEFAULT 0 " +
-            ");",
-          [],
-          (tx, success) => {console.log("SUCCESS! = " + success)/* success */}, // prettier-ignore
-          (tx, error) => { console.log("error createUser = " + error); return false; } // prettier-ignore
-        );
-      });
-    } catch (error) {}
+  createUser(): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      try {
+        db.transaction((tx) => {
+          tx.executeSql(
+            "CREATE TABLE IF NOT EXISTS user (" +
+              "userId INTEGER PRIMARY KEY NOT NULL, " +
+              "initials TEXT DEFAULT 'XX', " +
+              "dob TEXT DEFAULT (datetime('now')), " +
+              "userTypeId INT DEFAULT 0, " +
+              "userSetUp BOOLEAN DEFAULT 0, " +
+              "completeOnboarding BOOLEAN DEFAULT 0 " +
+              ");",
+            [],
+            (tx, success) => { console.log("createUser SUCCESS! = " + success); resolve(true); /* success */}, // prettier-ignore
+            (tx, error) => { console.log("createUser ERROR! = " + error); resolve(false); return false; } // prettier-ignore
+          );
+        });
+      } catch (error) {}
+    });
   }
 
   /****************************************************************************************************************************************************/
   //Create Table 'condition'. No return;
-  createCondition() {
-    console.log("CREATING CONDITION");
-    try {
-      db.transaction((tx) => {
-        tx.executeSql(
-          "CREATE TABLE IF NOT EXISTS condition (" +
-            "conditionId INTEGER PRIMARY KEY NOT NULL, " +
-            "userId INT NULL DEFAULT 1, " +
-            "conditionNumber INT DEFAULT 0, " +
-            "conditionSummary TEXT DEFAULT '', " +
-            "conditionText TEXT DEFAULT '', " +
-            "conditionSelected BOOLEAN DEFAULT 0, " +
-            "conditionMandatory BOOLEAN DEFAULT 0, " +
-            "FOREIGN KEY(userId) REFERENCES user(userId) " +
-            ");",
-          [],
-          (tx, success) => {console.log("SUCCESS createCondition! = " + success)/* success */}, // prettier-ignore
-          (tx, error) => { console.log("error createCondition = " + error); return false; } // prettier-ignore
-        );
-      });
-    } catch (error) {}
+  createCondition(): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      try {
+        db.transaction((tx) => {
+          tx.executeSql(
+            "CREATE TABLE IF NOT EXISTS condition (" +
+              "conditionId INTEGER PRIMARY KEY NOT NULL, " +
+              "userId INT NULL DEFAULT 1, " +
+              "conditionNumber INT DEFAULT 0, " +
+              "conditionSummary TEXT DEFAULT '', " +
+              "conditionText TEXT DEFAULT '', " +
+              "conditionSelected BOOLEAN DEFAULT 0, " +
+              "conditionMandatory BOOLEAN DEFAULT 0, " +
+              "FOREIGN KEY(userId) REFERENCES user(userId) " +
+              ");",
+            [],
+            (tx, success) => {console.log("SUCCESS createCondition! = " + success); resolve(true); /* success */}, // prettier-ignore
+            (tx, error) => { console.log("error createCondition = " + error); resolve(false); return false; } // prettier-ignore
+          );
+        });
+      } catch (error) {}
+    });
   }
 
   /****************************************************************************************************************************************************/
   //Drops table 'user'. No return;
-  dropUser() {
-    try {
-      db.transaction((tx) => {
-        tx.executeSql("DROP TABLE IF EXISTS user");
-      });
-    } catch (error) {}
+  dropUser(): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      try {
+        console.log("1.1");
+        db.transaction((tx) => {
+          tx.executeSql(
+            "DROP TABLE IF EXISTS user",
+            [],
+            (tx, success) => { resolve(true); /* success */}, // prettier-ignore
+            (tx, error) => {
+              console.log("error insertUserDefaultRecord = " + error);
+              resolve(false);
+              return false;
+            }
+          );
+        });
+      } catch (error) {}
+    });
   }
 
   /****************************************************************************************************************************************************/
   //Drops table 'condition'. No return;
-  dropCondtion() {
-    try {
-      db.transaction((tx) => {
-        tx.executeSql("DROP TABLE IF EXISTS condition");
-      });
-    } catch (error) {}
+  dropCondtion(): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      try {
+        db.transaction((tx) => {
+          tx.executeSql(
+            "DROP TABLE IF EXISTS condition",
+            [],
+            (tx, success) => { resolve(true); /* success */}, // prettier-ignore
+            (tx, error) => {
+              console.log("error insertUserDefaultRecord = " + error);
+              resolve(false);
+              return false;
+            }
+          );
+        });
+      } catch (error) {}
+    });
   }
 
   /****************************************************************************************************************************************************/
   //Inserts a new record into 'user' table. No return;
-  insertUserDefaultRecord() {
-    try {
-      db.transaction((tx) => {
-        tx.executeSql(
-          "INSERT INTO " +
-            " user(initials, dob, userTypeId) " +
-            " VALUES('','','')",
-          [],
-          (tx, success) => {/* success */}, // prettier-ignore
-          (tx, error) => {
-            console.log("error insertUserDefaultRecord = " + error);
-            return false;
-          }
-        );
-      });
-    } catch (err) {}
+  insertUserDefaultRecord(): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      try {
+        db.transaction((tx) => {
+          tx.executeSql(
+            "INSERT INTO " +
+              " user(initials, dob, userTypeId) " +
+              " VALUES('','','')",
+            [],
+            (tx, success) => { resolve(true); /* success */}, // prettier-ignore
+            (tx, error) => {
+              console.log("error insertUserDefaultRecord = " + error);
+              resolve(false);
+              return false;
+            }
+          );
+        });
+      } catch (err) {}
+    });
   }
 
   /****************************************************************************************************************************************************/
@@ -879,7 +915,7 @@ class User {
             " condition(conditionNumber, conditionSummary, conditionText, conditionSelected, conditionMandatory) " +
             " VALUES(?,?,?,?,?)",
           [condNumber, condSummary, condText, conditionSelected, condMandatory],
-          (tx, success) => {console.log("SUCCESS")/* success */}, // prettier-ignore
+          (tx, success) => {/* success */}, // prettier-ignore
           (tx, error) => {
             console.log("error insertConditionRecord = " + error);
             return false;
@@ -897,7 +933,7 @@ class User {
             resolve(rs.rows.length);
           }),
             (tx, error) => {
-              console.log("checkUserSetUp FAIL = " + error);
+              console.log("getConditionRecordCount FAIL = " + error);
             };
         });
       } catch (error) {}
@@ -906,61 +942,69 @@ class User {
 
   /****************************************************************************************************************************************************/
   //Sets up the 'user' table for first timers.
-  setUpUserTable() {
-    try {
-      db.transaction((txn) => {
-        txn.executeSql(
-          "SELECT * FROM user",
-          [],
-          (tx, rs) => {
-            //console.log("item:", rs.rows.length);
-            if (rs.rows.length == 0) {
-              // No rows found on the 'user' table. We then drop if user table exist, create user table then insert a default record.
-              this.dropUser();
+  setUpUserTable(): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      try {
+        db.transaction((txn) => {
+          txn.executeSql(
+            "SELECT * FROM user",
+            [],
+            async (tx, rs) => {
+              //console.log("item:", rs.rows.length);
+              if (rs.rows.length == 0) {
+                // No rows found on the 'user' table. We then drop if user table exist, create user table then insert a default record.
+                await this.dropUser();
+                await this.createUser();
+                await this.insertUserDefaultRecord();
+                resolve(true);
+              } else {
+                //I think there is an sql bug where it duplicates records hence having more than 1 row. We delete them here.
+                txn.executeSql("DELETE FROM user WHERE id > 1;", []);
+                resolve(true);
+              }
+            },
+            () => {
+              //This is 100% the error: => "no such table: user (code 1 SQLITE_ERROR[1]): , while compiling: SELECT * FROM user"
+              //So to overcome this problem we'll have to create a "user" table then insert a default record.
               this.createUser();
               this.insertUserDefaultRecord();
-            } else {
-              //I think there is an sql bug where it duplicates records hence having more than 1 row. We delete them here.
-              txn.executeSql("DELETE FROM user WHERE id > 1;", []);
+              resolve(false);
+              return false;
             }
-          },
-          (tx, err) => {
-            console.log(err);
-            //This is 100% the error: => "no such table: user (code 1 SQLITE_ERROR[1]): , while compiling: SELECT * FROM user"
-            //So to overcome this problem we'll have to create a "user" table then insert a default record.
-            this.createUser();
-            this.insertUserDefaultRecord();
-            return false;
-          }
-        );
-      });
-    } catch (error) {}
+          );
+        });
+      } catch (error) {}
+    });
   }
 
   /****************************************************************************************************************************************************/
   //Sets up the 'condition' table after doing an api call.
-  setUpConditionTable() {
-    try {
-      db.transaction((txn) => {
-        txn.executeSql(
-          "SELECT * FROM condition",
-          [],
-          (tx, rs) => {
-            if (rs.rows.length == 0) {
-              this.dropCondtion();
+  setUpConditionTable(): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      try {
+        db.transaction((txn) => {
+          txn.executeSql(
+            "SELECT * FROM condition",
+            [],
+            async (tx, rs) => {
+              if (rs.rows.length == 0) {
+                await this.dropCondtion();
+                await this.createCondition();
+              }
+              resolve(true);
+            },
+            (tx, err) => {
+              // console.log(err);
+              //This is 100% the error: => "no such table: user (code 1 SQLITE_ERROR[1]): , while compiling: SELECT * FROM user"
+              //So to overcome this problem we'll have to create a "user" table then insert a default record.
               this.createCondition();
+              resolve(false);
+              return false;
             }
-          },
-          (tx, err) => {
-            console.log(err);
-            //This is 100% the error: => "no such table: user (code 1 SQLITE_ERROR[1]): , while compiling: SELECT * FROM user"
-            //So to overcome this problem we'll have to create a "user" table then insert a default record.
-            this.createCondition();
-            return false;
-          }
-        );
-      });
-    } catch (error) {}
+          );
+        });
+      } catch (error) {}
+    });
   }
 
   /****************************************************************************************************************************************************/
@@ -988,6 +1032,8 @@ class User {
     await this.dropQuestions();
     await this.dropQuestionType();
     await this.dropAnswers();
+    await this.dropUserAnswers();
+    await this.dropUserPerformance();
 
     await this.createLearningModules();
     await this.createQuestions();
@@ -1263,6 +1309,48 @@ class User {
     });
   }
 
+  dropUserAnswers() {
+    return new Promise((resolve, reject) => {
+      try {
+        db.transaction((tx) => {
+          tx.executeSql(
+            "DROP TABLE IF EXISTS userAnswer",
+            [],
+            (t, s) => {
+              console.log("drop userAnswer");
+              resolve(true);
+            },
+            (t, e) => {
+              console.log("fail drop userAnswer: " + e);
+              return false;
+            }
+          );
+        });
+      } catch (error) {}
+    });
+  }
+
+  dropUserPerformance() {
+    return new Promise((resolve, reject) => {
+      try {
+        db.transaction((tx) => {
+          tx.executeSql(
+            "DROP TABLE IF EXISTS userPerformance",
+            [],
+            (t, s) => {
+              console.log("drop userPerformance");
+              resolve(true);
+            },
+            (t, e) => {
+              console.log("fail drop userPerformance: " + e);
+              return false;
+            }
+          );
+        });
+      } catch (error) {}
+    });
+  }
+
   /****************************************************************************************************************************************************/
   // Update Statements
 
@@ -1286,7 +1374,29 @@ class User {
   updateUserType(v: number) {
     try {
       db.transaction((tx) => {
-        tx.executeSql("UPDATE USER SET userTypeId = ? WHERE userId = 1;", [v]);
+        tx.executeSql(
+          "UPDATE USER SET userTypeId = ? WHERE userId = 1;",
+          [v],
+          (t, r) => {
+            console.log("WORKING UPDATE?");
+            tx.executeSql(
+              "SELECT * FROM user;",
+              [],
+              (t, r) => {
+                console.log("SELECT USER");
+                console.log(r);
+              },
+              (t, e) => {
+                console.log("SELECT USER FAIL");
+                return false;
+              }
+            );
+          },
+          (t, e) => {
+            console.log("ERROR UPDATE!");
+            return false;
+          }
+        );
       });
     } catch (error) {}
   }
@@ -1840,6 +1950,27 @@ class User {
             "SELECT * from userPerformance WHERE learningModuleId = ? ;",
             [learningModuleId],
             (trans, rs) => {
+              resolve(rs);
+            },
+            (tx, error) => {console.log("grabUserPerformance select ERROR: " + error);/* fail */ return false;} // prettier-ignore
+          );
+        });
+      } catch (err) {}
+    });
+  }
+
+  grabUserType(): Promise<SQLResultSet> {
+    return new Promise((resolve, reject) => {
+      try {
+        db.transaction((tx) => {
+          tx.executeSql(
+            "SELECT * from user ;",
+            [],
+            (trans, rs) => {
+              console.log(
+                "rs.rows.item(0).userTypeId= " + rs.rows.item(0).userTypeId
+              );
+              console.log(rs);
               resolve(rs);
             },
             (tx, error) => {console.log("grabUserPerformance select ERROR: " + error);/* fail */ return false;} // prettier-ignore

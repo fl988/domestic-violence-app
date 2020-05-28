@@ -180,7 +180,9 @@ export default class LearningModule extends Component<IProps, IState> {
                 }}
               >
                 <Body>
-                  <Text style={styles.lmText}>{page.moduleTitle}</Text>
+                  <Text style={[styles.lmText, { fontWeight: "bold" }]}>
+                    {page.moduleTitle}
+                  </Text>
                   <Text style={styles.lmText}>{page.quizTopic}</Text>
                 </Body>
               </TouchableOpacity>

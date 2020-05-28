@@ -17,11 +17,13 @@ export default StyleSheet.create({
 
   /*************************************/
   navBackButton: {
-    marginTop: PAGE_HEIGHT / 1.2,
-    marginLeft: 60,
-    marginRight: 60,
     flexDirection: "row",
+    alignSelf: "center",
     justifyContent: "space-between",
+    flex: 1,
+    marginTop: PAGE_HEIGHT / 1.2,
+    width: PAGE_WIDTH / 1.2,
+    position: "absolute",
   },
   screenDimension: {
     width,
@@ -76,27 +78,25 @@ export default StyleSheet.create({
     marginTop: 40,
   },
   card: {
-    position: "absolute",
-    margin: 12,
-    marginTop: 60,
-    left: 12,
-    top: 0,
-    right: 0,
-    borderRadius: 8,
-    paddingHorizontal: 24,
-    paddingTop: 16,
-    paddingBottom: 140,
+    lineHeight: 30,
+    paddingTop: 100,
+    paddingRight: 16,
+    paddingLeft: 16,
+    paddingBottom: 16,
+    height: PAGE_HEIGHT / 3,
   },
   frame: {
-    position: "absolute",
-    left: 0,
-    bottom: 160,
+    // position: "absolute",
+    // left: 0,
+    // bottom: 160,
     // borderRadius: (PAGE_WIDTH - 100) / 2,
-    height: PAGE_WIDTH - 100,
-    width: PAGE_WIDTH - 100,
-    margin: 50,
+    // margin: 50,
     // backgroundColor: Constants.COLOUR_WHITE,
-    paddingTop: 70,
+    // paddingTop: 70,
+  },
+  innerFrame: {
+    alignSelf: "center",
+    width: PAGE_WIDTH / 1.2,
   },
   frameV2: {
     position: "absolute",
@@ -279,7 +279,7 @@ export default StyleSheet.create({
     flex: 1,
     flexDirection: "row",
   },
-  homeDashboardItems: {
+  homeDashboardEngageItems: {
     // flex: 1, //this will fill out the remaining spaces, don't need it for now.
     display: "flex",
     flexDirection: "column",
@@ -291,6 +291,21 @@ export default StyleSheet.create({
     justifyContent: "center",
     height: PAGE_WIDTH / 2 - 36,
     width: PAGE_WIDTH / 2 - 36, // Page width / 2 then we take the margin into consideration which in this case is on the left. We want 3 of them which is 12 * 3 = 36.
+    // height: PAGE_HEIGHT / 8,
+    // width: PAGE_HEIGHT / 4.8,
+  },
+  homeDashboardArticleItem: {
+    // flex: 1, //this will fill out the remaining spaces, don't need it for now.
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    marginLeft: 24,
+    marginBottom: 24,
+    backgroundColor: Constants.COLOUR_EAST_BAY, //"rgba(255,255,255, 0.3)",
+    borderRadius: 8,
+    justifyContent: "center",
+    height: PAGE_WIDTH / 2 - 36,
+    width: PAGE_WIDTH - 48, // Page width / 2 then we take the margin into consideration which in this case is on the left. We want 3 of them which is 12 * 3 = 36.
     // height: PAGE_HEIGHT / 8,
     // width: PAGE_HEIGHT / 4.8,
   },
@@ -306,6 +321,10 @@ export default StyleSheet.create({
     width: PAGE_WIDTH, // Page width / 2 then we take the margin into consideration which in this case is on the left. We want 3 of them which is 12 * 3 = 36.
     // height: PAGE_HEIGHT / 8,
     // width: PAGE_HEIGHT / 4.8,
+  },
+  homeDashboardHeading: {
+    paddingBottom: 10,
+    width: "100%",
   },
   homeDashboardGreeterLeftContent: {
     borderRightColor: "white",
@@ -419,8 +438,6 @@ export default StyleSheet.create({
     display: "flex",
     flexDirection: "row",
     margin: 8,
-    paddingLeft: 20,
-    paddingRight: 20,
   },
   quizzesPageHeader: {
     color: Constants.COLOUR_WHITE,

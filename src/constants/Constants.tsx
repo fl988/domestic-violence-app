@@ -4,6 +4,7 @@ export const STATUS_BAR_HEIGHT = getStatusBarHeight();
 
 /****************************************************************************************************************************/
 // Can find the name of the colours here => https://abouts.co/color/2A1D59 <= just replace this with the colour hex code
+export const COLOUR_SMALT = "#003c8f";
 export const COLOUR_PURPLE = "#2A1D59";
 export const COLOUR_EBONY = "#101726";
 export const COLOUR_WHITE = "#ffffff";
@@ -60,6 +61,7 @@ export const AUTH_PENTECH_SPACE_ID = "37vuyawjmcwg";
 export const AUTH_PENTECH_ACCESS_TOKEN_DELIVERY = "pSgENeKWlgTIQVTnqGjamNNcVJuf1fOJZ9V-crbfTvA"; // prettier-ignore
 export const AUTH_PENTECH_ACCESS_TOKEN_PREVIEW = "Xj_LZA_aUd_fhyLHZc6ZmSJJjP3sYqZB-0zbAFIPTTA"; // prettier-ignore
 
+//
 // AVO Condition Contents
 export const CONT_PENTECH_CONDITIONS_ARR = [
   "5RAmZgEytS3Hzc3nuSoa45",
@@ -74,15 +76,6 @@ export const CONT_PENTECH_CONDITIONS_ARR = [
   "Mpt8Pk4GwBBW8WZS0J9qN",
 ];
 
-export const PENTECH_LEARNING_MODULES = {
-  m1: [
-    "7wE7hjJQD207nmNrNKSAZZ", //Module 1 (Parent node)
-    "5OfLfUewAwuFp5uvyM42V3", //Module Quiz (1st child node)
-    "3CUYkXJljrEwJ8rKWlWe4b", //Quiz question true or false (last child node)
-    "6pW3OX8tiDQOyJ1TzAcmX0", //Quiz quesiont multi (last child node)
-  ],
-};
-
 /****************************************************************************************************************************/
 // Learning Modules
 export const QTYPE_TRUE_OR_FALSE             = 1; // prettier-ignore
@@ -96,5 +89,9 @@ export const HOME_SCREEN_LEARNING_MODULES    = "Learning Modules"; // prettier-i
 export const HOME_SCREEN_INTERACTIVE_STORIES = "Interactive Stories"; // prettier-ignore
 export const HOME_SCREEN_STATISTICS          = "Statistics"; // prettier-ignore
 export const HOME_SCREEN_SUPPORT             = "Support"; // prettier-ignore
+export const LEFT_NAV_HOME                   = "Home"; // prettier-ignore
+export const LEFT_NAV_SETTINGS               = "Settings"; // prettier-ignore
+export const LEFT_NAV_FAQ                    = "FAQ"; // prettier-ignore
+export const LEFT_NAV_PDF_VIEW_AVO           = "PDFViewAVO"; // prettier-ignore
 export const MODULE                          = "Module"; // prettier-ignore
 export const QUIZZES                         = "Quizzes"; // prettier-ignore

@@ -26,14 +26,18 @@ import {
 /* *************************************** */
 // Import Custom Components
 // import CircularProgress from "components/home-dashboard/CircularProgress";
+import db from "db/User";
 import styles from "styles/Styles";
 import * as Constants from "constants/Constants";
-import db from "db/User";
 import MyAVO from "components/home-dashboard/my-avo/MyAVO";
 import LearningModule from "components/home-dashboard/learning-modules/LearningModule";
 import Module from "components/home-dashboard/learning-modules/Module";
 import Quiz from "components/home-dashboard/learning-modules/Quiz";
 import Support from "components/home-dashboard/Support";
+import QuickHelp from "components/QuickHelp";
+import { ScrollView } from "react-native-gesture-handler";
+import ArticleOfTheDay from "components/home-dashboard/ArticleOfTheDay";
+import Engage from "components/home-dashboard/Engage";
 
 /* *************************************** */
 // Interface
@@ -97,7 +101,6 @@ export default class HomeScreen extends Component<IProps, IState> {
   async fetchLeaningModules() {
     //we first check if we have pre-existing learning modules
     let checkForLearningModules = await db.checkForLearningModuleData();
-    console.log("checkForLearningModules = " + checkForLearningModules);
     if (!checkForLearningModules) {
       //drop the create the tables.
       await db.setUpLearningModules();
@@ -116,80 +119,43 @@ export default class HomeScreen extends Component<IProps, IState> {
   }
 
   fetchUserInitials = () => {
-    if (this.state.initials != "") {
+    if (this.state.initials !== "") {
       return <>{"Hello " + this.state.initials + "!"}</>;
     } else {
       return <>{"Hello There!"}</>;
     }
   };
 
-  PAGES = [
-    {
-      icon: <Icon name="balance-scale" type="font-awesome" color="white" />,
-      screenName: Constants.HOME_SCREEN_MY_AVO,
-    },
-    {
-      icon: <Icon name="graduation-cap" type="font-awesome" color="white" />,
-      screenName: Constants.HOME_SCREEN_LEARNING_MODULES,
-    },
-    {
-      icon: <Icon name="users" type="font-awesome" color="white" />,
-      screenName: Constants.HOME_SCREEN_SUPPORT,
-    },
-    // {
-    //   icon: <Icon name="users" type="font-awesome" color="white" />,
-    //   screenName: Constants.HOME_SCREEN_STATISTICS,
-    // },
-    // {
-    //   icon: <Icon name="users" type="font-awesome" color="white" />,
-    //   screenName: Constants.HOME_SCREEN_SUPPORT,
-    // },
-  ];
-
   render() {
     const homeScreenLinkComponents = ({ navigation }) => {
       return (
-        <View
-          style={{
-            backgroundColor: Constants.COLOUR_EBONY,
-            flex: 1,
-            flexDirection: "row",
-            flexWrap: "wrap",
-          }}
-        >
-          <LinearGradient
-            colors={Constants.LINEAR_GRADIENT_MAIN}
-            style={styles.homeDashboardGreeterContainer}
+        <ScrollView>
+          <View
+            style={{
+              backgroundColor: Constants.COLOUR_EBONY,
+              flex: 1,
+              flexDirection: "row",
+              flexWrap: "wrap",
+            }}
           >
-            <Right style={styles.homeDashboardGreeterRightContent}>
-              <Text style={styles.homeDashboardContent}>
-                <this.fetchUserInitials />
-              </Text>
-            </Right>
-          </LinearGradient>
-
-          <View style={{ paddingBottom: 10, width: "100%" }}>
-            <Text style={styles.homeDashboardHeader}>{"Engage"}</Text>
-          </View>
-
-          {this.PAGES.map((page, x) => (
-            <TouchableOpacity
-              key={x}
-              onPress={() => navigation.navigate(page.screenName)}
+            <LinearGradient
+              colors={Constants.LINEAR_GRADIENT_MAIN}
+              style={styles.homeDashboardGreeterContainer}
             >
-              <LinearGradient
-                colors={Constants.LINEAR_GRADIENT_MAIN}
-                style={styles.homeDashboardItems}
-              >
-                {page.icon}
+              <Right style={styles.homeDashboardGreeterRightContent}>
                 <Text style={styles.homeDashboardContent}>
-                  {/* {page.numberOfModules} */}
-                  {page.screenName}
+                  <this.fetchUserInitials />
                 </Text>
-              </LinearGradient>
-            </TouchableOpacity>
-          ))}
-        </View>
+              </Right>
+            </LinearGradient>
+
+            {/* ENGAGE ITEMS */}
+            <Engage navigation={navigation} />
+
+            {/* ARTICLE OF THE DAY */}
+            <ArticleOfTheDay />
+          </View>
+        </ScrollView>
       );
     };
 
@@ -238,6 +204,8 @@ export default class HomeScreen extends Component<IProps, IState> {
               options={this.learningModuleHeaderOptions}
             />
           </Stack.Navigator>
+          <QuickHelp />
+
           {/* END */}
           {/* *************************** */}
         </Content>

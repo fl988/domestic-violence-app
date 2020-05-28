@@ -1,7 +1,7 @@
 import React from "react";
 import { TouchableOpacity, TextInput } from "react-native";
 import { Icon } from "react-native-elements";
-import { Left, Right, Body } from "native-base";
+import { View, Left, Right, Body } from "native-base";
 import { LinearGradient } from "expo-linear-gradient";
 
 // Styles
@@ -25,7 +25,7 @@ const CustomTextInput = (props) => {
     return c;
   };
   const rightIconComponent = () => {
-    let c = <Right />;
+    let c = <></>;
     if (props.rightIcon != null) {
       c = (
         <Right style={{ flex: 1, alignItems: "center" }}>
@@ -55,45 +55,52 @@ const CustomTextInput = (props) => {
   };
   const finalComponent = () => {
     let final = (
-      <>
+      <View style={{ flex: 1, flexDirection: "row" }}>
         {leftIconComponent()}
         {bodyComponent()}
         {rightIconComponent()}
-      </>
+      </View>
     );
     if (props.disableRightComponent) {
       final = (
-        <>
+        <View style={{ flex: 1, flexDirection: "row" }}>
           {leftIconComponent()}
           {bodyComponent()}
-        </>
+        </View>
       );
     } else if (props.disableLeftComponent) {
       final = (
-        <>
+        <View style={{ flex: 1, flexDirection: "row" }}>
           {bodyComponent()}
           {rightIconComponent()}
-        </>
+        </View>
       );
     }
 
     return (
-      <LinearGradient
-        colors={
-          props.colors != null ? props.colors : Constants.LINEAR_GRADIENT_MAIN
-        }
-        style={styles.sectionStyle}
-      >
-        {final}
-      </LinearGradient>
+      <TouchableOpacity onPress={props.onPress}>
+        <LinearGradient
+          colors={
+            props.colors != null ? props.colors : Constants.LINEAR_GRADIENT_MAIN
+          }
+          style={{
+            margin: 15,
+            height: 40,
+            // borderColor: Constants.COLOUR_WHITE,
+            borderRadius: 3,
+            // backgroundColor: Constants.COLOUR_WHITE,
+            // opacity: 0.5,
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          {final}
+        </LinearGradient>
+      </TouchableOpacity>
     );
   };
 
-  return (
-    <TouchableOpacity onPress={props.onPress}>
-      {finalComponent()}
-    </TouchableOpacity>
-  );
+  return finalComponent();
 };
 
 export default CustomTextInput;

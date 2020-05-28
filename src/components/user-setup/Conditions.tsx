@@ -15,6 +15,7 @@ import {
 import Accordion from "components/user-setup/Accordion";
 import * as Constants from "constants/Constants";
 import db from "db/User";
+import { fetchAVOConditions } from "contentful-api/ContentfulData";
 
 // Styles
 import styles from "styles/Styles";
@@ -56,7 +57,7 @@ export default class Conditions extends Component<IProps, IState> {
         const apiKey = Constants.CONT_PENTECH_CONDITIONS_ARR[x];
 
         //fetch data from api and wait until finish before continuing the loop
-        let data = await db.fetchData(apiKey);
+        let data = await fetchAVOConditions(apiKey);
 
         // if (!this.state.error) {
         //   //Error: Network Error

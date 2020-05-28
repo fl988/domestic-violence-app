@@ -10,7 +10,13 @@ Dependencies:
 // Import Modules
 import React from "react";
 import SafeAreaView from "react-native-safe-area-view";
-import { View, StyleSheet, Text, useWindowDimensions } from "react-native";
+import {
+  View,
+  StyleSheet,
+  Text,
+  Linking,
+  useWindowDimensions,
+} from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { Icon } from "react-native-elements";
 import {
@@ -32,6 +38,8 @@ import FAQ from "components/home-dashboard/FAQ";
 import CustomModal from "components/user-setup/CustomModal";
 import Support from "components/home-dashboard/Support";
 
+import * as api from "contentful-api/ContentfulData";
+
 /* *************************************** */
 // Interface - a syntactical contract that an entity should conform to. In other words, an interface defines the syntax that any entity must adhere to.
 interface IProps {
@@ -44,11 +52,18 @@ export default class HomeDashboard extends React.Component<IProps> {
     modalVisible: false,
   };
 
+  componentDidMount() {}
+
   modalVisibleHandler = (v) => {
     this.setState({
       modalVisible: v,
     });
   };
+
+  async downloadAVO() {
+    let linkAVO = await api.fetchPDF("3TdsIlSOU3H1gaAQJtHuhF");
+    Linking.openURL("https://" + linkAVO);
+  }
 
   MyDrawer = () => {
     const dimensions = useWindowDimensions();
@@ -63,7 +78,7 @@ export default class HomeDashboard extends React.Component<IProps> {
       >
         {/* Add non-custom drawers here */}
         <Drawer.Screen
-          name="Home"
+          name={Constants.LEFT_NAV_HOME}
           component={HomeScreen}
           options={{
             drawerLabel: ({}) => (
@@ -77,7 +92,7 @@ export default class HomeDashboard extends React.Component<IProps> {
           }}
         />
         <Drawer.Screen
-          name="Settings"
+          name={Constants.LEFT_NAV_SETTINGS}
           component={SettingsScreen}
           options={{
             drawerLabel: ({}) => (
@@ -91,7 +106,7 @@ export default class HomeDashboard extends React.Component<IProps> {
           }}
         />
         <Drawer.Screen
-          name="FAQ"
+          name={Constants.LEFT_NAV_FAQ}
           component={FAQ}
           options={{
             drawerLabel: ({}) => (
@@ -116,6 +131,7 @@ export default class HomeDashboard extends React.Component<IProps> {
     props: DrawerContentComponentProps<DrawerContentOptions>
   ) => {
     return (
+      // LEFT NAVIGATION COMPONENTS
       <DrawerContentScrollView
         {...props}
         contentContainerStyle={{
@@ -124,16 +140,35 @@ export default class HomeDashboard extends React.Component<IProps> {
           justifyContent: "space-between",
         }}
       >
+        {/* ALWAYS ON TOP, ORDER BY STACK */}
         <SafeAreaView forceInset={{ top: "always", horizontal: "never" }}>
           <DrawerItemList {...props} />
           {/* https://reactnavigation.org/docs/drawer-navigator/#providing-a-custom-drawercontent */}
           {/* Add your custom <DrawerItem> below here */}
+          {/* DONWLOAD SAMPLE AVO BUTTON */}
+          <DrawerItem
+            label={() => (
+              <View style={styles.drawerScreen}>
+                <Icon name="book" type="font-awesome" color="white" />
+                <Text style={{ color: Constants.COLOUR_WHITE, paddingLeft: 8 }}>
+                  {"Download Sample AVO"}
+                </Text>
+              </View>
+            )}
+            onPress={() => {
+              this.downloadAVO();
+            }}
+          />
         </SafeAreaView>
+
+        {/* ALWAYS ON BOTTOM, ORDER BY STACK */}
         <SafeAreaView forceInset={{ bottom: "always", horizontal: "never" }}>
           {/* ONLY add components below here IF you want a particular component to be positioned on the bottom of the left navigation. To test it out, uncomment the <DrawerItem> below by highlighting it then press "CTRL + /forward-slash" */}
           {/* <DrawerItem
             label={() => <Text style={{ color: "#black" }}>{"Test"}</Text>}
           /> */}
+
+          {/* DELETE ACCOUNT BUTTON */}
           <DrawerItem
             label={() => (
               <Text style={{ color: "#fff" }}>{"Delete Account"}</Text>

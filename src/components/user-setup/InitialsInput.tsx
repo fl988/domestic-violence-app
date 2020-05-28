@@ -52,29 +52,31 @@ const InitialsInput = (props) => {
   /***********************************************************************************/
   // The returning component
   return (
-    <View style={myStyles.frame}>
-      <LinearGradient
-        colors={Constants.LINEAR_GRADIENT_MAIN}
-        style={myStyles.sectionStyle}
-      >
-        <TextInput
-          underlineColorAndroid="transparent"
-          placeholder="Leave blank to remain anonymous"
-          // selectionColor={"#428AF8"}
-          placeholderTextColor={Constants.COLOUR_WHITE}
-          style={myStyles.input2}
-          onChangeText={initialsInputHandler} //For every key strokes, this will invoke initialsInputHandler.
-          value={getInitialsEntered}
-        />
-      </LinearGradient>
-
-      <View>
-        <TouchableOpacity
-          style={myStyles.nextBtnV2}
-          onPress={() => onNextHandler(getInitialsEntered)}
+    <View>
+      <View style={myStyles.innerFrame}>
+        <LinearGradient
+          colors={Constants.LINEAR_GRADIENT_MAIN}
+          style={myStyles.sectionStyle}
         >
-          <Text style={myStyles.buttonText}>{"NEXT"}</Text>
-        </TouchableOpacity>
+          <TextInput
+            underlineColorAndroid="transparent"
+            placeholder="Leave blank to remain anonymous"
+            // selectionColor={"#428AF8"}
+            placeholderTextColor={Constants.COLOUR_WHITE}
+            style={myStyles.input2}
+            onChangeText={initialsInputHandler} //For every key strokes, this will invoke initialsInputHandler.
+            value={getInitialsEntered}
+          />
+        </LinearGradient>
+
+        <View>
+          <TouchableOpacity
+            style={myStyles.nextBtnV2}
+            onPress={() => onNextHandler(getInitialsEntered)}
+          >
+            <Text style={myStyles.buttonText}>{"NEXT"}</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
   );

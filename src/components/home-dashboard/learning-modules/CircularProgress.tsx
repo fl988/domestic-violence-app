@@ -34,7 +34,7 @@ export default class CircularProgress extends Component<IProps, IState> {
   render() {
     return (
       <TouchableWithoutFeedback>
-        <View style={{ marginLeft: 10 }}>
+        <View style={{ alignSelf: "center" }}>
           <ProgressCircle
             percent={this.state.percent}
             radius={radius}

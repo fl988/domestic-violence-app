@@ -60,24 +60,26 @@ const DateOfBirth = (props) => {
   /***********************************************************************************/
   // The returning component
   return (
-    <View style={styles.frame}>
-      <CustomTextInput
-        editable={false}
-        onPress={showDatePicker}
-        leftIcon={"calendar"}
-        leftIconType={"font-awesome"} //the type of the icon you're using.
-        leftIconColor={"white"} //you can put simple color words or hex or rgb.
-        textInputPlaceholder={"'Tap' to select DOB"}
-        textInputPlaceholderColor={"#fff"}
-        value={getDateDisplay.length > 0 ? getDateDisplay.toString() : null}
-      />
-      <View>{nextBtn}</View>
-      <DateTimePickerModal
-        isVisible={isDatePickerVisible}
-        onConfirm={handleConfirm}
-        onCancel={hideDatePicker}
-        mode="date"
-      />
+    <View>
+      <View style={styles.innerFrame}>
+        <CustomTextInput
+          editable={false}
+          onPress={showDatePicker}
+          leftIcon={"calendar"}
+          leftIconType={"font-awesome"} //the type of the icon you're using.
+          leftIconColor={"white"} //you can put simple color words or hex or rgb.
+          textInputPlaceholder={"'Tap' to select DOB"}
+          textInputPlaceholderColor={"#fff"}
+          value={getDateDisplay.length > 0 ? getDateDisplay.toString() : null}
+        />
+        <View>{nextBtn}</View>
+        <DateTimePickerModal
+          isVisible={isDatePickerVisible}
+          onConfirm={handleConfirm}
+          onCancel={hideDatePicker}
+          mode="date"
+        />
+      </View>
     </View>
   );
 };

@@ -4,3 +4,6 @@ export const KIDS_HELP_LINE = require("images/Kids-Helpline_logo.png");
 export const LIFE_LINE = require("images/lifeline-logo.png");
 export const IC_ARR_DOWN = require("images/arrow-down.png");
 export const IC_ARR_UP = require("images/arrow-up.png");
+export const SAMPLE_AVO = require("images/sample-avo.png");
+export const QUICK_HELP_ALARM = require("images/alarm.png");
+export const QUICK_HELP_QUESTION = require("images/question.png");

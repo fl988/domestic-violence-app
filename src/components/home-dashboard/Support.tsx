@@ -126,6 +126,12 @@ export default class Support extends Component<IProps, IState> {
         //   Alert.alert("Modal has been closed.");
         // }}
       >
+        <TouchableOpacity
+          onPress={() => {
+            this.modalVisibleHandler(!this.state.modalVisible);
+          }}
+          style={styles.modalBackdrop}
+        ></TouchableOpacity>
         <View style={styles.modal}>
           <View>{this.modalContainer}</View>
         </View>
@@ -362,7 +368,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   modal: {
-    backgroundColor: "#00000099",
+    backgroundColor: "#000000",
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
