@@ -48,7 +48,7 @@ export default class QuickHelp extends Component {
     <View style={styles.modalBody}>
       <Text style={styles.bodyText}>
         {
-          "Beyond Blue is an Australian independent nonprofit organization working to address issues associated with depression, suicide, anxiety disorders and other related mental disorders."
+          "Quick Help is where the users can ask help for tutorials for the app, call 000 for evemgency and go to help service for any support. Users can also find a link to the online dictionary website so they can search about words that they don't know about."
         }
       </Text>
     </View>
@@ -57,7 +57,7 @@ export default class QuickHelp extends Component {
   modalFooter = (
     <View>
       <View style={{ flexDirection: "column" }}>
-        <TouchableOpacity style={styles.action1}>
+        <TouchableOpacity style={[styles.action1, {}] }>
           <Text
             style={styles.element1}
             onPress={() => Linking.openURL("tel://231323312")}
@@ -88,6 +88,15 @@ export default class QuickHelp extends Component {
             onPress={() => Linking.openURL("https://www.beyondblue.org.au/")}
           >
             I am experiecing homelessness
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.action3}>
+          <Text
+            style={styles.element1}
+            onPress={() => Linking.openURL("https://www.wordreference.com/")}
+          >
+            Online Dictionary 
           </Text>
         </TouchableOpacity>
       </View>
@@ -208,18 +217,21 @@ const styles = StyleSheet.create({
   action1: {
     marginLeft: 15,
     marginRight: 15,
-    paddingBottom: 12,
+    paddingBottom: 10,
     marginBottom: 15,
+    paddingTop: 10,
     flexDirection: "row",
     justifyContent: "center",
     borderColor: "white",
     borderBottomWidth: 1,
+    borderTopWidth: 1,
     alignItems: "center",
   },
   action2: {
     marginLeft: 15,
     marginRight: 15,
-    marginBottom: 27,
+    marginBottom: 20,
+    marginTop: -15,
     flexDirection: "row",
     justifyContent: "center",
     borderColor: "white",
@@ -229,7 +241,8 @@ const styles = StyleSheet.create({
   action3: {
     marginLeft: 15,
     marginRight: 15,
-    marginBottom: 27,
+    marginBottom: 15,
+    marginTop: -10,
     paddingBottom: 12,
     flexDirection: "row",
     justifyContent: "center",
