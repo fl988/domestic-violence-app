@@ -57,22 +57,6 @@ export const fetchArticleOfTheDay = (): Promise<any> => {
     await client
       .getEntries() //grab all of the entries
       .then((res) => {
-        console.log("startings");
-        //we'll loop through each entry
-        // let x = 0;
-        // res.items.forEach(async (element) => {
-        //   let item = element.fields;
-        //   let isAnArticle = typeof item.url !== "undefined";
-        //   if (item.url) {
-        //     x++;
-        //     console.log("TEST == " + x);
-        //     console.log(item.articleTitle);
-        //     // resolve(true);
-        //     // return;
-        //   }
-        //   // res.items.forEach(async (element) => {
-        // });
-        // });
         resolve(res);
       })
       .catch(console.error);

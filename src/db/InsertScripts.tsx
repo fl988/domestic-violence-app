@@ -11,19 +11,16 @@ export const insertArticles = (
 ): Promise<boolean> => {
   return new Promise(async (resolve, reject) => {
     try {
-      db.transaction(async (tx) => {
-        let isAlreadyExist = await grabSingleArticleByUrl(url);
+      let isAlreadyExist = await grabSingleArticleByUrl(url);
+      await db.transaction(async (tx) => {
         if (!isAlreadyExist) {
           tx.executeSql(
-            "INSERT INTO articles(url, articleTitle, articleImage)" +
-              "VALUES(?,?,?); ",
+            "INSERT INTO articles(url, articleTitle, articleImage) VALUES(?,?,?); ",
             [url, articleTitle, articleImage],
             (tx, success) => {
-              console.log("insertArticles SUCCESS! = " + success);
               resolve(true);
             },
             (tx, error) => {
-              console.log("insertArticles ERROR! = " + error);
               resolve(false);
               return false;
             }

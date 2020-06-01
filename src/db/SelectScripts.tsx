@@ -28,13 +28,20 @@ export const grabSingleArticleByUrl = (url: string): Promise<boolean> => {
     try {
       db.transaction((tx) => {
         tx.executeSql(
-          "SELECT * FROM articles WHERE url = ? ;",
+          "SELECT count(*) as count FROM articles WHERE url LIKE ? ;",
           [url],
           (tx, rs) => {
-            resolve(rs.rows.item(0).url == url);
+            console.log("rs.rows.item(0).count = " + rs.rows.item(0).count);
+            if (rs.rows.item(0).count > 0) {
+              console.log("WE GO SOME1");
+              resolve(rs.rows.item(0).url == url);
+            } else {
+              console.log("WE GO SOME2 = " + url);
+              resolve(false);
+            }
           },
           (tx, error) => {
-            console.log("grabAllArticles ERROR! = " + error);
+            console.log("grabSingleArticleByUrl ERROR! = " + error);
             resolve(false);
             return null;
           }

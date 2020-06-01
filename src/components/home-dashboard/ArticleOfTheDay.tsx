@@ -33,23 +33,25 @@ export default class ArticleOfTheDay extends Component<IProps, IState> {
 
   async fetchContentful() {
     let rs = await grabAllArticles();
-    let item = rs.rows.item(0);
-    let articleImageComponent = <></>;
-    if (item.articleImage != "") {
-      articleImageComponent = (
-        <Image
-          style={{ flex: 1, borderTopLeftRadius: 8, borderTopRightRadius: 8 }}
-          source={{
-            uri: "https:" + item.articleImage,
-          }}
-        />
-      );
+    if (rs != null && rs.rows.length > 0) {
+      let item = rs.rows.item(0);
+      let articleImageComponent = <></>;
+      if (typeof item.articleImage !== "undefined") {
+        articleImageComponent = (
+          <Image
+            style={{ flex: 1, borderTopLeftRadius: 8, borderTopRightRadius: 8 }}
+            source={{
+              uri: "https:" + item.articleImage,
+            }}
+          />
+        );
+      }
+      this.setState({
+        url: item.url,
+        articleImage: articleImageComponent,
+        articleTitle: item.articleTitle,
+      });
     }
-    this.setState({
-      url: item.url,
-      articleImage: articleImageComponent,
-      articleTitle: item.articleTitle,
-    });
   }
 
   render() {

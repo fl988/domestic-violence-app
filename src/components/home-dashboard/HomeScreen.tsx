@@ -1,6 +1,6 @@
 /* *************************************** */
 // Import Modules
-import React, { Component } from "react";
+import React, { Component, ReactFragment } from "react";
 import { View, Image, TouchableOpacity, AppState } from "react-native";
 import { Container, Header, Content, Left, Right, Body } from "native-base";
 import { Icon, Text } from "react-native-elements";
@@ -50,6 +50,7 @@ interface IState {
   initials?: string;
   numberOfModules: number;
   appState?: any;
+  articleOfTheDay: ReactFragment;
 }
 
 export default class HomeScreen extends Component<IProps, IState> {
@@ -59,10 +60,11 @@ export default class HomeScreen extends Component<IProps, IState> {
       initials: "",
       numberOfModules: 0,
       appState: AppState.currentState,
+      articleOfTheDay: <></>,
     };
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     AppState.addEventListener("change", this._handleAppStateChange);
 
     //Display initials
@@ -76,8 +78,8 @@ export default class HomeScreen extends Component<IProps, IState> {
     });
 
     //fetch learning modules.
-    this.fetchLeaningModules();
-    this.fetchArticles();
+    await this.fetchLeaningModules();
+    await this.fetchArticles();
   }
 
   componentWillUnmount() {
@@ -122,13 +124,19 @@ export default class HomeScreen extends Component<IProps, IState> {
   }
 
   async fetchArticles() {
-    await grabAllArticles().then(async (rs) => {
-      if (rs != null && rs.rows.length > 0) {
-        console.log("SOMETHING = " + rs.rows.length);
-      } else {
-        await fetchArticlesAndSave();
+    let rs = await grabAllArticles();
+    if (rs != null && rs.rows.length > 0) {
+      this.setState({
+        articleOfTheDay: <ArticleOfTheDay />,
+      });
+    } else {
+      let success = await fetchArticlesAndSave();
+      if (success) {
+        this.setState({
+          articleOfTheDay: <ArticleOfTheDay />,
+        });
       }
-    });
+    }
   }
 
   fetchUserInitials = () => {
@@ -166,7 +174,7 @@ export default class HomeScreen extends Component<IProps, IState> {
             <Engage navigation={navigation} />
 
             {/* ARTICLE OF THE DAY */}
-            <ArticleOfTheDay />
+            {this.state.articleOfTheDay}
           </View>
         </ScrollView>
       );

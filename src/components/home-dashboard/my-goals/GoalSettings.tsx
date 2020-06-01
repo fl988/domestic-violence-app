@@ -1,21 +1,19 @@
 import * as React from "react";
 import * as Constants from "constants/Constants";
 import { Component } from "react";
-import { Text, View, Dimensions, ActivityIndicator } from "react-native";
+import { Text, View, ActivityIndicator } from "react-native";
 import { Icon } from "react-native-elements";
-import { Container, Header, Content, Left, Right, Body } from "native-base";
+import { Container, Content } from "native-base";
+import { DrawerActions } from "@react-navigation/native";
 import { LinearGradient } from "expo-linear-gradient";
 import { createStackNavigator, TransitionPresets } from "@react-navigation/stack"; //prettier-ignore
 const Stack = createStackNavigator();
-const PAGE_HEIGHT = Dimensions.get("window").height;
-const PAGE_WIDTH = Dimensions.get("window").width;
 
 /* *************************************** */
 // Import Custom Components
 import styles from "styles/Styles";
 import { createUserGoal } from "db/CreateScripts";
 import { grabActiveUserGoal } from "db/SelectScripts";
-import { dropUserGoal } from "db/DropScripts";
 import CreateGoal from "components/home-dashboard/my-goals/CreateGoal";
 import EditGoal from "components/home-dashboard/my-goals/EditGoal";
 
@@ -52,77 +50,74 @@ export default class GoalSettings extends Component<IProps, IState> {
   async init() {
     this.screenLoader(true);
     // await dropUserGoal(); //for testings only.
-    await grabActiveUserGoal().then(async (rs) => {
-      if (rs != null && rs.rows.length > 0) {
-        this.setState({ goalHeaderAndBodyComponent: <></> });
-        this.setState({
-          isGoalExist: true,
-          goalHeaderAndBodyComponent: (
-            <>
-              <Text style={styles.goalSettingsTextHeader}>
-                {"Current Goal"}
-              </Text>
-              <Text style={styles.goalSettingsTextBody}>
-                {rs.rows.item(0).userGoalDesc}
-              </Text>
-              <View
-                style={{
-                  paddingTop: 8,
-                  justifyContent: "center",
-                  alignItems: "flex-end",
-                }}
-              >
-                <Icon
-                  name="edit"
-                  type="font-awesome"
-                  color="white"
-                  onPress={() =>
-                    this.props.navigation.navigate(Constants.GOAL_EDIT, {
-                      userGoalId: rs.rows.item(0).userGoalId,
-                      refreshData: this.refreshData.bind(this),
-                    })
-                  }
-                />
-              </View>
-            </>
-          ),
-        });
-      } else {
-        //if rs is null, we create a userGoal table.
-        await createUserGoal();
-        this.setState({
-          isGoalExist: false,
-          goalHeaderAndBodyComponent: (
-            <>
-              <Text style={styles.goalSettingsTextHeader}>
-                {"No goals currently set"}
-              </Text>
-              <Text style={styles.goalSettingsTextBody}>
-                {"Let's set a goal for you"}
-              </Text>
-              <View
-                style={{
-                  paddingTop: 8,
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-              >
-                <Icon
-                  reverse
-                  name="arrow-right"
-                  type="font-awesome"
-                  onPress={() =>
-                    this.props.navigation.navigate(Constants.GOAL_CREATE, {
-                      refreshData: this.refreshData.bind(this),
-                    })
-                  }
-                />
-              </View>
-            </>
-          ),
-        });
-      }
-    });
+    let rs = await grabActiveUserGoal();
+    if (rs != null && rs.rows.length > 0) {
+      this.setState({ goalHeaderAndBodyComponent: <></> });
+      this.setState({
+        isGoalExist: true,
+        goalHeaderAndBodyComponent: (
+          <>
+            <Text style={styles.goalSettingsTextHeader}>{"Current Goal"}</Text>
+            <Text style={styles.goalSettingsTextBody}>
+              {rs.rows.item(0).userGoalDesc}
+            </Text>
+            <View
+              style={{
+                paddingTop: 8,
+                justifyContent: "center",
+                alignItems: "flex-end",
+              }}
+            >
+              <Icon
+                name="edit"
+                type="font-awesome"
+                color="white"
+                onPress={() =>
+                  this.props.navigation.navigate(Constants.GOAL_EDIT, {
+                    userGoalId: rs.rows.item(0).userGoalId,
+                    refreshData: this.refreshData.bind(this),
+                  })
+                }
+              />
+            </View>
+          </>
+        ),
+      });
+    } else {
+      //if rs is null, we create a userGoal table.
+      await createUserGoal();
+      this.setState({
+        isGoalExist: false,
+        goalHeaderAndBodyComponent: (
+          <>
+            <Text style={styles.goalSettingsTextHeader}>
+              {"No goals currently set"}
+            </Text>
+            <Text style={styles.goalSettingsTextBody}>
+              {"Let's set a goal for you"}
+            </Text>
+            <View
+              style={{
+                paddingTop: 8,
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <Icon
+                reverse
+                name="arrow-right"
+                type="font-awesome"
+                onPress={() =>
+                  this.props.navigation.navigate(Constants.GOAL_CREATE, {
+                    refreshData: this.refreshData.bind(this),
+                  })
+                }
+              />
+            </View>
+          </>
+        ),
+      });
+    }
     this.screenLoader(false);
   }
 
@@ -209,12 +204,12 @@ export default class GoalSettings extends Component<IProps, IState> {
       color: "white",
     },
     headerLeft: () => (
-      <View style={{ marginLeft: 10 }}>
+      <View style={{ marginLeft: 20 }}>
         <Icon
-          name="arrow-left"
-          type="material-community"
+          name="bars"
+          type="font-awesome"
           color="white"
-          onPress={() => navigation.goBack()}
+          onPress={() => navigation.dispatch(DrawerActions.openDrawer())}
         />
       </View>
     ),

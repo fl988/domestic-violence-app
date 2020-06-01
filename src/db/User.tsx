@@ -605,6 +605,7 @@ class User {
             }
           } //end for loop questions
         } //end for loop modules
+        resolve(true);
       } catch (err) {}
     });
   }
@@ -945,7 +946,7 @@ class User {
       try {
         db.transaction((txn) => {
           txn.executeSql(
-            "SELECT * FROM user",
+            "SELECT * FROM user; ",
             [],
             async (tx, rs) => {
               //console.log("item:", rs.rows.length);
@@ -1971,7 +1972,10 @@ class User {
               console.log(rs);
               resolve(rs);
             },
-            (tx, error) => {console.log("grabUserPerformance select ERROR: " + error);/* fail */ return false;} // prettier-ignore
+            (tx, error) => {
+              console.log("grabUserType select ERROR: " + error);
+              return false;
+            }
           );
         });
       } catch (err) {}
