@@ -118,17 +118,7 @@ class FAQ extends Component<IProps> {
                         contentVisible={false}
                         visibleElement={
                           <Image
-                            source={
-                              <Icon
-                                name="chevron-up"
-                                type="font-awesome"
-                                color="white"
-                                style={{
-                                  backgroundColor: "blue",
-                                  alignSelf: "center",
-                                }}
-                              />
-                            }
+                            source={IC_ARR_UP}
                             style={{
                               position: "absolute",
                               alignSelf: "flex-end",
@@ -138,17 +128,7 @@ class FAQ extends Component<IProps> {
                         }
                         invisibleElement={
                           <Image
-                            source={
-                              <Icon
-                                name="chevron-down"
-                                type="font-awesome"
-                                color="white"
-                                style={{
-                                  backgroundColor: "blue",
-                                  alignSelf: "center",
-                                }}
-                              />
-                            }
+                            source={IC_ARR_DOWN}
                             style={{
                               marginRight: 10,
                               position: "absolute",
