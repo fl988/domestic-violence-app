@@ -22,6 +22,7 @@ import { grabUserGoalById } from "db/SelectScripts";
 import { updateUserGoalById } from "db/UpdateScripts";
 import CustomTextInput from "components/user-setup/CustomTextInput";
 import CustomModal from "components/user-setup/CustomModal";
+import { RotationGestureHandler } from "react-native-gesture-handler";
 
 interface IProps {
   navigation: any;
@@ -33,6 +34,8 @@ interface IState {
   modalAction: number;
   userGoalId: number;
   userGoalDesc: string;
+  prevUserGoalDesc: string;
+  isShowResetButton: boolean;
   screenLoader: React.ReactFragment;
   errorMsg: string;
 }
@@ -46,6 +49,8 @@ export default class EditGoal extends Component<IProps, IState> {
       modalAction: 0,
       userGoalId: 0,
       userGoalDesc: "",
+      prevUserGoalDesc: "",
+      isShowResetButton: false,
       screenLoader: <></>,
       errorMsg: "",
     };
@@ -61,6 +66,8 @@ export default class EditGoal extends Component<IProps, IState> {
     this.setState({
       userGoalId: item.userGoalId,
       userGoalDesc: item.userGoalDesc,
+      prevUserGoalDesc: item.userGoalDesc,
+      isShowResetButton: false,
     });
   }
 
@@ -88,7 +95,7 @@ export default class EditGoal extends Component<IProps, IState> {
       this.loadData(); //reload data
     }
   };
-
+  ji;
   goalTextAreaComponent = () => {
     return (
       <View>
@@ -105,7 +112,12 @@ export default class EditGoal extends Component<IProps, IState> {
               margin: 15,
               padding: 5,
             }}
-            onChangeText={(userGoalDesc) => this.setState({ userGoalDesc })}
+            onChangeText={(userGoalDesc: string) => {
+              this.setState({
+                userGoalDesc,
+                isShowResetButton: userGoalDesc !== this.state.prevUserGoalDesc,
+              });
+            }}
             defaultValue={this.state.userGoalDesc}
             maxLength={200}
             placeholder={"Tap here"}
@@ -200,6 +212,27 @@ export default class EditGoal extends Component<IProps, IState> {
     });
   };
 
+  resetButton = () => {
+    if (this.state.isShowResetButton) {
+      return (
+        <CustomTextInput
+          editable={false}
+          onPress={() => {
+            this.loadData();
+          }}
+          rightIcon={"refresh"}
+          rightIconType={"font-awesome"}
+          rightIconColor={"white"}
+          textInputPlaceholder={"Reset"}
+          textInputPlaceholderColor={"white"}
+          value={null}
+        />
+      );
+    } else {
+      return <></>;
+    }
+  };
+
   render() {
     return (
       <Container style={styles.bgPurple1}>
@@ -241,18 +274,7 @@ export default class EditGoal extends Component<IProps, IState> {
           value={null}
         />
 
-        <CustomTextInput
-          editable={false}
-          onPress={() => {
-            this.loadData();
-          }}
-          rightIcon={"refresh"}
-          rightIconType={"font-awesome"}
-          rightIconColor={"white"}
-          textInputPlaceholder={"Reset"}
-          textInputPlaceholderColor={"white"}
-          value={null}
-        />
+        <this.resetButton />
 
         <CustomModal
           modalVisible={this.state.modalVisible}
