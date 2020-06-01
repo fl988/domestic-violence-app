@@ -10,6 +10,8 @@ Dependencies:
 // Import Modules
 import React from "react";
 import SafeAreaView from "react-native-safe-area-view";
+import { NavigationContainer } from "@react-navigation/native";
+import { Icon } from "react-native-elements";
 import {
   View,
   StyleSheet,
@@ -17,8 +19,6 @@ import {
   Linking,
   useWindowDimensions,
 } from "react-native";
-import { NavigationContainer } from "@react-navigation/native";
-import { Icon } from "react-native-elements";
 import {
   DrawerContentComponentProps,
   DrawerContentOptions,
@@ -32,13 +32,12 @@ const Drawer = createDrawerNavigator();
 /* *************************************** */
 // Import Custom Components
 import * as Constants from "constants/Constants";
+import * as api from "contentful-api/ContentfulData";
 import HomeScreen from "components/home-dashboard/HomeScreen";
 import SettingsScreen from "components/home-dashboard/SettingsScreen";
 import FAQ from "components/home-dashboard/FAQ";
+import GoalSettings from "components/home-dashboard/my-goals/GoalSettings";
 import CustomModal from "components/user-setup/CustomModal";
-import Support from "components/home-dashboard/Support";
-
-import * as api from "contentful-api/ContentfulData";
 
 /* *************************************** */
 // Interface - a syntactical contract that an entity should conform to. In other words, an interface defines the syntax that any entity must adhere to.
@@ -118,6 +117,20 @@ export default class HomeDashboard extends React.Component<IProps> {
                 />
                 <Text style={{ color: Constants.COLOUR_WHITE, paddingLeft: 8 }}>
                   {"Frequently Asked Questions"}
+                </Text>
+              </View>
+            ),
+          }}
+        />
+        <Drawer.Screen
+          name={Constants.LEFT_NAV_GOAL_SETTINGS}
+          component={GoalSettings}
+          options={{
+            drawerLabel: ({}) => (
+              <View style={styles.drawerScreen}>
+                <Icon name="bullseye" type="font-awesome" color="white" />
+                <Text style={{ color: Constants.COLOUR_WHITE, paddingLeft: 8 }}>
+                  {"Goal Settings"}
                 </Text>
               </View>
             ),

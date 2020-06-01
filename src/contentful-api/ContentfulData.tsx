@@ -73,6 +73,7 @@ export const fetchArticleOfTheDay = (): Promise<any> => {
         //   // res.items.forEach(async (element) => {
         // });
         // });
+        resolve(res);
       })
       .catch(console.error);
   });

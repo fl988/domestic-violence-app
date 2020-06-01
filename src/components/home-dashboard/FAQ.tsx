@@ -86,7 +86,7 @@ class FAQ extends Component<IProps> {
     return (
       <Container style={styles2.bgPurple1}>
         <Header style={styles2.bgPurple1}>
-          <Left style={{ flex: 1 }}>
+          <Left style={{ flex: 1, paddingLeft: 10 }}>
             <Icon
               name="bars"
               type="font-awesome"
@@ -118,7 +118,17 @@ class FAQ extends Component<IProps> {
                         contentVisible={false}
                         visibleElement={
                           <Image
-                            source={IC_ARR_UP}
+                            source={
+                              <Icon
+                                name="chevron-up"
+                                type="font-awesome"
+                                color="white"
+                                style={{
+                                  backgroundColor: "blue",
+                                  alignSelf: "center",
+                                }}
+                              />
+                            }
                             style={{
                               position: "absolute",
                               alignSelf: "flex-end",
@@ -128,7 +138,17 @@ class FAQ extends Component<IProps> {
                         }
                         invisibleElement={
                           <Image
-                            source={IC_ARR_DOWN}
+                            source={
+                              <Icon
+                                name="chevron-down"
+                                type="font-awesome"
+                                color="white"
+                                style={{
+                                  backgroundColor: "blue",
+                                  alignSelf: "center",
+                                }}
+                              />
+                            }
                             style={{
                               marginRight: 10,
                               position: "absolute",

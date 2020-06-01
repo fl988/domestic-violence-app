@@ -1,9 +1,7 @@
-// import React, { Component } from "react";
-import { Text } from "react-native";
 import * as Constants from "constants/Constants";
 import * as Helper from "components/Helper";
 import { openDatabase } from "expo-sqlite";
-const db = openDatabase("dbUser79");
+const db = openDatabase(Constants.DB_NAME);
 
 interface questionJSONStructure {
   userAnswerCorrect: boolean;

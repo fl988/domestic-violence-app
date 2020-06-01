@@ -33,7 +33,7 @@ class SettingsScreen extends Component<IProps, IState> {
     return (
       <Container style={styles.bgPurple1}>
         <Header style={styles.bgPurple1}>
-          <Left style={{ flex: 1 }}>
+          <Left style={{ flex: 1, paddingLeft: 10 }}>
             <Icon
               name="bars"
               type="font-awesome"

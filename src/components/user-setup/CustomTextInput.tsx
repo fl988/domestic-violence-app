@@ -25,7 +25,7 @@ const CustomTextInput = (props) => {
     return c;
   };
   const rightIconComponent = () => {
-    let c = <></>;
+    let c = <Right />;
     if (props.rightIcon != null) {
       c = (
         <Right style={{ flex: 1, alignItems: "center" }}>
@@ -41,7 +41,13 @@ const CustomTextInput = (props) => {
   };
   const bodyComponent = () => {
     return (
-      <Body style={{ flex: 2, alignItems: "flex-start" }}>
+      <Body
+        style={{
+          flex: 2,
+          alignContent: "center",
+          alignItems: "center",
+        }}
+      >
         <TextInput
           style={{ textAlign: "center", color: "#fff" }}
           placeholder={props.textInputPlaceholder}
@@ -84,6 +90,7 @@ const CustomTextInput = (props) => {
             props.colors != null ? props.colors : Constants.LINEAR_GRADIENT_MAIN
           }
           style={{
+            flexDirection: "row",
             margin: 15,
             height: 40,
             // borderColor: Constants.COLOUR_WHITE,

@@ -27,6 +27,8 @@ import {
 // Import Custom Components
 // import CircularProgress from "components/home-dashboard/CircularProgress";
 import db from "db/User";
+import { grabAllArticles } from "db/SelectScripts";
+import { fetchArticlesAndSave } from "db/FetchAndSaveScripts";
 import styles from "styles/Styles";
 import * as Constants from "constants/Constants";
 import MyAVO from "components/home-dashboard/my-avo/MyAVO";
@@ -75,6 +77,7 @@ export default class HomeScreen extends Component<IProps, IState> {
 
     //fetch learning modules.
     this.fetchLeaningModules();
+    this.fetchArticles();
   }
 
   componentWillUnmount() {
@@ -115,6 +118,16 @@ export default class HomeScreen extends Component<IProps, IState> {
     let rsLM = await db.grabAllLearningModulesData();
     this.setState({
       numberOfModules: rsLM.rows.length,
+    });
+  }
+
+  async fetchArticles() {
+    await grabAllArticles().then(async (rs) => {
+      if (rs != null && rs.rows.length > 0) {
+        console.log("SOMETHING = " + rs.rows.length);
+      } else {
+        await fetchArticlesAndSave();
+      }
     });
   }
 
@@ -227,7 +240,7 @@ export default class HomeScreen extends Component<IProps, IState> {
     ),
     headerRight: () => <View />,
     headerLeft: () => (
-      <View style={{ marginLeft: 10 }}>
+      <View style={{ paddingLeft: 20 }}>
         <Icon
           name="bars"
           type="font-awesome"

@@ -503,5 +503,37 @@ export default StyleSheet.create({
   /*************************************/
 
   /*************************************/
+  // Goals Settings |
+  goalSettingsContainer: {
+    marginTop: 24,
+    borderRadius: 24,
+    height: "auto",
+    width: PAGE_WIDTH - 72,
+    backgroundColor: Constants.COLOUR_EAST_BAY,
+  },
+  goalSettingsContent: {
+    display: "flex",
+    margin: 32,
+  },
+  goalSettingsTextHeader: {
+    color: Constants.COLOUR_WHITE,
+    fontSize: 21,
+    fontWeight: "bold",
+    alignSelf: "center",
+    justifyContent: "center",
+    textAlign: "center",
+    paddingBottom: 16,
+  },
+  goalSettingsTextBody: {
+    color: Constants.COLOUR_WHITE,
+    alignSelf: "center",
+    justifyContent: "center",
+    textAlign: "center",
+    fontSize: 18,
+    lineHeight: 30,
+  },
+  /*************************************/
+
+  /*************************************/
   /*************************************/
 });

@@ -1,4 +1,8 @@
 /****************************************************************************************************************************/
+//DB
+export const DB_NAME = "dbUser79";
+
+/****************************************************************************************************************************/
 import { getStatusBarHeight } from "react-native-status-bar-height";
 export const STATUS_BAR_HEIGHT = getStatusBarHeight();
 
@@ -93,5 +97,8 @@ export const LEFT_NAV_HOME                   = "Home"; // prettier-ignore
 export const LEFT_NAV_SETTINGS               = "Settings"; // prettier-ignore
 export const LEFT_NAV_FAQ                    = "FAQ"; // prettier-ignore
 export const LEFT_NAV_PDF_VIEW_AVO           = "PDFViewAVO"; // prettier-ignore
+export const LEFT_NAV_GOAL_SETTINGS          = "Goal Settings"; // prettier-ignore
+export const GOAL_CREATE                     = "Set a Goal"; // prettier-ignore
+export const GOAL_EDIT                       = "Edit Goal"; // prettier-ignore
 export const MODULE                          = "Module"; // prettier-ignore
 export const QUIZZES                         = "Quizzes"; // prettier-ignore
