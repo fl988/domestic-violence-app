@@ -16,6 +16,8 @@ export const Onbording_menu_home = require("images/Onboarding_menu_home.png");
 export const Onboarding_menu_setting = require("images/Onboarding_menu_setting.png");
 export const Onboarding_menu_FAQ = require("images/Onboarding_menu_FAQ.png");
 export const Onboarding_Sample = require("images/Sample.png");
+export const CHATBOT = require("images/chatbot.png");
+
 
 
 

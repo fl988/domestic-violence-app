@@ -12,6 +12,8 @@ import {
   TouchableOpacityComponent,
 } from "react-native";
 import { TouchableWithoutFeedback } from "react-native-gesture-handler";
+
+
 const PAGE_HEIGHT = Dimensions.get("window").height;
 const PAGE_WIDTH = Dimensions.get("window").width;
 

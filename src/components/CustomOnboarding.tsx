@@ -4,6 +4,8 @@ import * as Constants from "constants/Constants";
 
 import { Button, Icon } from "react-native-elements";
 import Onboarding from "react-native-onboarding-swiper";
+import {Dimensions} from "react-native"
+
 
 //images for tutorials 
 import { Onbording_first } from "images/Images";
@@ -18,7 +20,8 @@ import { Onboarding_Sample } from "images/Images";
 
 
 
-
+const PAGE_HEIGHT = Dimensions.get("window").height;
+const PAGE_WIDTH = Dimensions.get("window").width;
 
 
 const CustomOnboarding = (props) => {
@@ -41,7 +44,10 @@ const CustomOnboarding = (props) => {
       image: <View style = {{alignContent: 'center'}}><Icon name="hand-peace-o" type="font-awesome" size={100} color="white" /></View> // prettier-ignore
     },
     {
-      title: <View><Text style ={styles.head}>HomeDashboard</Text></View>,
+        // <View style={{ height : PAGE_HEIGHT / 2 }}>
+
+
+      title: <View style={{ height : PAGE_HEIGHT / 15 }}><Text style ={styles.head}>HomeDashboard</Text></View>,
       backgroundColor: '#101726',
       image: <View>
                 <Image 

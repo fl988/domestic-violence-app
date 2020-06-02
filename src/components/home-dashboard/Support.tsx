@@ -25,7 +25,7 @@ import { Icon } from "react-native-elements";
 /* *************************************** */
 // Import Custom Components
 import styles2 from "styles/Styles";
-import { BEYOND_BLUE, KIDS_HELP_LINE, LIFE_LINE } from "images/Images";
+import { BEYOND_BLUE, KIDS_HELP_LINE, LIFE_LINE, CHATBOT} from "images/Images";
 
 const { width, height } = Dimensions.get("window");
 // const PAGE_HEIGHT = Dimensions.get("window").height;
@@ -40,6 +40,8 @@ interface IState {
   modalVisible?: boolean;
   modalVisible1?: boolean;
   modalVisible2?: boolean;
+  modalVisible3?: boolean;
+
 }
 
 export default class Support extends Component<IProps, IState> {
@@ -130,7 +132,6 @@ export default class Support extends Component<IProps, IState> {
           onPress={() => {
             this.modalVisibleHandler(!this.state.modalVisible);
           }}
-          style={styles.modalBackdrop}
         ></TouchableOpacity>
         <View style={styles.modal}>
           <View>{this.modalContainer}</View>
@@ -309,6 +310,83 @@ export default class Support extends Component<IProps, IState> {
     );
   };
 
+  // Chatbot 
+  modalVisibleHandler3 = (v) => {
+    this.setState({
+      modalVisible3: v,
+    });
+  };
+
+  modalHeader3= (
+    <View style={styles.modalHeader}>
+      <TouchableOpacity
+        style={{ ...styles.action1 }}
+        onPress={() => {
+          this.modalVisibleHandler3(!this.state.modalVisible3 || false);
+        }}
+      >
+        <Icon
+          containerStyle={styles.closeIconStyle}
+          name="times"
+          type="font-awesome"
+          color={"#fff"}
+        />
+      </TouchableOpacity>
+      <Text style={styles.title}>{"Head to Health"}</Text>
+      <Text style={styles.number}>{"Sam The Chatbot"}</Text>
+    </View>
+  );
+
+  modalBody3 = (
+    <View style={styles.modalBody}>
+      <Text style={styles.bodyText}>
+        {
+          "Head to Health can help you find digital mental health services from some of Australia’s most trusted mental health organisations. Click on 'Go to Website' to chat to Sam: If you don’t know where to start, tell our chatbot sam what’s going on, and it will point you in the right direction. "
+        }
+      </Text>
+    </View>
+  );
+
+  modalFooter3 = (
+    <View style={styles.modalFooter}>
+      <View style={{ flexDirection: "row-reverse", margin: 10 }}>
+        <TouchableOpacity style={{ ...styles.action2 }}>
+          <Text
+            style={styles.actionText2}
+            onPress={() => Linking.openURL("https://headtohealth.gov.au/sam-the-chatbot")}
+          >
+            Go to Website
+          </Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+
+  modalContainer3 = (
+    <View style={styles.modalContainer}>
+      {this.modalHeader3}
+      {this.modalBody3}
+      {this.modalFooter3}
+    </View>
+  );
+
+  Modal3 = () => {
+    return (
+      <Modal
+        transparent={true}
+        visible={this.state.modalVisible3 || false}
+        // onRequestClose={() => {
+        //   Alert.alert("Modal has been closed.");
+        // }}
+      >
+        <View style={styles.modal}>
+          <View>{this.modalContainer3}</View>
+        </View>
+      </Modal>
+    );
+  };
+
+
   render() {
     return (
       <Container style={styles2.bgPurple1}>
@@ -353,6 +431,20 @@ export default class Support extends Component<IProps, IState> {
             >
               <Image source={LIFE_LINE} style={styles.ImageClass} />
             </TouchableOpacity>
+
+            {/* ********************************** */}
+            {/* Head to Health */}
+            {this.Modal3()}
+            <TouchableOpacity
+              style={styles.Support}
+              activeOpacity={0.5}
+              onPress={() => {
+                this.modalVisibleHandler3(true);
+              }}
+            >
+              <Image source={CHATBOT} style={styles.ImageClass} />
+            </TouchableOpacity>
+
           </ScrollView>
         </Content>
       </Container>
