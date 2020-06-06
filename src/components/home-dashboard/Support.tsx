@@ -25,7 +25,7 @@ import { Icon } from "react-native-elements";
 /* *************************************** */
 // Import Custom Components
 import styles2 from "styles/Styles";
-import { BEYOND_BLUE, KIDS_HELP_LINE, LIFE_LINE, CHATBOT} from "images/Images";
+import { BEYOND_BLUE, KIDS_HELP_LINE, LIFE_LINE, CHATBOT, HOTLINE} from "images/Images";
 
 const { width, height } = Dimensions.get("window");
 // const PAGE_HEIGHT = Dimensions.get("window").height;
@@ -41,6 +41,8 @@ interface IState {
   modalVisible1?: boolean;
   modalVisible2?: boolean;
   modalVisible3?: boolean;
+  modalVisible4?: boolean;
+
 
 }
 
@@ -387,6 +389,93 @@ export default class Support extends Component<IProps, IState> {
   };
 
 
+  // YOUTH HOTLINE
+
+  modalVisibleHandler4 = (v) => {
+    this.setState({
+      modalVisible4: v,
+    });
+  };
+
+  modalHeader4= (
+    <View style={styles.modalHeader}>
+      <TouchableOpacity
+        style={{ ...styles.action1 }}
+        onPress={() => {
+          this.modalVisibleHandler4(!this.state.modalVisible4 || false);
+        }}
+      >
+        <Icon
+          containerStyle={styles.closeIconStyle}
+          name="times"
+          type="font-awesome"
+          color={"#fff"}
+        />
+      </TouchableOpacity>
+      <Text style={styles.title}>{"Youth Hotline"}</Text>
+      <Text style={styles.number}>{"1800 10 18 10"}</Text>
+    </View>
+  );
+
+  modalBody4 = (
+    <View style={styles.modalBody}>
+      <Text style={styles.bodyText}>
+        {
+          "Blurb: The Hotline provides legal advice and information to young people under 18, and operates 9am to midnight weekdays, with a 24-hour service from Friday 9am to Sunday midnight and also on public holidays."
+        }
+      </Text>
+    </View>
+  );
+
+  modalFooter4 = (
+    <View style={styles.modalFooter}>
+      <View style={{ flexDirection: "row-reverse", margin: 10 }}>
+      <TouchableOpacity style={{ ...styles.action2 }}>
+          <Text
+            style={styles.actionText2}
+            onPress={() => Linking.openURL(`tel:${131114}`)}
+          >
+            Call now
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={{ ...styles.action2 }}>
+          <Text
+            style={styles.actionText2}
+            onPress={() => Linking.openURL("https://www.legalaid.nsw.gov.au/what-we-do/criminal-law/youth-hotline")}
+          >
+            Go to Website
+          </Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+
+  modalContainer4 = (
+    <View style={styles.modalContainer}>
+      {this.modalHeader4}
+      {this.modalBody4}
+      {this.modalFooter4}
+    </View>
+  );
+
+  Modal4 = () => {
+    return (
+      <Modal
+        transparent={true}
+        visible={this.state.modalVisible4 || false}
+        // onRequestClose={() => {
+        //   Alert.alert("Modal has been closed.");
+        // }}
+      >
+        <View style={styles.modal}>
+          <View>{this.modalContainer4}</View>
+        </View>
+      </Modal>
+    );
+  };
+
+
   render() {
     return (
       <Container style={styles2.bgPurple1}>
@@ -443,6 +532,19 @@ export default class Support extends Component<IProps, IState> {
               }}
             >
               <Image source={CHATBOT} style={styles.ImageClass} />
+            </TouchableOpacity>
+
+             {/* ********************************** */}
+            {/* Head to Health */}
+            {this.Modal4()}
+            <TouchableOpacity
+              style={styles.Support}
+              activeOpacity={0.5}
+              onPress={() => {
+                this.modalVisibleHandler4(true);
+              }}
+            >
+              <Image source={HOTLINE} style={styles.ImageClass} />
             </TouchableOpacity>
 
           </ScrollView>
