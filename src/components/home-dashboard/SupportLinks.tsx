@@ -58,7 +58,7 @@ export class SupportLinks extends Component<IProps, IState> {
     // First we check if we have something on our table "supportLink".
     // If no such table, it'll throw an error and then handle it by creating a supportLink table.
     let rs: SQLResultSet = await grabSupportLinks();
-    if (rs == null) {
+    if (rs == null || rs.rows.length == 0) {
       // Since we just created a table, our program will come here straight after.
       //   We then start to fetch support links data then save it on our table 'supportLink'.
       await fetchSupportLinksAndSave();

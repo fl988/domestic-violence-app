@@ -5,6 +5,7 @@ import { Text, Image } from "react-native";
 import { Container, Header, Content, Left, Right, Body } from "native-base";
 import { Icon } from "react-native-elements";
 import { DrawerActions } from "@react-navigation/native";
+import RNPickerSelect from "react-native-picker-select";
 
 /* *************************************** */
 // Import Custom Components
@@ -42,7 +43,14 @@ class SettingsScreen extends Component<IProps, IState> {
             justifyContent: "center",
           }}
         >
-          <Text style={{ color: "#fff" }}> Settings Screen </Text>
+          <RNPickerSelect
+            onValueChange={(value) => console.log(value)}
+            items={[
+              { label: "Football", value: "football" },
+              { label: "Baseball", value: "baseball" },
+              { label: "Hockey", value: "hockey" },
+            ]}
+          />
         </Content>
       </Container>
     );
