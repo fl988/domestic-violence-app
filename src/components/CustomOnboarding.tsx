@@ -12,6 +12,7 @@ import { Onbording_first } from "images/Images";
 import { Onbording_second } from "images/Images";
 import { Onbording_third } from "images/Images";
 import { Onbording_fourth } from "images/Images";
+import { Onbording_fifth } from "images/Images";
 import { Onbording_quick } from "images/Images";
 import { Onbording_menu_home } from "images/Images";
 import { Onboarding_menu_setting } from "images/Images";
@@ -38,30 +39,33 @@ const CustomOnboarding = (props) => {
 
   const PAGES = [
     {
-      title: <Text style ={{color :'white', fontWeight: 'bold', fontSize: 25, marginBottom: 10, marginTop: -35,}}>Hey!</Text>,
-      subtitle: <Text style ={{color :'white', fontWeight: 'bold', fontSize: 15}}>WELCOME to Juvenile AVO APP</Text>,
-      backgroundColor: '#101726',
-      image: <View style = {{alignContent: 'center'}}><Icon name="hand-peace-o" type="font-awesome" size={100} color="white" /></View> // prettier-ignore
+      title: <Text style ={{color :'white', fontWeight: 'bold', fontSize: 25, marginBottom: 10, marginTop: -35,}}>Welcome !</Text>,
+      subtitle: <Text style ={{color :'white', fontWeight: 'bold', fontSize: 15, margin: 10, textAlign: 'center'}}>This will give you tutorial for using the App briefly</Text>,
+      backgroundColor: '#631C47',
+      image: <View style = {{alignContent: 'center'}}><Text style = {{fontWeight: '900', fontSize: 45, color: "white", fontStyle: 'normal'}}> 
+      YAVOS
+    </Text></View> // prettier-ignore
+      //<Icon name="hand-peace-o" type="font-awesome" size={100} color="white" /> taken out as we need text as logo
     },
     {
         // <View style={{ height : PAGE_HEIGHT / 2 }}>
 
 
       title: <View style={{ height : PAGE_HEIGHT / 15 }}><Text style ={styles.head}>HomeDashboard</Text></View>,
-      backgroundColor: '#101726',
+      backgroundColor: '#631C47',
       image: <View>
                 <Image 
                   style = {styles.body}
                   source = {Onbording_first}
                 />
             </View>,
-      subtitle: <Text style ={styles.bottom}>Homedashboard is where you can find AVO information, Learning Moduels, Support page and articles of the day.</Text>,
+      subtitle: <Text style ={styles.bottom}> This is Homedashboard where you can find AVO information, Learning Moduels, Support page, Goals and articles of the day.</Text>,
 
       //image: <Icon name="paper-plane-o" type="font-awesome" size={100} color="white" /> //prettier-ignore
     },
     {
       title: <View><Text style ={styles.head}>My AVO</Text></View>,
-      backgroundColor: '#101726',
+      backgroundColor: '#631C47',
       image: <View>
                 <Image 
                   style = {styles.body}
@@ -72,7 +76,7 @@ const CustomOnboarding = (props) => {
     },
     {
       title: <View><Text style ={styles.head}>Learning Module</Text></View>,
-      backgroundColor: '#101726',
+      backgroundColor: '#631C47',
       image: <View>
                 <Image 
                   style = {styles.body}
@@ -83,18 +87,29 @@ const CustomOnboarding = (props) => {
     },
     {
       title: <View><Text style ={styles.head}>Support</Text></View>,
-      backgroundColor: '#101726',
+      backgroundColor: '#631C47',
       image: <View>
                 <Image 
                   style = {styles.body}
                   source = {Onbording_fourth}
                 />
             </View>,
-      subtitle: <Text style ={styles.bottom}>In Support page, you can see three different support pages you can ask help for and you can also visit thier site to have information and it has a function to call them directly on your own device.</Text>,
+      subtitle: <Text style ={styles.bottom}>In Support page, you can see many different support pages you can ask help for and you can also visit thier site to have information and it has a function to call them directly on your own device.</Text>,
     },
     {
-      title: <View><Text style ={[styles.head, {bottom: 520}]}>Quick Help</Text></View>,
-      backgroundColor: '#101726',
+      title: <View><Text style ={styles.head}>My Goals</Text></View>,
+      backgroundColor: '#631C47',
+      image: <View>
+                <Image 
+                  style = {styles.body}
+                  source = {Onbording_fifth}
+                />
+            </View>,
+      subtitle: <Text style ={styles.bottom}> You can set your goals in there and see completed goals and dropped goals</Text>,
+    },
+    {
+      title: <View><Text style ={[styles.head, {bottom: 500}]}>Quick Help</Text></View>,
+      backgroundColor: '#631C47',
       image: <View>
                 <Image 
                   style = {[styles.body, {}]}
@@ -105,7 +120,7 @@ const CustomOnboarding = (props) => {
     },
     {
       title: <View><Text style ={styles.head}>Home in Hamburger menu</Text></View>,
-      backgroundColor: '#101726',
+      backgroundColor: '#631C47',
       image: <View>
                 <Image 
                   style = {styles.body}
@@ -116,7 +131,7 @@ const CustomOnboarding = (props) => {
     },
     {
       title: <View><Text style ={styles.head}>Settings in Hamburger menu</Text></View>,
-      backgroundColor: '#101726',
+      backgroundColor: '#631C47',
       image: <View>
                 <Image 
                   style = {styles.body}
@@ -127,7 +142,7 @@ const CustomOnboarding = (props) => {
     },
     {
       title: <View><Text style ={styles.head}>FAQ in Hamburger menu</Text></View>,
-      backgroundColor: '#101726',
+      backgroundColor: '#631C47',
       image: <View>
                 <Image 
                   style = {styles.body}
@@ -137,8 +152,8 @@ const CustomOnboarding = (props) => {
       subtitle: <Text style ={styles.bottom}>There is FAQ(Frequently Asked Questions) menu you can check. </Text>,
     },
     {
-      title: <View><Text style ={styles.head}>Sample AVO and Delete Account</Text></View>,
-      backgroundColor: '#101726',
+      title: <View><Text style ={styles.head}>Sample AVO / Delete Account</Text></View>,
+      backgroundColor: '#631C47',
       image: <View>
                 <Image 
                   style = {styles.body}
@@ -151,7 +166,7 @@ const CustomOnboarding = (props) => {
 
 
     {
-      title: "That's Enough",
+      title: <View><Text style = {{ color: 'white', fontWeight: 'bold', fontSize: 15, bottom: 20}}>YAVOS is ready for you now !</Text></View>,
       subtitle: (
         <Button
           title="Get Started"
@@ -161,8 +176,12 @@ const CustomOnboarding = (props) => {
           }}
         />
       ),
-      backgroundColor: '#101726',
-      image: <Icon name="rocket" type="font-awesome" size={100} color="white" /> //prettier-ignore
+      backgroundColor: '#631C47',
+      image: <View style = {{alignContent: 'center'}}><Text style = {{fontWeight: '900', fontSize: 45, color: "white", fontStyle: 'normal'}}> 
+      YAVOS
+    </Text></View> //prettier-ignore
+
+      // <Icon name="rocket" type="font-awesome" size={100} color="white" /> // Icon has been taken out as we need to use text for logo 
     },
   ];
 
@@ -189,21 +208,21 @@ const styles = StyleSheet.create({
   head: {
     color :'white', 
     fontWeight: 'bold',
-    fontSize: 25, 
+    fontSize: 30, 
     textAlign: 'center',
     bottom: 500,
   }, 
   body: {
     width: 300, 
     height: 400,
-    bottom: 10, 
+    bottom: -25, 
     resizeMode: 'contain',  
   },
   bottom: {
     color :'white', 
     fontWeight: 'bold', 
-    fontSize: 15,
-    bottom: 80,
+    fontSize: 17,
+    bottom: 60,
     padding: 10,
   },
 
