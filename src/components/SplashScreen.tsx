@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { View, Animated } from "react-native";
+import { View, Animated, Text } from "react-native";
 import { Icon } from "react-native-elements";
 import styles from "styles/Styles";
 
@@ -64,7 +64,7 @@ export default class SplashScreen extends Component<IProps, IState> {
   render() {
     const viewStyles = [
       styles.splashScreenContainer,
-      { backgroundColor: "#003c8f" },
+      { backgroundColor: "#631C47" },
     ];
     const textStyles = {
       color: "white",
@@ -81,12 +81,10 @@ export default class SplashScreen extends Component<IProps, IState> {
         <View style={styles.screenDimension}>
           <View style={viewStyles}>
             <Animated.View style={[animatedStyle]}>
-              <Icon
-                name="hand-peace-o"
-                type="font-awesome"
-                size={100}
-                color="white"
-              />
+              <Text style = {{fontWeight: '900', fontSize: 45, color: "white", fontStyle: 'normal'}}> 
+                YAVOS
+              </Text>
+              
             </Animated.View>
           </View>
         </View>
@@ -97,3 +95,16 @@ export default class SplashScreen extends Component<IProps, IState> {
     return null;
   }
 }
+
+
+
+// taken out Icon as we use logo name 
+/*
+<Icon
+                name="hand-peace-o"
+                type="font-awesome"
+                size={100}
+                color="white"
+              />
+
+*/
