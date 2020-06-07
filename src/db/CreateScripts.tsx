@@ -178,6 +178,9 @@ export const createSupportLink = (): Promise<boolean> => {
   });
 };
 
+/**
+ *
+ */
 export const createFrequentlyAskedQuestions = (): Promise<boolean> => {
   return new Promise((resolve, reject) => {
     try {
@@ -196,6 +199,37 @@ export const createFrequentlyAskedQuestions = (): Promise<boolean> => {
           },
           (tx, error) => {
             console.log("createFrequentlyAskedQuestions ERROR! = " + error);
+            resolve(false);
+            return false;
+          }
+        );
+      });
+    } catch (error) {}
+  });
+};
+
+export const createCondition = (): Promise<boolean> => {
+  return new Promise((resolve, reject) => {
+    try {
+      db.transaction((tx) => {
+        tx.executeSql(
+          "CREATE TABLE IF NOT EXISTS condition (" +
+            "conditionId INTEGER PRIMARY KEY NOT NULL, " +
+            "userId INT NULL DEFAULT 1, " +
+            "conditionNumber INT DEFAULT 0, " +
+            "conditionSummary TEXT DEFAULT '', " +
+            "conditionText TEXT DEFAULT '', " +
+            "conditionSelected BOOLEAN DEFAULT 0, " +
+            "conditionMandatory BOOLEAN DEFAULT 0, " +
+            "FOREIGN KEY(userId) REFERENCES user(userId) " +
+            ");",
+          [],
+          (tx, success) => {
+            console.log("createSupportLink SUCCESS! = " + success);
+            resolve(true);
+          },
+          (tx, error) => {
+            console.log("createSupportLink ERROR! = " + error);
             resolve(false);
             return false;
           }

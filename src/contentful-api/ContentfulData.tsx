@@ -5,6 +5,7 @@ const client = contentful.createClient({
   accessToken: Constants.AUTH_PENTECH_ACCESS_TOKEN_DELIVERY,
 });
 import {
+  insertConditionRecord,
   insertSupportLink,
   insertFrequentlyAskedQuestion,
 } from "db/InsertScripts";
@@ -12,35 +13,58 @@ import { grabSingleSupportLinkByUrl } from "db/SelectScripts";
 
 /****************************************************************************************************************************************************/
 // START API CALLS
-// grabUserConditionsAPI() {
-//   // This API call will request an entry with the specified ID from the space defined at the top, using a space-specific access token. ie. the Conditions.
-//   // We then start building our own custom json object array.
-// usage => https://www.contentful.com/developers/docs/javascript/tutorials/using-js-cda-sdk/
-export const fetchAVOConditions = (apiKey: String): Promise<any> => {
-  const contentful = require("contentful/dist/contentful.browser.min.js");
-  const client = contentful.createClient({
-    space: Constants.AUTH_PENTECH_SPACE_ID,
-    accessToken: Constants.AUTH_PENTECH_ACCESS_TOKEN_DELIVERY,
-  });
+interface conditionJSONObjStructure {
+  conditionNumber: number;
+  title: string;
+  conditionSummary: string;
+  conditionText: string;
+  alreadySelected: boolean; // 1st condition is always true
+  mandatory: boolean; // 1st condition is always mandatory
+}
+export const fetchAVOConditionsV2 = (): Promise<
+  conditionJSONObjStructure[]
+> => {
+  return new Promise(async (resolve, reject) => {
+    await client
+      .getEntries({
+        // HTTP Headers
+        content_type: "avoCondition",
+        order: "sys.createdAt",
+      }) //grab all of the entries
+      .then(function (entries) {
+        // var conditionsArr = {};
 
-  return new Promise((resolve, reject) => {
-    var conditionsArr = {};
-    client
-      .getEntry(apiKey)
-      .then((entry) => {
-        conditionsArr = {
-          conditionNumber: entry.fields.conditionNumber,
-          conditionSummary: entry.fields.conditionSummary,
-          conditionText: entry.fields.conditionText,
-          keyTerms: entry.fields.keyTerms,
-        };
+        let conditionArr: conditionJSONObjStructure[] = [];
+        entries.items.forEach((entry, i) => {
+          // Save into database
+          insertConditionRecord(
+            entry.fields.conditionNumber,
+            entry.fields.conditionSummary,
+            entry.fields.conditionText,
+            i == 0, // 1st condition is always true
+            i == 0 // 1st condition is always mandatory
+          );
 
-        resolve(conditionsArr);
+          //make use of the raw data and build an array of objects to return rather than reading from db.
+          let condSum = entry.fields.conditionSummary;
+          if (condSum.length > 18) condSum = condSum.slice(0, 15) + "...";
+          conditionArr.push({
+            conditionNumber: entry.fields.conditionNumber,
+            title:
+              "\tCondition " +
+              entry.fields.conditionNumber +
+              " ( " +
+              condSum +
+              " )",
+            conditionSummary: condSum,
+            conditionText: entry.fields.conditionText,
+            alreadySelected: i == 0, // 1st condition is always true
+            mandatory: i == 0, // 1st condition is always mandatory
+          });
+        });
+        resolve(conditionArr);
       })
-      .catch((err) => {
-        console.log("fetchData ERROR = " + err);
-        resolve(err);
-      });
+      .catch(console.error);
   });
 };
 
@@ -72,7 +96,6 @@ export const fetchArticleOfTheDay = (): Promise<any> => {
  * Fetches Contentful API for content type "supportLinks" then saves the data into our table "supportLink"
  */
 export const fetchSupportLinksAndSave = (): Promise<boolean> => {
-  let x = 0;
   return new Promise(async (resolve, reject) => {
     await client
       .getEntries({

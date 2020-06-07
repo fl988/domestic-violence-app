@@ -69,6 +69,7 @@ export default class GoalSettings extends Component<IProps, IState> {
   }
 
   private refreshData = () => {
+    console.log("TEST1111");
     this.init();
   };
 
@@ -136,6 +137,13 @@ export default class GoalSettings extends Component<IProps, IState> {
         // set something here to show user if we have something on our table otherwise hide this component
       });
     } else {
+      this.setState({
+        userHasGoalsHistory: false,
+        goalHeaderAndBodyComponent: <></>,
+        goalsCompleted: 0,
+        goalsDropped: 0,
+        // set something here to show user if we have something on our table otherwise hide this component
+      });
     }
   };
 

@@ -4,6 +4,7 @@ import { openDatabase } from "expo-sqlite";
 const db = openDatabase(Constants.DB_NAME); //setUpUserGoalTables.
 import {
   setUpUserGoalTables,
+  createCondition,
   createSupportLink,
   createUserGoal,
   createFrequentlyAskedQuestions,
@@ -432,6 +433,28 @@ export const grabSingleSupportLinkByUrl = (
   });
 };
 
+export const grabConditions = (): Promise<SQLResultSet> => {
+  return new Promise((resolve, reject) => {
+    try {
+      db.transaction(
+        (tx) => {
+          tx.executeSql("SELECT * FROM condition; ", [], (txSuccess, rs) => {
+            // Resultset will be returned even there are no records.
+            // We handle this empty table where ever we using this.
+            resolve(rs);
+          });
+        },
+        async (tx) => {
+          // TRANSACTION ERROR CAUGHT.
+          // This means that this table is not exist. We create then create it.
+          await createCondition();
+          resolve(null);
+        }
+      );
+    } catch (error) {}
+  });
+};
+
 /**
  * FOR DEBUGGING ONLY!
  * VERY HELPFUL THING HERE!
@@ -454,7 +477,7 @@ export const debugPrintScript = (script: string): Promise<SQLResultSet> => {
         (tx) => {
           console.log("\n\n!!!!!!!!!!!!!!!!!!!!!!!!!");
           console.log("TRANSACTION ERROR CAUGHT, WE NOW HANDLE IT");
-
+          console.log(tx);
           resolve(null);
         }
       );

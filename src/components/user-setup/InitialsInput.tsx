@@ -69,14 +69,16 @@ const InitialsInput = (props) => {
           />
         </LinearGradient>
 
-        <View>
-          <TouchableOpacity
-            style={myStyles.nextBtnV2}
-            onPress={() => onNextHandler(getInitialsEntered)}
-          >
-            <Text style={myStyles.buttonText}>{"NEXT"}</Text>
-          </TouchableOpacity>
-        </View>
+        {!props.hideNextButton && (
+          <View>
+            <TouchableOpacity
+              style={myStyles.nextBtnV2}
+              onPress={() => onNextHandler(getInitialsEntered)}
+            >
+              <Text style={myStyles.buttonText}>{"NEXT"}</Text>
+            </TouchableOpacity>
+          </View>
+        )}
       </View>
     </View>
   );

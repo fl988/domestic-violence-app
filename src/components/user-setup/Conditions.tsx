@@ -1,10 +1,4 @@
-import React, {
-  Component,
-  FunctionComponent,
-  ComponentType,
-  ReactNode,
-  ReactFragment,
-} from "react";
+import React, { Component } from "react";
 import {
   View,
   ScrollView,
@@ -13,12 +7,8 @@ import {
   ActivityIndicator,
 } from "react-native";
 import Accordion from "components/user-setup/Accordion";
-import * as Constants from "constants/Constants";
-import db from "db/User";
-import { fetchAVOConditions } from "contentful-api/ContentfulData";
-
-// Styles
-import styles from "styles/Styles";
+import { fetchAVOConditionsV2 } from "contentful-api/ContentfulData";
+import { grabConditions, debugPrintScript } from "db/SelectScripts";
 
 // type FC<P = {}> = FunctionComponent<P>;
 
@@ -39,54 +29,31 @@ export default class Conditions extends Component<IProps, IState> {
   };
 
   componentDidMount() {
-    this.checkUser();
+    this.init();
   }
 
-  async checkUser() {
-    await this.fetchAPI(); //fetch stuff from contentful then populate the 'condition' table.
-    await this.grabDisplayData(); //grab the recently saved data then set the state for display.
-  }
-
-  async fetchAPI() {
-    let isUserAlreadySet = await db.checkUserSetUp();
-
-    if (!isUserAlreadySet) {
-      let count = await db.getConditionRecordCount();
-      count > 9 ? await db.deleteCondition() : "";
-      for (let x = 0; x < Constants.CONT_PENTECH_CONDITIONS_ARR.length; x++) {
-        const apiKey = Constants.CONT_PENTECH_CONDITIONS_ARR[x];
-
-        //fetch data from api and wait until finish before continuing the loop
-        let data = await fetchAVOConditions(apiKey);
-
-        // if (!this.state.error) {
-        //   //Error: Network Error
-        //   this.setState({
-        //     error: true,
-        //     conditionComponents: (
-        //       <>
-        //         <Text style={{ color: "white", alignSelf: "center" }}>
-        //           {"Network Error"}
-        //         </Text>
-        //       </>
-        //     ),
-        //   });
-        // }
-
-        await db.insertConditionRecord(
-          data.conditionNumber,
-          data.conditionSummary,
-          data.conditionText,
-          x == 0, // 1st condition is always true
-          x == 0 // 1st condition is always mandatory
-        );
-      }
+  init = async () => {
+    await debugPrintScript("select conditionText from condition;");
+    // First we check if we have something on our table "condition".
+    // If no such table, it'll throw an error and then handle it by creating a condition table.
+    let rs: SQLResultSet = await grabConditions();
+    if (rs == null || rs.rows.length == 0) {
+      // Since we just created a table, our program will come here straight after.
+      //   We then start to fetch data then save it on our table 'condition'.
+      let objArr = await fetchAVOConditionsV2();
+      this.setState({
+        conditionComponents: this.renderAccordians(objArr) // prettier-ignore
+      });
+    } else {
+      // We have data on our table.
+      await this.grabDisplayData();
     }
-  }
+  };
 
   async grabDisplayData() {
     // get all the condition as resultset
-    let rsCond = await db.grabConditionDetails(); //prettier-ignore
+    let rsCond = await grabConditions(); //prettier-ignore
+    console.log(rsCond);
     if (rsCond != null) {
       var conditionsArr = [];
       // loop through each of the condition.
@@ -97,18 +64,21 @@ export default class Conditions extends Component<IProps, IState> {
         conditionsArr[x] = {
           conditionNumber: item.conditionNumber,
           title: "\tCondition " + item.conditionNumber + " ( " + condSum + " )", //prettier-ignore
-          data: (
-            <>
-              <Text style={{ fontWeight: "bold" }}>
-                {item.conditionSummary}
-              </Text>
-              <Text>{item.conditionText}</Text>
-            </>
-          ),
+          conditionSummary: item.conditionSummary,
+          conditionText: item.conditionText,
           alreadySelected: item.conditionSelected,
           mandatory: item.conditionMandatory,
         };
       }
+
+      conditionsArr[10] = {
+        conditionNumber: 11,
+        title: "\tCondition 11",
+        conditionSummary: "A special condition.",
+        conditionText: " ",
+        specialCondition: true,
+      };
+
       this.setState({
         conditionComponents: this.renderAccordians(conditionsArr) // prettier-ignore
       });
@@ -125,18 +95,25 @@ export default class Conditions extends Component<IProps, IState> {
 
   /***********************************************************************************/
   // functional functions
-
   renderAccordians(avoConditions) {
     const items = [];
     if (avoConditions.length > 0 && typeof avoConditions[0] !== "undefined") {
       for (let x = 0; x < avoConditions.length; x++) {
+        let data: any = (
+          <>
+            <Text style={{ fontWeight: "bold" }}>
+              {avoConditions[x].conditionSummary}
+            </Text>
+            <Text>{avoConditions[x].conditionText}</Text>
+          </>
+        );
         items.push(
           <Accordion
             key={x}
             checkBoxDisabled={false}
             conditionNumber={avoConditions[x].conditionNumber}
             title={avoConditions[x].title}
-            data={avoConditions[x].data}
+            data={data}
             alreadySelected={avoConditions[x].alreadySelected}
             mandatory={avoConditions[x].mandatory}
             specialCondition={avoConditions[x].specialCondition}

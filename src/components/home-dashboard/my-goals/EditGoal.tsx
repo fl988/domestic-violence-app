@@ -75,6 +75,7 @@ export default class EditGoal extends Component<IProps, IState> {
   }
 
   async loadData() {
+    console.log(this.props.route.params.userGoalId);
     let rsUserGoal = await grabUserGoalById(this.props.route.params.userGoalId);
     let item = rsUserGoal.rows.item(0);
     this.setState({

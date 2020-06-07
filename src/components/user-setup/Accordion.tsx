@@ -48,12 +48,8 @@ export default class Accordion extends Component<IProps, IState> {
     }
 
     //Translation: if its condition 11 AND it's a special condition AND it's checked then do the following.
-    if (v == 10 && this.props.specialCondition && !this.state.isChecked) {
-      Alert.alert(
-        "Condition " +
-          conditionNum +
-          " is special, you will have to contact Julian Bernardi. "
-      );
+    if (v == 11 && this.props.specialCondition && !this.state.isChecked) {
+      Alert.alert("Please contact your parent/guardian for this condition.");
       return;
     }
 

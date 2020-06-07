@@ -9,6 +9,40 @@ import {
 
 /**
  *
+ * @param condNumber
+ * @param condSummary
+ * @param condText
+ * @param conditionSelected
+ * @param condMandatory
+ */
+export const insertConditionRecord = (
+  condNumber: number,
+  condSummary: string,
+  condText: string,
+  conditionSelected: boolean,
+  condMandatory: boolean
+): Promise<boolean> => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      db.transaction((tx) => {
+        tx.executeSql(
+          "INSERT INTO " +
+            " condition(conditionNumber, conditionSummary, conditionText, conditionSelected, conditionMandatory) " +
+            " VALUES(?,?,?,?,?); ",
+          [condNumber, condSummary, condText, conditionSelected, condMandatory],
+          (tx, success) => {/* success */ resolve(true);}, // prettier-ignore
+          (tx, error) => {
+            console.log("error insertConditionRecord = " + error);
+            return false;
+          }
+        );
+      });
+    } catch (err) {}
+  });
+};
+
+/**
+ *
  * @param url
  * @param articleTitle
  * @param articleImage
@@ -123,39 +157,39 @@ export const insertSupportLink = (
     try {
       // We don't want duplicates.
       // So we first check if this supportLinkURL that is being saved is already existing in our table supportLink.
-      
+
       db.transaction((tx) => {
         // if (!isAlreadyExist) {
-          tx.executeSql(
-            "INSERT INTO supportLink(" +
-              "supportLinkURL, " +
-              "supportLinkNumber, " +
-              "supportLinkTitle, " +
-              "supportLinkDescription, " +
-              "supportLinkAdditionalURL, " +
-              "supportLinkAdditionalHeading, " +
-              "supportLinkImageURL, " +
-              "supportLinkImageFileName) " +
-              "VALUES(?,?,?,?,?,?,?,?); ",
-            [
-              supportLinkURL,
-              supportLinkNumber,
-              supportLinkTitle,
-              supportLinkDescription,
-              supportLinkAdditionalURL,
-              supportLinkAdditionalHeading,
-              supportLinkImageURL,
-              supportLinkImageFileName,
-            ],
-            (tx, success) => {
-              console.log("insertSupportLink SUCCESS!");
-              resolve(true);
-            },
-            (tx, error) => {
-              resolve(false);
-              return false;
-            }
-          );
+        tx.executeSql(
+          "INSERT INTO supportLink(" +
+            "supportLinkURL, " +
+            "supportLinkNumber, " +
+            "supportLinkTitle, " +
+            "supportLinkDescription, " +
+            "supportLinkAdditionalURL, " +
+            "supportLinkAdditionalHeading, " +
+            "supportLinkImageURL, " +
+            "supportLinkImageFileName) " +
+            "VALUES(?,?,?,?,?,?,?,?); ",
+          [
+            supportLinkURL,
+            supportLinkNumber,
+            supportLinkTitle,
+            supportLinkDescription,
+            supportLinkAdditionalURL,
+            supportLinkAdditionalHeading,
+            supportLinkImageURL,
+            supportLinkImageFileName,
+          ],
+          (tx, success) => {
+            console.log("insertSupportLink SUCCESS!");
+            resolve(true);
+          },
+          (tx, error) => {
+            resolve(false);
+            return false;
+          }
+        );
         // }
       });
     } catch (error) {}
