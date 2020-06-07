@@ -168,7 +168,7 @@ class User {
           tx.executeSql(
             "SELECT * FROM learningModules;",
             [],
-            (trans, rs) => {console.log("learningModules exist "+ (rs.rows.length > 0 ? "" : "but EMPTY! ") +": " + rs.rows.length); resolve(rs.rows.length > 0); }, // prettier-ignore
+            (trans, rs) => {/*console.log("learningModules exist "+ (rs.rows.length > 0 ? "" : "but EMPTY! ") +": " + rs.rows.length);*/ resolve(rs.rows.length > 0); }, // prettier-ignore
             (tx, error) => {console.log("learningModules checkForLearningModuleData does NOT EXIST!."); resolve(false); return false;} // prettier-ignore
           );
         });
@@ -792,7 +792,7 @@ class User {
             "CREATE TABLE IF NOT EXISTS user (" +
               "userId INTEGER PRIMARY KEY NOT NULL, " +
               "initials TEXT DEFAULT 'XX', " +
-              "dob TEXT DEFAULT (datetime('now')), " +
+              "dob TEXT DEFAULT (datetime('now','localtime')), " +
               "userTypeId INT DEFAULT 0, " +
               "userSetUp BOOLEAN DEFAULT 0, " +
               "completeOnboarding BOOLEAN DEFAULT 0 " +
@@ -1061,7 +1061,7 @@ class User {
               "moduleContent TEXT DEFAULT '', " +
               "quizTopic TEXT DEFAULT '', " +
               "finished BOOLEAN DEFAULT 0, " +
-              "insertTimestamp TEXT DEFAULT (datetime('now')) " +
+              "insertTimestamp TEXT DEFAULT (datetime('now','localtime')) " +
               ");",
             [],
             (tx, success) => {console.log("createLearningModules SUCCESS!"); resolve(true);/* success */}, // prettier-ignore
@@ -1373,29 +1373,7 @@ class User {
   updateUserType(v: number) {
     try {
       db.transaction((tx) => {
-        tx.executeSql(
-          "UPDATE USER SET userTypeId = ? WHERE userId = 1;",
-          [v],
-          (t, r) => {
-            console.log("WORKING UPDATE?");
-            tx.executeSql(
-              "SELECT * FROM user;",
-              [],
-              (t, r) => {
-                console.log("SELECT USER");
-                console.log(r);
-              },
-              (t, e) => {
-                console.log("SELECT USER FAIL");
-                return false;
-              }
-            );
-          },
-          (t, e) => {
-            console.log("ERROR UPDATE!");
-            return false;
-          }
-        );
+        tx.executeSql("UPDATE USER SET userTypeId = ? WHERE userId = 1;", [v]);
       });
     } catch (error) {}
   }
@@ -1802,7 +1780,7 @@ class User {
   ): Promise<boolean> {
     return new Promise(async (resolve, reject) => {
       try {
-        console.log("Checking Answers");
+        // console.log("Checking Answers");
         let userScore = 0;
         for (let x = 0; x < rsUserAnswers.rows.length; x++) {
           let item = rsUserAnswers.rows.item(x);
@@ -1869,7 +1847,7 @@ class User {
   ): Promise<boolean> {
     return new Promise((resolve, reject) => {
       try {
-        console.log("updateLearningModuleCompletion finished = " + finished);
+        // console.log("updateLearningModuleCompletion finished = " + finished);
         db.transaction((tx) => {
           tx.executeSql(
             "UPDATE learningModules SET finished = ? " +
@@ -1899,9 +1877,9 @@ class User {
               "WHERE learningModuleId = ? ;",
             [userScoreNume, userScoreDeno, userScoreValue, learningModuleId],
             (tx, success) => {
-              console.log(
-                "updateUserPerformance SUCCESS!: " + success.rows.length
-              );
+              // console.log(
+              //   "updateUserPerformance SUCCESS!: " + success.rows.length
+              // );
             },
             (tx, error) => {console.log("updateUserPerformance ERROR!: " + error);/* fail */ return false;} // prettier-ignore
           );
@@ -1911,9 +1889,9 @@ class User {
             [learningModuleId],
             (trans, rs) => {
               if (rs == null || rs.rows.length == 0) {
-                console.log(
-                  "EITHER EMPTY or NO RECORD FOUND ON userPerformance."
-                );
+                // console.log(
+                //   "EITHER EMPTY or NO RECORD FOUND ON userPerformance."
+                // );
                 db.transaction((tx) => {
                   tx.executeSql(
                     "INSERT INTO " +
@@ -1930,7 +1908,6 @@ class User {
                   );
                 });
               } else {
-                // console.log(rs);
                 resolve(true);
               }
             },

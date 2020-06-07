@@ -128,10 +128,10 @@ export default class CreateGoal extends Component<IProps, IState> {
         this.screenLoader(false);
       } else {
         //this is a function from GoalSettings that is currently binded. Will refresh the page first.
-        this.props.route.params.refreshData();
+        // this.props.route.params.refreshData();
         //after refresh we go back.
         setTimeout(() => {
-          this.props.navigation.navigate(Constants.LEFT_NAV_GOAL_SETTINGS);
+          this.props.navigation.navigate(Constants.HOME_SCREEN_GOALS);
           this.screenLoader(false);
         }, 1000);
       }

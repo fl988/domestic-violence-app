@@ -5,6 +5,17 @@ const PAGE_HEIGHT = Dimensions.get("window").height;
 const PAGE_WIDTH = Dimensions.get("window").width;
 
 export default StyleSheet.create({
+  activityIndicatorOverlayCentre: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
+    opacity: 0.5,
+    backgroundColor: "black",
+    justifyContent: "center",
+    alignItems: "center",
+  },
   /*************************************/
   // Colors
   bgPurple1: {
@@ -310,17 +321,15 @@ export default StyleSheet.create({
     // width: PAGE_HEIGHT / 4.8,
   },
   homeDashboardGreeterContainer: {
-    // flex: 1, //this will fill out the remaining spaces, don't need it for now.
-    display: "flex",
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 24,
     backgroundColor: Constants.COLOUR_EAST_BAY, //"rgba(255,255,255, 0.3)",
     justifyContent: "center",
     height: PAGE_WIDTH / 2 - 36,
-    width: PAGE_WIDTH, // Page width / 2 then we take the margin into consideration which in this case is on the left. We want 3 of them which is 12 * 3 = 36.
-    // height: PAGE_HEIGHT / 8,
-    // width: PAGE_HEIGHT / 4.8,
+    width: PAGE_WIDTH,
+    // Page width / 2 then we take the margin into consideration which in this case is on the left.
+    // We want 3 of them which is 12 * 3 = 36.
   },
   homeDashboardHeading: {
     paddingBottom: 10,
@@ -486,7 +495,7 @@ export default StyleSheet.create({
   rneContentHomeDashboard: {
     flex: 1,
     alignItems: "flex-start",
-    justifyContent: "flex-start",
+    justifyContent: "center",
     flexDirection: "row",
     flexWrap: "wrap",
   },
@@ -505,11 +514,12 @@ export default StyleSheet.create({
   /*************************************/
   // Goals Settings |
   goalSettingsContainer: {
+    marginLeft: 24,
+    marginBottom: 24,
     marginTop: 24,
     borderRadius: 24,
     height: "auto",
-    width: PAGE_WIDTH - 72,
-    backgroundColor: Constants.COLOUR_EAST_BAY,
+    width: PAGE_WIDTH - 48,
   },
   goalSettingsContent: {
     display: "flex",
@@ -533,7 +543,14 @@ export default StyleSheet.create({
     lineHeight: 30,
   },
   /*************************************/
-
+  // Support Links
+  supportLinkTouch: {
+    justifyContent: "center",
+    alignItems: "center",
+    alignContent: "center",
+    top: 20,
+    paddingBottom: 20,
+  },
   /*************************************/
   /*************************************/
 });

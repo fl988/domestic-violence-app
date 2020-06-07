@@ -1,11 +1,10 @@
 import React, { useState } from "react";
-import { Text, View, TouchableOpacity } from "react-native";
+import { View } from "react-native";
 import * as Constants from "constants/Constants";
 // Database
 import db from "db/User";
 // Styles
 import styles from "styles/Styles";
-import CustomModal from "components/user-setup/CustomModal";
 import CustomTextInput from "components/user-setup/CustomTextInput";
 
 const UserType = (props) => {
@@ -53,7 +52,7 @@ const UserType = (props) => {
           leftIcon={"graduation-cap"}
           leftIconType={"font-awesome"} //the type of the icon you're using.
           leftIconColor={"white"} //you can put simple color words or hex or rgb.
-          textInputPlaceholder={"Just Learning"}
+          textInputPlaceholder={Constants.USER_TYPE_DESC_JUST_LEARNING}
           textInputPlaceholderColor={"white"}
           value={null}
         />
@@ -66,7 +65,7 @@ const UserType = (props) => {
           leftIcon={"users"}
           leftIconType={"font-awesome"} //the type of the icon you're using.
           leftIconColor={"white"} //you can put simple color words or hex or rgb.
-          textInputPlaceholder={"A Parent / Guardian"}
+          textInputPlaceholder={Constants.USER_TYPE_DESC_PARENT_AND_GUARDIAN}
           textInputPlaceholderColor={"white"}
           value={null}
         />
@@ -79,7 +78,7 @@ const UserType = (props) => {
           leftIcon={"balance-scale"}
           leftIconType={"font-awesome"} //the type of the icon you're using.
           leftIconColor={"white"} //you can put simple color words or hex or rgb.
-          textInputPlaceholder={"An AVO Holder"}
+          textInputPlaceholder={Constants.USER_TYPE_DESC_AVO_HOLDER}
           textInputPlaceholderColor={"white"}
           value={null}
         />

@@ -9,7 +9,7 @@ import {
   View,
   ScrollView,
   Text,
-  TouchableOpacity,
+  Dimensions,
   ActivityIndicator,
 } from "react-native";
 import Accordion from "components/user-setup/Accordion";
@@ -177,9 +177,18 @@ export default class Conditions extends Component<IProps, IState> {
     }
   };
   render() {
+    const { width, height } = Dimensions.get("window");
     return (
       <View
-        style={[styles.frameV2]}
+        style={{
+          position: "absolute",
+          left: 0,
+          bottom: 80,
+          // borderRadius: (PAGE_WIDTH - 100) / 2,
+          height: height / 2.1,
+          width: width,
+          marginBottom: 50,
+        }}
         // onLayout={(e) => {
         //   find_dimesions(e.nativeEvent.layout);
         // }}

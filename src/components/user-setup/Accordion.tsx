@@ -1,8 +1,9 @@
 import React, { Component, FunctionComponent } from "react";
-import { View, TouchableOpacity, Text, Alert } from "react-native";
+import { View, TouchableOpacity, Text, Alert, Dimensions } from "react-native";
 import CheckBox from "react-native-check-box";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import * as Constants from "constants/Constants";
+const { width, height } = Dimensions.get("window");
 
 // Database
 import db from "db/User";
@@ -86,9 +87,9 @@ export default class Accordion extends Component<IProps, IState> {
           style={{
             flexDirection: "row",
             justifyContent: "space-between",
-            height: 46,
+            height: height / 15,
             paddingLeft: 25,
-            paddingRight: 18,
+            paddingRight: 25,
             alignItems: "center",
             backgroundColor:
               this.state.isChecked || this.props.mandatory

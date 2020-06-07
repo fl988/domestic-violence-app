@@ -2,6 +2,9 @@ import * as Constants from "constants/Constants";
 import { openDatabase } from "expo-sqlite";
 const db = openDatabase(Constants.DB_NAME);
 
+/**
+ *
+ */
 export const createArticles = (): Promise<boolean> => {
   return new Promise((resolve, reject) => {
     try {
@@ -12,7 +15,7 @@ export const createArticles = (): Promise<boolean> => {
             "url TEXT DEFAULT '', " +
             "articleTitle TEXT DEFAULT '', " +
             "articleImage TEXT DEFAULT '', " +
-            "insertTimestamp TEXT DEFAULT (datetime('now')) " +
+            "insertTimestamp TEXT DEFAULT (datetime('now','localtime')) " +
             ");",
           [],
           (tx, success) => {
@@ -30,6 +33,23 @@ export const createArticles = (): Promise<boolean> => {
   });
 };
 
+/**
+ *
+ */
+export const setUpUserGoalTables = (): Promise<boolean> => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      await createUserGoal();
+      // await createUserGoalSettings();
+      await createUserGoalHistory();
+      resolve(true);
+    } catch (err) {}
+  });
+};
+
+/**
+ *
+ */
 export const createUserGoal = (): Promise<boolean> => {
   return new Promise((resolve, reject) => {
     try {
@@ -39,7 +59,10 @@ export const createUserGoal = (): Promise<boolean> => {
             "userGoalId INTEGER PRIMARY KEY NOT NULL, " +
             "userGoalDesc TEXT DEFAULT '', " +
             "userGoalActive BOOLEAN DEFAULT 0, " +
-            "insertTimestamp TEXT DEFAULT (datetime('now')) " +
+            "userGoalComplete BOOLEAN DEFAULT 0, " +
+            "startTimestamp TEXT DEFAULT (datetime('now','localtime')), " +
+            "endTimestamp TEXT DEFAULT '0000-00-00 00:00:00', " +
+            "insertTimestamp TEXT DEFAULT (datetime('now','localtime')) " +
             ");",
           [],
           (tx, success) => {
@@ -57,34 +80,40 @@ export const createUserGoal = (): Promise<boolean> => {
   });
 };
 
-export const createUserGoalSettings = (): Promise<boolean> => {
-  return new Promise((resolve, reject) => {
-    try {
-      db.transaction((tx) => {
-        tx.executeSql(
-          "CREATE TABLE IF NOT EXISTS userGoalSettings (" +
-            "userGoalSettingsId INTEGER PRIMARY KEY NOT NULL, " +
-            "userGoalId INTEGER PRIMARY KEY NOT NULL, " +
-            "userGoalDuration INT DEFAULT 0, " +
-            "userGoalFrequency INT DEFAULT 0, " +
-            "FOREIGN KEY(userGoalId) REFERENCES userGoal(userGoalId) " +
-            ");",
-          [],
-          (tx, success) => {
-            console.log("createUserGoalSettings SUCCESS! = " + success);
-            resolve(true);
-          },
-          (tx, error) => {
-            console.log("createUserGoalSettings ERROR! = " + error);
-            resolve(false);
-            return false;
-          }
-        );
-      });
-    } catch (error) {}
-  });
-};
+/**
+ *
+ */
+// export const createUserGoalSettings = (): Promise<boolean> => {
+//   return new Promise((resolve, reject) => {
+//     try {
+//       db.transaction((tx) => {
+//         tx.executeSql(
+//           "CREATE TABLE IF NOT EXISTS userGoalSettings (" +
+//             "userGoalSettingsId INTEGER PRIMARY KEY NOT NULL, " +
+//             "userGoalId INT DEFAULT 0, " +
+//             "userGoalDuration INT DEFAULT 0, " +
+//             "userGoalFrequency INT DEFAULT 0, " +
+//             "FOREIGN KEY(userGoalId) REFERENCES userGoal(userGoalId) " +
+//             ");",
+//           [],
+//           (tx, success) => {
+//             console.log("createUserGoalSettings SUCCESS! = " + success);
+//             resolve(true);
+//           },
+//           (tx, error) => {
+//             console.log("createUserGoalSettings ERROR! = " + error);
+//             resolve(false);
+//             return false;
+//           }
+//         );
+//       });
+//     } catch (error) {}
+//   });
+// };
 
+/**
+ *
+ */
 export const createUserGoalHistory = (): Promise<boolean> => {
   return new Promise((resolve, reject) => {
     try {
@@ -92,8 +121,8 @@ export const createUserGoalHistory = (): Promise<boolean> => {
         tx.executeSql(
           "CREATE TABLE IF NOT EXISTS userGoalHistory (" +
             "userGoalHistoryId INTEGER PRIMARY KEY NOT NULL, " +
-            "userGoalId INTEGER PRIMARY KEY NOT NULL, " +
-            "insertTimestamp TEXT DEFAULT (datetime('now')) " +
+            "userGoalId INT DEFAULT 0, " +
+            "insertTimestamp TEXT DEFAULT (datetime('now','localtime')), " +
             "FOREIGN KEY(userGoalId) REFERENCES userGoal(userGoalId) " +
             ");",
 
@@ -104,6 +133,69 @@ export const createUserGoalHistory = (): Promise<boolean> => {
           },
           (tx, error) => {
             console.log("createUserGoalHistory ERROR! = " + error);
+            resolve(false);
+            return false;
+          }
+        );
+      });
+    } catch (error) {}
+  });
+};
+
+/**
+ *
+ */
+export const createSupportLink = (): Promise<boolean> => {
+  return new Promise((resolve, reject) => {
+    try {
+      db.transaction((tx) => {
+        tx.executeSql(
+          "CREATE TABLE IF NOT EXISTS supportLink (" +
+            "supportLinkId INTEGER PRIMARY KEY NOT NULL, " +
+            "supportLinkURL TEXT DEFAULT '', " +
+            "supportLinkNumber INT DEFAULT 0, " +
+            "supportLinkTitle TEXT DEFAULT '', " +
+            "supportLinkDescription TEXT DEFAULT '', " +
+            "supportLinkAdditionalURL TEXT DEFAULT '', " +
+            "supportLinkAdditionalHeading TEXT DEFAULT '', " +
+            "supportLinkImageURL TEXT DEFAULT '', " +
+            "supportLinkImageFileName TEXT DEFAULT '', " +
+            "insertTimestamp TEXT DEFAULT (datetime('now','localtime')) " +
+            ");",
+          [],
+          (tx, success) => {
+            console.log("createSupportLink SUCCESS! = " + success);
+            resolve(true);
+          },
+          (tx, error) => {
+            console.log("createSupportLink ERROR! = " + error);
+            resolve(false);
+            return false;
+          }
+        );
+      });
+    } catch (error) {}
+  });
+};
+
+export const createFrequentlyAskedQuestions = (): Promise<boolean> => {
+  return new Promise((resolve, reject) => {
+    try {
+      db.transaction((tx) => {
+        tx.executeSql(
+          "CREATE TABLE IF NOT EXISTS frequentlyAskedQuestions (" +
+            "faqId INTEGER PRIMARY KEY NOT NULL, " +
+            "faqQuestion TEXT DEFAULT '', " +
+            "faqAnswer TEXT DEFAULT '', " +
+            "insertTimestamp TEXT DEFAULT (datetime('now','localtime')) " +
+            ");",
+          [],
+          (tx, success) => {
+            console.log("createFrequentlyAskedQuestions SUCCESS! = " + success);
+            resolve(true);
+          },
+          (tx, error) => {
+            console.log("createFrequentlyAskedQuestions ERROR! = " + error);
             resolve(false);
             return false;
           }

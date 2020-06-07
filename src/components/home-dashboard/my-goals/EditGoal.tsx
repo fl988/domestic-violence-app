@@ -15,11 +15,14 @@ import {
 } from "@react-navigation/stack";
 const Stack = createStackNavigator();
 
-/* *************************************** */
+/* ***************************************************************************************** */
 // Import Custom Components
 import { deleteUserGoal } from "db/DeleteScripts";
 import { grabUserGoalById } from "db/SelectScripts";
-import { updateUserGoalById } from "db/UpdateScripts";
+import {
+  updateUserGoalDescById,
+  updateUserGoalActiveById,
+} from "db/UpdateScripts";
 import CustomTextInput from "components/user-setup/CustomTextInput";
 import CustomModal from "components/user-setup/CustomModal";
 import { RotationGestureHandler } from "react-native-gesture-handler";
@@ -40,7 +43,16 @@ interface IState {
   errorMsg: string;
 }
 
+/* ***************************************************************************************** */
+// Local constants
+const GOAL_ACTION_DELETE = 1;
+const GOAL_ACTION_SAVE = 2;
+const GOAL_ACTION_RESET = 3;
+const GOAL_ACTION_COMPLETE = 4;
+
 export default class EditGoal extends Component<IProps, IState> {
+  /* ***************************************************************************************** */
+  // constructor, props and state
   constructor(props: IProps) {
     super(props);
     this.state = {
@@ -56,6 +68,8 @@ export default class EditGoal extends Component<IProps, IState> {
     };
   }
 
+  /* ***************************************************************************************** */
+  // Functions
   componentDidMount() {
     this.loadData();
   }
@@ -87,15 +101,17 @@ export default class EditGoal extends Component<IProps, IState> {
   };
 
   modalAction = () => {
-    if (this.state.modalAction == 1) {
-      this.deleteGoalHandler(this.state.userGoalId);
-    } else if (this.state.modalAction == 2) {
+    if (this.state.modalAction == GOAL_ACTION_DELETE) {
+      this.updateGoalHandler(this.state.userGoalId, false);
+    } else if (this.state.modalAction == GOAL_ACTION_SAVE) {
       this.saveGoalHandler(this.state.userGoalDesc);
-    } else if (this.state.modalAction == 3) {
+    } else if (this.state.modalAction == GOAL_ACTION_COMPLETE) {
+      this.updateGoalHandler(this.state.userGoalId, true);
+    } else if (this.state.modalAction == GOAL_ACTION_RESET) {
       this.loadData(); //reload data
     }
   };
-  ji;
+
   goalTextAreaComponent = () => {
     return (
       <View>
@@ -132,15 +148,19 @@ export default class EditGoal extends Component<IProps, IState> {
     );
   };
 
-  deleteGoalHandler = async (userGoalId: number) => {
+  updateGoalHandler = async (userGoalId: number, isComplete: boolean) => {
     Keyboard.dismiss(); //dismiss keyboard
     this.screenLoader(true);
-    let deleteSuccess = await deleteUserGoal(userGoalId);
-    if (deleteSuccess) {
+    let updateSuccess = await updateUserGoalActiveById(
+      false,
+      isComplete,
+      userGoalId
+    );
+    if (updateSuccess) {
       //this is a function from GoalSettings that is currently binded. Will refresh the page first.
-      await this.props.route.params.refreshData();
-      //after refresh we go back.
-      this.props.navigation.navigate(Constants.LEFT_NAV_GOAL_SETTINGS);
+      // await this.props.route.params.refreshData();
+      //after refresh we go back to the previous page.
+      this.props.navigation.navigate(Constants.HOME_SCREEN_GOALS);
       this.screenLoader(false);
     } else {
       this.screenLoader(false);
@@ -153,7 +173,7 @@ export default class EditGoal extends Component<IProps, IState> {
       this.screenLoader(true); //show screen loader
 
       // do db scripts here and wait.
-      let updateSuccess = await updateUserGoalById(userGoalDesc, this.state.userGoalId); //prettier-ignore
+      let updateSuccess = await updateUserGoalDescById(userGoalDesc, this.state.userGoalId); //prettier-ignore
       if (!updateSuccess) {
         this.errorMsgHandler("Failed to save goal.", 3);
         this.screenLoader(false);
@@ -162,7 +182,7 @@ export default class EditGoal extends Component<IProps, IState> {
         this.props.route.params.refreshData();
         //after refresh we go back.
         setTimeout(() => {
-          this.props.navigation.navigate(Constants.LEFT_NAV_GOAL_SETTINGS);
+          this.props.navigation.navigate(Constants.HOME_SCREEN_GOALS);
           this.screenLoader(false);
         }, 1000);
       }
@@ -194,17 +214,7 @@ export default class EditGoal extends Component<IProps, IState> {
       screenLoader: show ? (
         <ActivityIndicator
           size="large"
-          style={{
-            position: "absolute",
-            left: 0,
-            right: 0,
-            top: 0,
-            bottom: 0,
-            opacity: 0.5,
-            backgroundColor: "black",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
+          style={styles.activityIndicatorOverlayCentre}
         />
       ) : (
         <></>
@@ -233,6 +243,8 @@ export default class EditGoal extends Component<IProps, IState> {
     }
   };
 
+  /* ***************************************************************************************** */
+  // RENDER
   render() {
     return (
       <Container style={styles.bgPurple1}>
@@ -243,8 +255,8 @@ export default class EditGoal extends Component<IProps, IState> {
           onPress={() => {
             this.modalVisibleHandler(
               true,
-              1,
-              "Are you sure you want to remove your goal?"
+              GOAL_ACTION_DELETE,
+              "You are about to remove your goal. \n\nAre you sure you want to continue?"
             );
             // this.saveGoalHandler(this.state.userGoalDesc);
           }}
@@ -261,8 +273,26 @@ export default class EditGoal extends Component<IProps, IState> {
           onPress={() => {
             this.modalVisibleHandler(
               true,
-              2,
-              "Remember, changing your goal will reset progress on your current goal. \n\nDo you want to continue?"
+              GOAL_ACTION_COMPLETE,
+              "You are about to complete your goal. \n\nPlease make sure you've actually completed this goal."
+            );
+            // this.saveGoalHandler(this.state.userGoalDesc);
+          }}
+          rightIcon={"trophy"}
+          rightIconType={"font-awesome"}
+          rightIconColor={"white"}
+          textInputPlaceholder={"Complete Goal"}
+          textInputPlaceholderColor={"white"}
+          value={null}
+        />
+
+        <CustomTextInput
+          editable={false}
+          onPress={() => {
+            this.modalVisibleHandler(
+              true,
+              GOAL_ACTION_SAVE,
+              "You are about to change your goal. \n\nDo you want to continue?"
             );
             // this.saveGoalHandler(this.state.userGoalDesc);
           }}

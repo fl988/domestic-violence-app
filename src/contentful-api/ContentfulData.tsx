@@ -4,6 +4,11 @@ const client = contentful.createClient({
   space: Constants.AUTH_PENTECH_SPACE_ID,
   accessToken: Constants.AUTH_PENTECH_ACCESS_TOKEN_DELIVERY,
 });
+import {
+  insertSupportLink,
+  insertFrequentlyAskedQuestion,
+} from "db/InsertScripts";
+import { grabSingleSupportLinkByUrl } from "db/SelectScripts";
 
 /****************************************************************************************************************************************************/
 // START API CALLS
@@ -58,6 +63,85 @@ export const fetchArticleOfTheDay = (): Promise<any> => {
       .getEntries() //grab all of the entries
       .then((res) => {
         resolve(res);
+      })
+      .catch(console.error);
+  });
+};
+
+/**
+ * Fetches Contentful API for content type "supportLinks" then saves the data into our table "supportLink"
+ */
+export const fetchSupportLinksAndSave = (): Promise<boolean> => {
+  let x = 0;
+  return new Promise(async (resolve, reject) => {
+    await client
+      .getEntries({
+        // HTTP Headers
+        content_type: "supportLinks",
+        order: "-sys.createdAt", //order by
+        sys: {
+          // Link types that are located on Asset only.
+          type: "Link",
+          linkType: "Asset",
+        },
+      }) //grab all of the entries
+      .then((entries) => {
+        let isSuccess = false;
+        entries.items.forEach(async (entry, i) => {
+          // prettier-ignore
+          let isAlreadyExist = await grabSingleSupportLinkByUrl(entry.fields.supportLinkUrl);
+          if (!isAlreadyExist) {
+            isSuccess = await insertSupportLink(
+              entry.fields.supportLinkUrl,
+              entry.fields.supportLinkNumber,
+              entry.fields.supportLinkImage.fields.title,
+              entry.fields.supportLinkImage.fields.description,
+              typeof entry.fields.supportLinkAdditionalUrl === "undefined"
+                ? ""
+                : entry.fields.supportLinkAdditionalUrl,
+              typeof entry.fields.supportLinkAdditionalHeading === "undefined"
+                ? ""
+                : entry.fields.supportLinkAdditionalHeading,
+              entry.fields.supportLinkImage.fields.file.url,
+              entry.fields.supportLinkImage.fields.file.fileName
+            );
+          }
+        });
+        return isSuccess;
+      })
+      .catch(console.error);
+    resolve(true);
+  });
+};
+
+/**
+ * Fetches Contentful API for content type "supportLinks" then saves the data into our table "supportLink"
+ */
+export const fetchFrequentlyAskedQuestionsAndSave = (): Promise<boolean> => {
+  let x = 0;
+  return new Promise(async (resolve, reject) => {
+    await client
+      .getEntries({
+        // HTTP Headers
+        content_type: "frequentlyAskedQuestions",
+        order: "sys.createdAt",
+      }) //grab all of the entries
+      .then(function (entries) {
+        let success = false;
+        entries.items.forEach(async (entry, i) => {
+          // prettier-ignore
+          let builtFAQAnswer = "";
+          entry.fields.questionAnswer.content.forEach((entry2, i2) => {
+            builtFAQAnswer += entry2.content[0].value + "\n";
+          });
+
+          success = await insertFrequentlyAskedQuestion(
+            entry.fields.questionTitle,
+            builtFAQAnswer
+          );
+        });
+
+        resolve(success);
       })
       .catch(console.error);
   });

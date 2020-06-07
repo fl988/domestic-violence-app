@@ -1,6 +1,6 @@
 /****************************************************************************************************************************/
 //DB
-export const DB_NAME = "dbUser58";
+export const DB_NAME = "dbUser43";
 
 /****************************************************************************************************************************/
 import { getStatusBarHeight } from "react-native-status-bar-height";
@@ -36,24 +36,21 @@ export const USER_TYPE_AVO_HOLDER = 1;
 export const USER_TYPE_PARENT_GUARDIAN = 2;
 export const USER_TYPE_LEARNING = 3;
 
+export const USER_TYPE_DESC_AVO_HOLDER = "AVO Holder";
+export const USER_TYPE_DESC_PARENT_AND_GUARDIAN = "Parent / Guardian";
+export const USER_TYPE_DESC_JUST_LEARNING = "Just Learning";
+
 // AVO User Type Description Const
 export const userTypeDescArr = [
-  "AVO Holder",
-  "Parent / Guardian",
-  "Just Learning",
+  USER_TYPE_DESC_AVO_HOLDER,
+  USER_TYPE_DESC_PARENT_AND_GUARDIAN,
+  USER_TYPE_DESC_JUST_LEARNING,
 ];
 
 /****************************************************************************************************************************/
-// ****************
-// Authentications
-// This is the space ID. A space is like a project folder in Contentful terms
-export const AUTH_SPACE_ID = "8a1dp1qg7h57";
-// This is the access token for this space. Normally you get both ID and the token in the Contentful web app
-export const AUTH_ACCESS_TOKEN_DELIVERY = "aqsalLuLaFvcM0PCg2qyxr94Phu_p_Y_yqLoqVgxV14"; // prettier-ignore
-export const AUTH_ACCESS_TOKEN_PREVIEW = "yvMitd9RiQbd7wyIU3caPCkVRMvnGlWmid9GYkLtsgA"; // prettier-ignore
-
-// Contents
-export const CONT_CONDITIONS = "7frQjGWI7X3ZJ9969fXIiy";
+// Goal Settings
+export const GOAL_SETTINGS_DURATION = [1, 2, 3, 4, 5, 6, 7]; //in days
+export const GOAL_SETTINGS_FREQUENCY = ["Daily", "Weekly"]; // 1:Daily, 2:Weekly
 
 /****************************************************************************************************************************/
 // ****************
@@ -90,9 +87,10 @@ export const QTYPE_MULTIPLE_CHOICE           = 2; // prettier-ignore
 export const HOME_SCREEN_MAIN                = "Home Dashboard"; // prettier-ignore
 export const HOME_SCREEN_MY_AVO              = "My AVO"; // prettier-ignore
 export const HOME_SCREEN_LEARNING_MODULES    = "Learning Modules"; // prettier-ignore
-export const HOME_SCREEN_INTERACTIVE_STORIES = "Interactive Stories"; // prettier-ignore
-export const HOME_SCREEN_STATISTICS          = "Statistics"; // prettier-ignore
+// export const HOME_SCREEN_INTERACTIVE_STORIES = "Interactive Stories"; // prettier-ignore
+// export const HOME_SCREEN_STATISTICS          = "Statistics"; // prettier-ignore
 export const HOME_SCREEN_SUPPORT             = "Support"; // prettier-ignore
+export const HOME_SCREEN_GOALS               = "My Goals"; // prettier-ignore
 export const LEFT_NAV_HOME                   = "Home"; // prettier-ignore
 export const LEFT_NAV_SETTINGS               = "Settings"; // prettier-ignore
 export const LEFT_NAV_FAQ                    = "FAQ"; // prettier-ignore
@@ -100,5 +98,6 @@ export const LEFT_NAV_PDF_VIEW_AVO           = "PDFViewAVO"; // prettier-ignore
 export const LEFT_NAV_GOAL_SETTINGS          = "Goal Settings"; // prettier-ignore
 export const GOAL_CREATE                     = "Set a Goal"; // prettier-ignore
 export const GOAL_EDIT                       = "Edit Goal"; // prettier-ignore
+export const GOAL_VIEW_HISTORY               = "View Goal History"; // prettier-ignore
 export const MODULE                          = "Module"; // prettier-ignore
 export const QUIZZES                         = "Quizzes"; // prettier-ignore

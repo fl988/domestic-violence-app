@@ -57,44 +57,11 @@ export default class Module extends Component<IProps, IState> {
     };
   }
 
-  // static navigationOptions = ({ navigation }) => {
-  //   return {
-  //     headerLeft: () => (
-  //       <View style={{ marginLeft: 10 }}>
-  //         <Icon
-  //           name="arrow-left"
-  //           type="font-awesome"
-  //           color="white"
-  //           // onPress={()=>{navigation.state.params.on}
-  //           // onPress={() => this.props.navigation.goBack()}
-  //         />
-  //       </View>
-  //     ),
-  //   };
-  // };
-
-  // componentDidMount() {
-  //   this.props.route.params.onNavigateBack();
-  // }
-  // componentDidUpdate() {
-  //   this.props.route.params.onNavigateBack();
-  // }
-
   quizHandler = async () => {
     this.props.navigation.navigate(Constants.QUIZZES, {
       learningModuleId: this.state.learningModuleId,
     });
   };
-
-  // testBegin = () => {
-  //   console.log("testBegin");
-  //   this.test(this.props.navigation);
-  // };
-  // test = (navigation: any) => {
-  //   console.log("TESTING THIS YO");
-  //   console.log(this.props.navigation.state);
-  //   console.log(this.props.navigation.state.params);
-  // };
 
   render() {
     return (

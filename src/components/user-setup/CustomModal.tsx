@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { Text, View, TouchableOpacity, Modal, Alert } from "react-native";
 import { Icon } from "react-native-elements";
 import styles from "styles/Styles";
-
 const CustomModal = (props) => {
   let modalHeader = (
     <View style={styles.modalHeader}>
@@ -109,6 +108,7 @@ const CustomModal = (props) => {
 
   return (
     <Modal
+      animationType="slide"
       transparent={true}
       visible={props.modalVisible}
       //   onRequestClose={() => {

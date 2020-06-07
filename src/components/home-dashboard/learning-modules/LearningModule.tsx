@@ -43,7 +43,7 @@ interface enumJsonObj {
 interface enumJsonArr extends Array<enumJsonObj> {}
 
 interface IProps {
-  navigation: NavigationScreenProp<NavigationState, NavigationParams>;
+  navigation: any;
 }
 
 interface IState {
@@ -89,6 +89,10 @@ export default class LearningModule extends Component<IProps, IState> {
       this.reRenderComponentWhenBack();
     });
     this.init();
+  }
+
+  componentWillUnmount() {
+    this.props.navigation.removeListener("focus");
   }
 
   async init() {

@@ -50,7 +50,7 @@ export default class UserSetupSwiper extends Component<IProps, IState> {
     },
     {
       title: "Please check which conditions apply to you.",
-      //   description: "Please choose one.",
+      description: "These conditions are listed on your AVO from the court.",
       bgColor: Constants.COLOUR_EBONY,
       mainComponent: <Conditions />,
     },
@@ -83,12 +83,13 @@ export default class UserSetupSwiper extends Component<IProps, IState> {
         }
       }
 
+      // prettier-ignore
       let userItem = rsUser.rows.item(0);
       this.setState({
         userDetails:
-          "Initials: "                + (userItem.initials == "" ? "Anonymous" : userItem.initials) + // prettier-ignore
-          "\n\nDOB: "                 + userItem.dob +                                                // prettier-ignore
-          "\n\nType of User: "        + Constants.userTypeDescArr[userItem.userTypeId - 1] +          // prettier-ignore
+          "Initials: "                + (userItem.initials == "" ? "Anonymous" : userItem.initials) + 
+          "\n\nDOB: "                 + userItem.dob +                                                
+          "\n\nType of User: "        + Constants.userTypeDescArr[userItem.userTypeId - 1] +          
           "\n\nConditions selected:"  + component // prettier-ignore
       });
     }

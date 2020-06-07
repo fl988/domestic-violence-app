@@ -1,47 +1,53 @@
-/* *************************************** */
+/* ***************************************************************************************** */
 // Import Modules
 import React, { Component, ReactFragment } from "react";
-import { View, Image, TouchableOpacity, AppState } from "react-native";
-import { Container, Header, Content, Left, Right, Body } from "native-base";
+import { View, AppState, ImageBackground, Dimensions } from "react-native";
+import { Container, Content, Right } from "native-base";
 import { Icon, Text } from "react-native-elements";
-import { NavigationContainer, DrawerActions } from "@react-navigation/native";
+import { DrawerActions } from "@react-navigation/native";
 import { LinearGradient } from "expo-linear-gradient";
+import { ScrollView } from "react-native-gesture-handler";
+const { width, height } = Dimensions.get("window");
+import { HOME_BACKGROUND } from "images/Images";
+import {
+  NavigationState,
+  NavigationParams,
+  NavigationScreenProp,
+} from "react-navigation"; //React Navigation with TypeScript => https://dev.to/andreasbergqvist/react-navigation-with-typescript-29ka
 import {
   createStackNavigator,
   TransitionPresets,
 } from "@react-navigation/stack";
 const Stack = createStackNavigator();
+
 // const forFade = ({ current, closing }) => ({
 //   // cardStyle: {
 //   //   opacity: current.progress,
 //   // },
 // });
 
-import {
-  NavigationState,
-  NavigationParams,
-  NavigationScreenProp,
-} from "react-navigation"; //React Navigation with TypeScript => https://dev.to/andreasbergqvist/react-navigation-with-typescript-29ka
-
-/* *************************************** */
+/* ***************************************************************************************** */
 // Import Custom Components
-// import CircularProgress from "components/home-dashboard/CircularProgress";
+import * as Constants from "constants/Constants";
+import styles from "styles/Styles";
 import db from "db/User";
 import { grabAllArticles } from "db/SelectScripts";
 import { fetchArticlesAndSave } from "db/FetchAndSaveScripts";
-import styles from "styles/Styles";
-import * as Constants from "constants/Constants";
 import MyAVO from "components/home-dashboard/my-avo/MyAVO";
 import LearningModule from "components/home-dashboard/learning-modules/LearningModule";
 import Module from "components/home-dashboard/learning-modules/Module";
 import Quiz from "components/home-dashboard/learning-modules/Quiz";
-import Support from "components/home-dashboard/Support";
+import SupportLinks from "components/home-dashboard/SupportLinks";
 import QuickHelp from "components/QuickHelp";
-import { ScrollView } from "react-native-gesture-handler";
 import ArticleOfTheDay from "components/home-dashboard/ArticleOfTheDay";
 import Engage from "components/home-dashboard/Engage";
+import GoalSettings from "components/home-dashboard/my-goals/GoalSettings";
+import CreateGoal from "components/home-dashboard/my-goals/CreateGoal";
+import EditGoal from "components/home-dashboard/my-goals/EditGoal";
+import ViewGoalHistory from "components/home-dashboard/my-goals/ViewGoalHistory";
+import { debugPrintScript } from "db/SelectScripts";
 
-/* *************************************** */
+/* ***************************************************************************************** */
 // Interface
 interface IProps {
   navigation: NavigationScreenProp<NavigationState, NavigationParams>;
@@ -65,8 +71,7 @@ export default class HomeScreen extends Component<IProps, IState> {
   }
 
   async componentDidMount() {
-    AppState.addEventListener("change", this._handleAppStateChange);
-
+    // await debugPrintScript("SELECT count(*) as count FROM supportLink; ");
     //Display initials
     db.grabUserDetails().then((data) => {
       if (data != null) {
@@ -81,23 +86,6 @@ export default class HomeScreen extends Component<IProps, IState> {
     await this.fetchLeaningModules();
     await this.fetchArticles();
   }
-
-  componentWillUnmount() {
-    AppState.removeEventListener("change", this._handleAppStateChange);
-  }
-
-  _handleAppStateChange = (nextAppState) => {
-    this.grabCurrentDate();
-    if (
-      this.state.appState.match(/inactive|background/) &&
-      nextAppState === "active"
-    ) {
-      console.log("App has come to the foreground!. save this time");
-    }
-    console.log("App sent to the background!. save this time. ");
-    /// difference between both the times is the time spent by user on app
-    this.setState({ appState: nextAppState });
-  };
 
   async grabCurrentDate() {
     await db.getCurrentTime();
@@ -153,22 +141,30 @@ export default class HomeScreen extends Component<IProps, IState> {
         <ScrollView>
           <View
             style={{
-              backgroundColor: Constants.COLOUR_EBONY,
+              // backgroundColor: Constants.COLOUR_EBONY,
               flex: 1,
               flexDirection: "row",
               flexWrap: "wrap",
             }}
           >
-            <LinearGradient
-              colors={Constants.LINEAR_GRADIENT_MAIN}
-              style={styles.homeDashboardGreeterContainer}
+            <ImageBackground
+              source={HOME_BACKGROUND}
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                marginBottom: 24,
+                backgroundColor: Constants.COLOUR_EAST_BAY, //"rgba(255,255,255, 0.3)",
+                justifyContent: "center",
+                height: width / 2,
+                width: width,
+              }}
             >
               <Right style={styles.homeDashboardGreeterRightContent}>
                 <Text style={styles.homeDashboardContent}>
                   <this.fetchUserInitials />
                 </Text>
               </Right>
-            </LinearGradient>
+            </ImageBackground>
 
             {/* ENGAGE ITEMS */}
             <Engage navigation={navigation} />
@@ -221,7 +217,27 @@ export default class HomeScreen extends Component<IProps, IState> {
             />
             <Stack.Screen
               name={Constants.HOME_SCREEN_SUPPORT}
-              component={Support}
+              component={SupportLinks}
+              options={this.learningModuleHeaderOptions}
+            />
+            <Stack.Screen
+              name={Constants.HOME_SCREEN_GOALS}
+              component={GoalSettings}
+              options={this.learningModuleHeaderOptions}
+            />
+            <Stack.Screen
+              name={Constants.GOAL_CREATE}
+              component={CreateGoal}
+              options={this.learningModuleHeaderOptions}
+            />
+            <Stack.Screen
+              name={Constants.GOAL_EDIT}
+              component={EditGoal}
+              options={this.learningModuleHeaderOptions}
+            />
+            <Stack.Screen
+              name={Constants.GOAL_VIEW_HISTORY}
+              component={ViewGoalHistory}
               options={this.learningModuleHeaderOptions}
             />
           </Stack.Navigator>

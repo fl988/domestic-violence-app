@@ -1,6 +1,11 @@
 import React, { Component } from "react";
 import { StyleSheet, View, StatusBar, ActivityIndicator } from "react-native";
 import db from "db/User";
+import {
+  dropUserGoal,
+  dropSupportLink,
+  dropFrequentlyAskedQuestions,
+} from "db/DropScripts";
 import styles from "styles/Styles";
 import SplashScreen from "components/SplashScreen";
 import UserSetupSwiper from "components/UserSetupSwiper";
@@ -8,6 +13,7 @@ import HomeDashboard from "components/HomeDashboard";
 import CustomOnboarding from "components/CustomOnboarding";
 
 // font-awesome icons = https://fontawesome.com/v4.7.0/icons/
+// 06-06-2020: https://www.typescriptlang.org/docs/handbook/basic-types.html
 
 export default class App extends Component {
   /****************************************************************************************************************************************************/
@@ -33,6 +39,9 @@ export default class App extends Component {
 
   //This will delete the whole "user" table. That means you will be able to mock up the registration process again and again
   deleteAccountHandler = async () => {
+    await dropUserGoal();
+    await dropSupportLink();
+    await dropFrequentlyAskedQuestions();
     await db.dropLearningModules();
     await db.dropUser(); //delete user table.
     await db.dropCondtion();

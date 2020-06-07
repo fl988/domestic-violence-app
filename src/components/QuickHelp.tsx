@@ -13,7 +13,6 @@ import {
 } from "react-native";
 import { TouchableWithoutFeedback } from "react-native-gesture-handler";
 
-
 const PAGE_HEIGHT = Dimensions.get("window").height;
 const PAGE_WIDTH = Dimensions.get("window").width;
 
@@ -59,7 +58,7 @@ export default class QuickHelp extends Component {
   modalFooter = (
     <View>
       <View style={{ flexDirection: "column" }}>
-        <TouchableOpacity style={[styles.action1, {}] }>
+        <TouchableOpacity style={[styles.action1, {}]}>
           <Text
             style={styles.element1}
             onPress={() => Linking.openURL("tel://231323312")}
@@ -98,7 +97,7 @@ export default class QuickHelp extends Component {
             style={styles.element1}
             onPress={() => Linking.openURL("https://www.wordreference.com/")}
           >
-            Online Dictionary 
+            Online Dictionary
           </Text>
         </TouchableOpacity>
       </View>

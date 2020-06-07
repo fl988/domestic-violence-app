@@ -36,7 +36,6 @@ import * as api from "contentful-api/ContentfulData";
 import HomeScreen from "components/home-dashboard/HomeScreen";
 import SettingsScreen from "components/home-dashboard/SettingsScreen";
 import FAQ from "components/home-dashboard/FAQ";
-import GoalSettings from "components/home-dashboard/my-goals/GoalSettings";
 import CustomModal from "components/user-setup/CustomModal";
 
 /* *************************************** */
@@ -117,20 +116,6 @@ export default class HomeDashboard extends React.Component<IProps> {
                 />
                 <Text style={{ color: Constants.COLOUR_WHITE, paddingLeft: 8 }}>
                   {"Frequently Asked Questions"}
-                </Text>
-              </View>
-            ),
-          }}
-        />
-        <Drawer.Screen
-          name={Constants.LEFT_NAV_GOAL_SETTINGS}
-          component={GoalSettings}
-          options={{
-            drawerLabel: ({}) => (
-              <View style={styles.drawerScreen}>
-                <Icon name="bullseye" type="font-awesome" color="white" />
-                <Text style={{ color: Constants.COLOUR_WHITE, paddingLeft: 8 }}>
-                  {"Goal Settings"}
                 </Text>
               </View>
             ),

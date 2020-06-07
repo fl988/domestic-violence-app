@@ -20,6 +20,7 @@ interface IProps {
 interface IState {}
 
 export default class Engage extends Component<IProps, IState> {
+  // prettier-ignore
   PAGES = [
     {
       icon: <Icon name="balance-scale" type="font-awesome" color="white" />,
@@ -33,10 +34,10 @@ export default class Engage extends Component<IProps, IState> {
       icon: <Icon name="users" type="font-awesome" color="white" />,
       screenName: Constants.HOME_SCREEN_SUPPORT,
     },
-    // {
-    //   icon: <Icon name="users" type="font-awesome" color="white" />,
-    //   screenName: Constants.HOME_SCREEN_STATISTICS,
-    // },
+    {
+      icon: <Icon name="bullseye-arrow" type="material-community" color="white" />,
+      screenName: Constants.HOME_SCREEN_GOALS,
+    },
     // {
     //   icon: <Icon name="users" type="font-awesome" color="white" />,
     //   screenName: Constants.HOME_SCREEN_SUPPORT,
