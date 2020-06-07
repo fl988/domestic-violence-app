@@ -47,11 +47,11 @@ class SettingsScreen extends Component<IProps, IState> {
         >
           <View style={{ flex: 1, flexDirection: "column", paddingTop: 16 }}>
             <View style={{ marginHorizontal: 16 }}>
-              <Text style={{ marginBottom: 8 }}>{"TEST"}</Text>
+              <Text style={{ paddingBottom: 8, color: "#fff" }}>{"TEST"}</Text>
               <InitialsInput hideNextButton={true} />
             </View>
             <View style={{ marginHorizontal: 16 }}>
-              <Text style={{ marginBottom: 8 }}>{"TEST"}</Text>
+              <Text style={{ marginBottom: 8, color: "#fff" }}>{"TEST"}</Text>
               <LinearGradient
                 colors={Constants.LINEAR_GRADIENT_MAIN}
                 style={localStyle.linearGStyle}
