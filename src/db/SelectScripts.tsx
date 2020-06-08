@@ -455,6 +455,32 @@ export const grabConditions = (): Promise<SQLResultSet> => {
   });
 };
 
+export const grabUserSelectedConditions = (): Promise<SQLResultSet> => {
+  return new Promise((resolve, reject) => {
+    try {
+      db.transaction(
+        (tx) => {
+          tx.executeSql(
+            "SELECT * FROM condition WHERE conditionSelected; ",
+            [],
+            (txSuccess, rs) => {
+              // Resultset will be returned even there are no records.
+              // We handle this empty table where ever we using this.
+              resolve(rs);
+            }
+          );
+        },
+        async (tx) => {
+          // TRANSACTION ERROR CAUGHT.
+          // This means that this table is not exist. We create then create it.
+          await createCondition();
+          resolve(null);
+        }
+      );
+    } catch (error) {}
+  });
+};
+
 /**
  * FOR DEBUGGING ONLY!
  * VERY HELPFUL THING HERE!

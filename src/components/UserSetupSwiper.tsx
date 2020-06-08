@@ -52,7 +52,7 @@ export default class UserSetupSwiper extends Component<IProps, IState> {
       title: "Please check which conditions apply to you.",
       description: "These conditions are listed on your AVO from the court.",
       bgColor: Constants.COLOUR_EBONY,
-      mainComponent: <Conditions />,
+      mainComponent: <Conditions useCustomStyle={false} />,
     },
   ];
 

@@ -59,7 +59,7 @@ const CustomOnboarding = (props) => {
                   source = {Onbording_first}
                 />
             </View>,
-      subtitle: <Text style ={styles.bottom}> This is Homedashboard where you can find AVO information, Learning Moduels, Support page, Goals and articles of the day.</Text>,
+      subtitle: <Text style ={styles.bottom}> This is the Home dashboard where you can find AVO information, Learning Modules, Support page, Goals and Articles of the day.</Text>,
 
       //image: <Icon name="paper-plane-o" type="font-awesome" size={100} color="white" /> //prettier-ignore
     },
@@ -72,7 +72,7 @@ const CustomOnboarding = (props) => {
                   source = {Onbording_second}
                 />
             </View>,
-      subtitle: <Text style ={styles.bottom}>You can chekc your AVO's condition in the page</Text>,
+      subtitle: <Text style ={styles.bottom}>You can check your AVO's condition in the page.</Text>,
     },
     {
       title: <View><Text style ={styles.head}>Learning Module</Text></View>,
@@ -83,7 +83,7 @@ const CustomOnboarding = (props) => {
                   source = {Onbording_third}
                 />
             </View>,
-      subtitle: <Text style ={styles.bottom}>Learning Module is made for that you have quizes to have better understading of AVO.</Text>,
+      subtitle: <Text style ={styles.bottom}>Learning Modules is here to help you better understad your "AVO".</Text>,
     },
     {
       title: <View><Text style ={styles.head}>Support</Text></View>,
@@ -94,7 +94,7 @@ const CustomOnboarding = (props) => {
                   source = {Onbording_fourth}
                 />
             </View>,
-      subtitle: <Text style ={styles.bottom}>In Support page, you can see many different support pages you can ask help for and you can also visit thier site to have information and it has a function to call them directly on your own device.</Text>,
+      subtitle: <Text style ={styles.bottom}>In the Support section, you will be able to see a list of support services who will be able to provide you help and valuable information. You can also visit their websites or call them directly.</Text>,
     },
     {
       title: <View><Text style ={styles.head}>My Goals</Text></View>,
@@ -105,7 +105,7 @@ const CustomOnboarding = (props) => {
                   source = {Onbording_fifth}
                 />
             </View>,
-      subtitle: <Text style ={styles.bottom}> You can set your goals in there and see completed goals and dropped goals</Text>,
+      subtitle: <Text style ={styles.bottom}>In "My Goals" section, here you will be able to set a goal for yourself. It will also display your goal histories such as completed and dropped goals.</Text>,
     },
     {
       title: <View><Text style ={[styles.head, {bottom: 500}]}>Quick Help</Text></View>,
@@ -116,7 +116,7 @@ const CustomOnboarding = (props) => {
                   source = {Onbording_quick}
                 />
             </View>,
-      subtitle: <Text style ={[styles.bottom, {marginBottom: -60}]}>In Quick Help page, you can go back to where you had tutorials to get to know more about the app thorough "I need help with the app", you can also call 000 by using "I have an emergency" button and you can go to support page where you can ask for help if you are experiencing homeplesso or anything like that by using "I am experiencing homelessness" button. </Text>,
+      subtitle: <Text style ={[styles.bottom, {marginBottom: -50}]}>In Quick Help page, you can go back to where you had tutorials to get to know more about the app thorough "I need help with the app", you can also call 000 by using "I have an emergency" and you can go to support page where you can ask for help if you are experiencing homelessness by using "I am experiencing homelessness". </Text>,
     },
     {
       title: <View><Text style ={styles.head}>Home in Hamburger menu</Text></View>,
@@ -149,7 +149,7 @@ const CustomOnboarding = (props) => {
                   source = {Onboarding_menu_FAQ}
                 />
             </View>,
-      subtitle: <Text style ={styles.bottom}>There is FAQ(Frequently Asked Questions) menu you can check. </Text>,
+      subtitle: <Text style ={styles.bottom}>There is FAQ (Frequently Asked Questions) menu you can check. </Text>,
     },
     {
       title: <View><Text style ={styles.head}>Sample AVO / Delete Account</Text></View>,
@@ -160,7 +160,7 @@ const CustomOnboarding = (props) => {
                   source = {Onboarding_Sample}
                 />
             </View>,
-      subtitle: <Text style ={styles.bottom}>It also has a function to delete your account and download sample AVO from online </Text>,
+      subtitle: <Text style ={styles.bottom}>It also has a function to delete your account and download a 'sample' of an AVO document online. </Text>,
     },
 
 
@@ -224,6 +224,7 @@ const styles = StyleSheet.create({
     fontSize: 17,
     bottom: 60,
     padding: 10,
+    textAlign:"center"
   },
 
 })

@@ -9,17 +9,25 @@ import {
   TouchableOpacity,
   Linking,
   Dimensions,
-  TouchableOpacityComponent,
 } from "react-native";
-import { TouchableWithoutFeedback } from "react-native-gesture-handler";
+import { NavigationRoute } from "react-navigation";
 
 const PAGE_HEIGHT = Dimensions.get("window").height;
 const PAGE_WIDTH = Dimensions.get("window").width;
 
-export default class QuickHelp extends Component {
-  state = {
-    modalVisible: false,
-  };
+interface IProps {
+  redoTutorial?: Function;
+}
+interface IState {
+  modalVisible: boolean;
+}
+export default class QuickHelp extends Component<IProps, IState> {
+  constructor(props: IProps) {
+    super(props);
+    this.state = {
+      modalVisible: false,
+    };
+  }
 
   modalVisibleHandler = (v) => {
     this.setState({
@@ -61,7 +69,7 @@ export default class QuickHelp extends Component {
         <TouchableOpacity style={[styles.action1, {}]}>
           <Text
             style={styles.element1}
-            onPress={() => Linking.openURL("tel://231323312")}
+            onPress={() => this.props.redoTutorial()}
           >
             I need help with the app
           </Text>

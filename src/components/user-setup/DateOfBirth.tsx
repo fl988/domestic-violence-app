@@ -1,6 +1,16 @@
 import React, { useState } from "react";
-import { Text, View, TouchableOpacity, TextInput } from "react-native";
+import {
+  Text,
+  View,
+  TouchableOpacity,
+  Dimensions,
+  StyleSheet,
+  Button,
+  ActivityIndicator,
+} from "react-native";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
+import { Icon } from "react-native-elements";
+import * as Constants from "constants/Constants";
 
 import db from "db/User";
 import styles from "styles/Styles";
@@ -13,6 +23,18 @@ const DateOfBirth = (props) => {
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [getDateDisplay, setDateDisplay] = useState("");
   const [getButtonHideStatus, setButtonHideStatus] = useState(false);
+  const [getIconStatus, setIconStatus] = useState(<></>);
+
+  React.useEffect(() => {
+    dobHandler();
+  }, []);
+
+  const dobHandler = async () => {
+    let rs = await db.grabUserDetails();
+    if (rs != null && rs.rows.length > 0) {
+      setDateDisplay(rs.rows.item(0).dob);
+    }
+  };
 
   /***********************************************************************************/
   // Functional components
@@ -30,13 +52,33 @@ const DateOfBirth = (props) => {
 
     //Wed, Mar, 04, 2020, 02:45:57, GMT-0500, (EST)
     const mdate = date.toString().split(" ");
-    setDateDisplay(mdate[2] + " - " + mdate[1] + " - " + mdate[3]);
+    const formattedDate = mdate[2] + " - " + mdate[1] + " - " + mdate[3];
+    setDateDisplay(formattedDate);
     setButtonHideStatus(true);
+
+    if (props.isSettingsPage) {
+      setIconStatus(<ActivityIndicator />);
+      autoUpdateInitials(formattedDate);
+      setTimeout(() => {
+        setIconStatus(
+          <Icon
+            style={{ alignSelf: "flex-end" }}
+            name="check-circle"
+            type="font-awesome"
+            color="green"
+          />
+        );
+      }, 1000); //We set it to 1.50 seconds
+    }
   };
 
-  const onNextHandler = (dateDisplay) => {
+  const autoUpdateInitials = (formattedDate: string) => {
+    db.updateUserDOB(formattedDate);
+  };
+
+  const onNextHandler = (formattedDate: string) => {
     props.onNext(); //Swipe to next page.
-    db.updateUserDOB(getDateDisplay);
+    db.updateUserDOB(formattedDate);
   };
 
   /***********************************************************************************/
@@ -60,8 +102,23 @@ const DateOfBirth = (props) => {
   /***********************************************************************************/
   // The returning component
   return (
-    <View>
-      <View style={styles.innerFrame}>
+    <>
+      {props.isSettingsPage && (
+        <View style={localStyle.updateButtonContainer}>
+          <Text style={localStyle.updateButtonHeader}>
+            {"Change your date of birth"}
+          </Text>
+          <View style={localStyle.updateButtonStyle}>
+            <TouchableOpacity style={{ alignSelf: "flex-end" }}>
+              {getIconStatus}
+            </TouchableOpacity>
+          </View>
+        </View>
+      )}
+
+      <View
+        style={props.isSettingsPage ? localStyle.custom : localStyle.default}
+      >
         <CustomTextInput
           editable={false}
           onPress={showDatePicker}
@@ -72,7 +129,9 @@ const DateOfBirth = (props) => {
           textInputPlaceholderColor={"#fff"}
           value={getDateDisplay.length > 0 ? getDateDisplay.toString() : null}
         />
-        <View>{nextBtn}</View>
+
+        {!props.isSettingsPage && <View>{nextBtn}</View>}
+
         <DateTimePickerModal
           isVisible={isDatePickerVisible}
           onConfirm={handleConfirm}
@@ -80,8 +139,36 @@ const DateOfBirth = (props) => {
           mode="date"
         />
       </View>
-    </View>
+    </>
   );
 };
 
 export default DateOfBirth;
+const { width, height } = Dimensions.get("window");
+const localStyle = StyleSheet.create({
+  default: {
+    alignSelf: "center",
+    width: width / 1.2,
+  },
+  custom: {
+    // alignSelf: "center",
+  },
+  updateButtonHeader: {
+    color: Constants.COLOUR_WHITE,
+    paddingTop: 8,
+    fontWeight: "bold",
+    justifyContent: "center",
+    alignSelf: "flex-start",
+    fontSize: 18,
+  },
+  updateButtonContainer: {
+    marginHorizontal: 16,
+    marginTop: 16,
+    flexDirection: "row",
+  },
+  updateButtonStyle: {
+    alignSelf: "flex-end",
+    marginRight: 16,
+    flex: 1,
+  },
+});

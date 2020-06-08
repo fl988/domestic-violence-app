@@ -89,6 +89,7 @@ export class SupportLinks extends Component<IProps, IState> {
     this.setState({
       supportLinkItems: objArr,
     });
+    console.log(this.state.supportLinkItems[0].supportLinkImageURL);
   };
 
   Modal = () => {

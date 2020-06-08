@@ -108,7 +108,7 @@ export default class LearningModule extends Component<IProps, IState> {
         }
 
         pagesObjArr.push({
-          progressGauge: <CircularProgress percent={progress} />, //TODO: Make this guage dynamic.
+          progressGauge: <CircularProgress percent={progress} />,
           learningModuleId: item.learningModuleId,
           moduleTitle: item.moduleTitle,
           moduleSummary: item.moduleSummary,

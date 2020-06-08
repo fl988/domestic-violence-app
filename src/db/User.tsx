@@ -1413,12 +1413,12 @@ class User {
   }
 
   // update 'user' completeOnboarding, no return;
-  updateUserOnboarding() {
+  updateUserOnboarding(v: number) {
     try {
       db.transaction((tx) => {
         tx.executeSql(
-          "UPDATE USER SET completeOnboarding = 1 WHERE userId = 1;",
-          [],
+          "UPDATE USER SET completeOnboarding = ? WHERE userId = 1;",
+          [v],
           (tx, success) => {
             /* success */
             console.log(success);

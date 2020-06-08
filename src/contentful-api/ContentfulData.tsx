@@ -68,16 +68,33 @@ export const fetchAVOConditionsV2 = (): Promise<
   });
 };
 
-export const fetchPDF = (apiKey: String): Promise<any> => {
-  return new Promise((resolve, reject) => {
-    client
-      .getEntry(apiKey)
-      .then((entry: any) => {
-        resolve(entry.fields.avoPdfFileUpload.fields.file.url);
+export const fetchPDF = (): Promise<any> => {
+  return new Promise(async (resolve, reject) => {
+    await client
+      .getEntries({
+        // HTTP Headers
+        content_type: "avoPdfFile",
+        order: "-sys.createdAt", //order by latest one.
+        sys: {
+          // Link types that are located on Asset only.
+          type: "Link",
+          linkType: "Asset",
+        },
+      }) //grab all of the entries
+      .then((entries) => {
+        entries.items.forEach(async (entry, i) => {
+          if (
+            typeof entry.fields.avoPdfFileUpload.fields.file.url !== "undefined"
+          ) {
+            resolve(entry.fields.avoPdfFileUpload.fields.file.url);
+          } else if (
+            typeof entries.includes.Asset[i].fields.file.url !== "undefined"
+          )
+            resolve(entries.includes.Asset[i].fields.file.url);
+        });
+        // resolve(res);
       })
-      .catch((err: Error) => {
-        resolve(err);
-      });
+      .catch(console.error);
   });
 };
 

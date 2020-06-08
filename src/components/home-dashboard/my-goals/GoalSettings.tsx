@@ -69,7 +69,6 @@ export default class GoalSettings extends Component<IProps, IState> {
   }
 
   private refreshData = () => {
-    console.log("TEST1111");
     this.init();
   };
 

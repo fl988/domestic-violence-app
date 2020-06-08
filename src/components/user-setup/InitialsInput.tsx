@@ -1,11 +1,15 @@
 import React, { useState } from "react";
 import { LinearGradient } from "expo-linear-gradient";
+import { Icon } from "react-native-elements";
 import {
   View,
   Text,
   TextInput,
   Keyboard,
   TouchableOpacity,
+  StyleSheet,
+  Dimensions,
+  ActivityIndicator,
 } from "react-native";
 // Database
 import db from "db/User";
@@ -18,7 +22,17 @@ const InitialsInput = (props) => {
   // States
   const [getInitialsEntered, setInitialsEntered] = useState(""); // "" by default.
   const [getButtonHideStatus, setButtonHideStatus] = useState({}); //The button that will show "Continue" when initials are completely filled out. Otherwise hide it.
+  const [getIconStatus, setIconStatus] = useState(<></>);
 
+  React.useEffect(() => {
+    initialsHandler();
+  }, []);
+
+  const initialsHandler = async () => {
+    let rs = await db.grabUserDetails();
+    if (rs != null && rs.rows.length > 0)
+      setInitialsEntered(rs.rows.item(0).initials);
+  };
   /***********************************************************************************/
   // Functional components
   const initialsInputHandler = (userInput) => {
@@ -26,7 +40,28 @@ const InitialsInput = (props) => {
     if (userInput.length >= 3) {
       return;
     }
-    setInitialsEntered(userInput.toUpperCase().replace(/[^a-zA-Z ]/g, "")); //Turn it to upper case then only accept A-z
+    userInput = userInput.toUpperCase().replace(/[^a-zA-Z ]/g, "");
+    setInitialsEntered(userInput); //Turn it to upper case then only accept A-z
+
+    if (props.isSettingsPage) {
+      autoUpdateInitials(userInput);
+    }
+  };
+
+  const autoUpdateInitials = (userInput: string) => {
+    setIconStatus(<ActivityIndicator />);
+    db.updateUserInitials(userInput);
+    setTimeout(() => {
+      setIconStatus(
+        <Icon
+          style={{ alignSelf: "flex-end" }}
+          name="check-circle"
+          type="font-awesome"
+          color="green"
+        />
+      );
+      props.refreshHomeScreen();
+    }, 500); //We set it to .50 seconds
   };
 
   const onNextHandler = (userInitials) => {
@@ -53,7 +88,22 @@ const InitialsInput = (props) => {
   // The returning component
   return (
     <View>
-      <View style={myStyles.innerFrame}>
+      {props.isSettingsPage && (
+        <View style={localStyle.updateButtonContainer}>
+          <Text style={localStyle.updateButtonHeader}>
+            {"Change your initials"}
+          </Text>
+          <View style={localStyle.updateButtonStyle}>
+            <TouchableOpacity style={{ alignSelf: "flex-end" }}>
+              {getIconStatus}
+            </TouchableOpacity>
+          </View>
+        </View>
+      )}
+
+      <View
+        style={props.isSettingsPage ? localStyle.custom : localStyle.default}
+      >
         <LinearGradient
           colors={Constants.LINEAR_GRADIENT_MAIN}
           style={myStyles.sectionStyle}
@@ -68,7 +118,6 @@ const InitialsInput = (props) => {
             value={getInitialsEntered}
           />
         </LinearGradient>
-
         {!props.hideNextButton && (
           <View>
             <TouchableOpacity
@@ -85,3 +134,32 @@ const InitialsInput = (props) => {
 };
 
 export default InitialsInput;
+
+const { width, height } = Dimensions.get("window");
+const localStyle = StyleSheet.create({
+  default: {
+    alignSelf: "center",
+    width: width / 1.2,
+  },
+  custom: {
+    // alignSelf: "center",
+  },
+  updateButtonHeader: {
+    color: Constants.COLOUR_WHITE,
+    paddingTop: 8,
+    fontWeight: "bold",
+    justifyContent: "center",
+    alignSelf: "flex-start",
+    fontSize: 18,
+  },
+  updateButtonContainer: {
+    marginHorizontal: 16,
+    marginTop: 16,
+    flexDirection: "row",
+  },
+  updateButtonStyle: {
+    alignSelf: "flex-end",
+    marginRight: 16,
+    flex: 1,
+  },
+});

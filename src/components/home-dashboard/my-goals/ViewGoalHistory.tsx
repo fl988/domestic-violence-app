@@ -51,11 +51,11 @@ export default class ViewGoalHistory extends React.Component<IProps, IState> {
   }
 
   async componentDidMount() {
-    await debugPrintScript(
-      "select count(*) from usergoal; "
-      //   "SELECT datetime('now','localtime');"
-      //   "select strftime('%d', '2020-06-06') as day, case strftime('%m', '2020-06-06') when '01' then 'January' when '02' then 'Febuary' when '03' then 'March' when '04' then 'April' when '05' then 'May' when '06' then 'June' when '07' then 'July' when '08' then 'August' when '09' then 'September' when '10' then 'October' when '11' then 'November' when '12' then 'December' else '' end as month; "
-    );
+    // await debugPrintScript(
+    //   "select count(*) from usergoal; "
+    //   //   "SELECT datetime('now','localtime');"
+    //   //   "select strftime('%d', '2020-06-06') as day, case strftime('%m', '2020-06-06') when '01' then 'January' when '02' then 'Febuary' when '03' then 'March' when '04' then 'April' when '05' then 'May' when '06' then 'June' when '07' then 'July' when '08' then 'August' when '09' then 'September' when '10' then 'October' when '11' then 'November' when '12' then 'December' else '' end as month; "
+    // );
     this.loadData();
   }
 

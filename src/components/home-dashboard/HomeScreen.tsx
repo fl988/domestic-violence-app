@@ -1,7 +1,13 @@
 /* ***************************************************************************************** */
 // Import Modules
 import React, { Component, ReactFragment } from "react";
-import { View, AppState, ImageBackground, Dimensions } from "react-native";
+import {
+  View,
+  AppState,
+  ImageBackground,
+  Dimensions,
+  Button,
+} from "react-native";
 import { Container, Content, Right } from "native-base";
 import { Icon, Text } from "react-native-elements";
 import { DrawerActions } from "@react-navigation/native";
@@ -13,6 +19,7 @@ import {
   NavigationState,
   NavigationParams,
   NavigationScreenProp,
+  NavigationRoute,
 } from "react-navigation"; //React Navigation with TypeScript => https://dev.to/andreasbergqvist/react-navigation-with-typescript-29ka
 import {
   createStackNavigator,
@@ -50,7 +57,8 @@ import { debugPrintScript } from "db/SelectScripts";
 /* ***************************************************************************************** */
 // Interface
 interface IProps {
-  navigation: NavigationScreenProp<NavigationState, NavigationParams>;
+  navigation: any;
+  route: NavigationRoute;
 }
 interface IState {
   initials?: string;
@@ -70,8 +78,7 @@ export default class HomeScreen extends Component<IProps, IState> {
     };
   }
 
-  async componentDidMount() {
-    // await debugPrintScript("SELECT count(*) as count FROM supportLink; ");
+  componentDidMount() {
     //Display initials
     db.grabUserDetails().then((data) => {
       if (data != null) {
@@ -82,13 +89,13 @@ export default class HomeScreen extends Component<IProps, IState> {
       }
     });
 
+    this.callFunctions();
+  }
+
+  async callFunctions() {
     //fetch learning modules.
     await this.fetchLeaningModules();
     await this.fetchArticles();
-  }
-
-  async grabCurrentDate() {
-    await db.getCurrentTime();
   }
 
   async fetchLeaningModules() {
@@ -241,7 +248,7 @@ export default class HomeScreen extends Component<IProps, IState> {
               options={this.learningModuleHeaderOptions}
             />
           </Stack.Navigator>
-          <QuickHelp />
+          <QuickHelp redoTutorial={this.props.route.params.redoTutorial} />
 
           {/* END */}
           {/* *************************** */}

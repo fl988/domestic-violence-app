@@ -42,13 +42,20 @@ import CustomModal from "components/user-setup/CustomModal";
 // Interface - a syntactical contract that an entity should conform to. In other words, an interface defines the syntax that any entity must adhere to.
 interface IProps {
   deleteAccountHandler?: Function;
+  redoTutorial?: Function;
 }
-// interface IState {}
-
-export default class HomeDashboard extends React.Component<IProps> {
-  state = {
-    modalVisible: false,
-  };
+interface IState {
+  modalVisible: boolean;
+  refreshHomeScreen: boolean;
+}
+export default class HomeDashboard extends React.Component<IProps, IState> {
+  constructor(props: IProps) {
+    super(props);
+    this.state = {
+      modalVisible: false,
+      refreshHomeScreen: false,
+    };
+  }
 
   componentDidMount() {}
 
@@ -59,70 +66,14 @@ export default class HomeDashboard extends React.Component<IProps> {
   };
 
   async downloadAVO() {
-    let linkAVO = await api.fetchPDF("3TdsIlSOU3H1gaAQJtHuhF");
+    let linkAVO = await api.fetchPDF();
     Linking.openURL("https://" + linkAVO);
   }
 
-  MyDrawer = () => {
-    const dimensions = useWindowDimensions();
-    const isLargeScreen = dimensions.width >= 768;
-
-    return (
-      <Drawer.Navigator
-        drawerStyle={{
-          backgroundColor: Constants.COLOUR_EBONY,
-        }}
-        drawerContent={(props) => this.CustomDrawerContent(props)}
-      >
-        {/* Add non-custom drawers here */}
-        <Drawer.Screen
-          name={Constants.LEFT_NAV_HOME}
-          component={HomeScreen}
-          options={{
-            drawerLabel: ({}) => (
-              <View style={styles.drawerScreen}>
-                <Icon name="home" type="font-awesome" color="white" />
-                <Text style={{ color: Constants.COLOUR_WHITE, paddingLeft: 8 }}>
-                  {"Home"}
-                </Text>
-              </View>
-            ),
-          }}
-        />
-        <Drawer.Screen
-          name={Constants.LEFT_NAV_SETTINGS}
-          component={SettingsScreen}
-          options={{
-            drawerLabel: ({}) => (
-              <View style={styles.drawerScreen}>
-                <Icon name="cog" type="font-awesome" color="white" />
-                <Text style={{ color: Constants.COLOUR_WHITE, paddingLeft: 8 }}>
-                  {"Settings"}
-                </Text>
-              </View>
-            ),
-          }}
-        />
-        <Drawer.Screen
-          name={Constants.LEFT_NAV_FAQ}
-          component={FAQ}
-          options={{
-            drawerLabel: ({}) => (
-              <View style={styles.drawerScreen}>
-                <Icon
-                  name="question-circle"
-                  type="font-awesome"
-                  color="white"
-                />
-                <Text style={{ color: Constants.COLOUR_WHITE, paddingLeft: 8 }}>
-                  {"Frequently Asked Questions"}
-                </Text>
-              </View>
-            ),
-          }}
-        />
-      </Drawer.Navigator>
-    );
+  refreshHomeScreenHandler = () => {
+    this.setState({
+      refreshHomeScreen: true,
+    });
   };
 
   CustomDrawerContent = (
@@ -182,9 +133,80 @@ export default class HomeDashboard extends React.Component<IProps> {
   };
 
   render() {
+    const MyDrawer = () => {
+      return (
+        <Drawer.Navigator
+          drawerStyle={{
+            backgroundColor: Constants.COLOUR_EBONY,
+          }}
+          drawerContent={(props) => this.CustomDrawerContent(props)}
+        >
+          {/* Add non-custom drawers here */}
+          <Drawer.Screen
+            name={Constants.LEFT_NAV_HOME}
+            component={HomeScreen}
+            initialParams={{
+              redoTutorial: this.props.redoTutorial,
+            }}
+            options={{
+              drawerLabel: ({}) => (
+                <View style={styles.drawerScreen}>
+                  <Icon name="home" type="font-awesome" color="white" />
+                  <Text
+                    style={{ color: Constants.COLOUR_WHITE, paddingLeft: 8 }}
+                  >
+                    {"Home"}
+                  </Text>
+                </View>
+              ),
+            }}
+          />
+          <Drawer.Screen
+            name={Constants.LEFT_NAV_SETTINGS}
+            component={SettingsScreen}
+            options={{
+              drawerLabel: ({}) => (
+                <View style={styles.drawerScreen}>
+                  <Icon name="cog" type="font-awesome" color="white" />
+                  <Text
+                    style={{ color: Constants.COLOUR_WHITE, paddingLeft: 8 }}
+                  >
+                    {"Settings"}
+                  </Text>
+                </View>
+              ),
+            }}
+            initialParams={{
+              refreshHomeScreenHandler: this.refreshHomeScreenHandler,
+            }}
+          />
+          <Drawer.Screen
+            name={Constants.LEFT_NAV_FAQ}
+            component={FAQ}
+            options={{
+              drawerLabel: ({}) => (
+                <View style={styles.drawerScreen}>
+                  <Icon
+                    name="question-circle"
+                    type="font-awesome"
+                    color="white"
+                  />
+                  <Text
+                    style={{ color: Constants.COLOUR_WHITE, paddingLeft: 8 }}
+                  >
+                    {"Frequently Asked Questions"}
+                  </Text>
+                </View>
+              ),
+            }}
+          />
+        </Drawer.Navigator>
+      );
+    };
+
     return (
       <NavigationContainer>
-        <this.MyDrawer />
+        <MyDrawer />
         <CustomModal
           modalVisible={this.state.modalVisible}
           modalVisibleHandler={this.modalVisibleHandler}

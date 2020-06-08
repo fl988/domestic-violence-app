@@ -33,7 +33,7 @@ export default class App extends Component {
   };
 
   completeUserOnboarding = () => {
-    db.updateUserOnboarding();
+    db.updateUserOnboarding(1);
     this.checkUser();
   };
 
@@ -50,6 +50,11 @@ export default class App extends Component {
     this.checkUser(); //check which component should the user see.
   };
 
+  redoTutorial = () => {
+    db.updateUserOnboarding(0);
+    this.checkUser();
+  };
+
   async checkUser() {
     this.setState({
       userLanding: <View style={[styles.container,styles.bgPurple1]}><ActivityIndicator/></View> //prettier-ignore
@@ -63,7 +68,7 @@ export default class App extends Component {
 
     if (isUserAlreadySet && isUserCompleteOnboarding) {
       this.setState({
-        userLanding: [<SplashScreen key={0}/>,<HomeDashboard key={1} deleteAccountHandler={this.deleteAccountHandler} />] //prettier-ignore
+        userLanding: [<SplashScreen key={0}/>,<HomeDashboard key={1} redoTutorial={this.redoTutorial} deleteAccountHandler={this.deleteAccountHandler} />] //prettier-ignore
       });
     } else if (isUserAlreadySet && !isUserCompleteOnboarding) {
       this.setState({

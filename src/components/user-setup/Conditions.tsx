@@ -5,6 +5,7 @@ import {
   Text,
   Dimensions,
   ActivityIndicator,
+  StyleSheet,
 } from "react-native";
 import Accordion from "components/user-setup/Accordion";
 import { fetchAVOConditionsV2 } from "contentful-api/ContentfulData";
@@ -12,7 +13,9 @@ import { grabConditions, debugPrintScript } from "db/SelectScripts";
 
 // type FC<P = {}> = FunctionComponent<P>;
 
-interface IProps {}
+interface IProps {
+  useCustomStyle: boolean;
+}
 interface IState {}
 
 export default class Conditions extends Component<IProps, IState> {
@@ -33,7 +36,6 @@ export default class Conditions extends Component<IProps, IState> {
   }
 
   init = async () => {
-    await debugPrintScript("select conditionText from condition;");
     // First we check if we have something on our table "condition".
     // If no such table, it'll throw an error and then handle it by creating a condition table.
     let rs: SQLResultSet = await grabConditions();
@@ -53,7 +55,6 @@ export default class Conditions extends Component<IProps, IState> {
   async grabDisplayData() {
     // get all the condition as resultset
     let rsCond = await grabConditions(); //prettier-ignore
-    console.log(rsCond);
     if (rsCond != null) {
       var conditionsArr = [];
       // loop through each of the condition.
@@ -66,7 +67,7 @@ export default class Conditions extends Component<IProps, IState> {
           title: "\tCondition " + item.conditionNumber + " ( " + condSum + " )", //prettier-ignore
           conditionSummary: item.conditionSummary,
           conditionText: item.conditionText,
-          alreadySelected: item.conditionSelected,
+          alreadySelected: item.conditionSelected === 1,
           mandatory: item.conditionMandatory,
         };
       }
@@ -141,12 +142,12 @@ export default class Conditions extends Component<IProps, IState> {
     return items;
   }
 
-  find_dimesions(layout) {
-    const { x, y, width, height } = layout;
-    // this.setState({
-    //   currentContainerHeight: height,
-    // });
-  }
+  // find_dimesions(layout) {
+  //   const { x, y, width, height } = layout;
+  //   // this.setState({
+  //   //   currentContainerHeight: height,
+  //   // });
+  // }
 
   scrollOnChange = (v: boolean) => {
     if (v) {
@@ -154,26 +155,36 @@ export default class Conditions extends Component<IProps, IState> {
     }
   };
   render() {
-    const { width, height } = Dimensions.get("window");
     return (
       <View
-        style={{
-          position: "absolute",
-          left: 0,
-          bottom: 80,
-          // borderRadius: (PAGE_WIDTH - 100) / 2,
-          height: height / 2.1,
-          width: width,
-          marginBottom: 50,
-        }}
+        style={
+          this.props.useCustomStyle ? localStyle.custom : localStyle.default
+        }
         // onLayout={(e) => {
         //   find_dimesions(e.nativeEvent.layout);
         // }}
       >
-        <ScrollView ref={(ref) => (this.scrollView = ref)}>
-          {this.state.conditionComponents}
+        <ScrollView style={{ flex: 1 }} ref={(ref) => (this.scrollView = ref)}>
+          <View style={{ flex: 1, justifyContent: "center" }}>
+            {this.state.conditionComponents}
+          </View>
         </ScrollView>
       </View>
     );
   }
 }
+
+const { width, height } = Dimensions.get("window");
+const localStyle = StyleSheet.create({
+  default: {
+    position: "absolute",
+    left: 0,
+    bottom: 80,
+    height: height / 2.1,
+    width: width,
+    marginBottom: 50,
+  },
+  custom: {
+    flex: 1,
+  },
+});

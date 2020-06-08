@@ -35,7 +35,7 @@ export default class Accordion extends Component<IProps, IState> {
       conditionNumber: props.conditionNumber,
       conditionDescComponent: props.data,
       expanded: false,
-      isChecked: false,
+      isChecked: this.props.alreadySelected,
     };
   }
 
