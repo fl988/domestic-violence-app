@@ -115,12 +115,7 @@ export default class UserSetupSwiper extends Component<IProps, IState> {
   screenNavButtonsHandler = (i) => {
     let component = (
       <View style={styles.navBackButton}>
-        <Icon
-          reverse
-          name="chevron-left"
-          type="font-awesome"
-          onPress={() => this.swiper.scrollBy(-1)}
-        />
+        <Icon reverse name="chevron-left" type="font-awesome" />
         {i == this.PAGES.length - 1 ? (
           <Icon
             reverse

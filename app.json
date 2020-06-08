@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "domestic-violence-alpha",
-    "slug": "domestic-violence-alpha",
+    "name": "domestic-violence-app",
+    "slug": "domestic-violence-app",
     "platforms": [
       "ios",
       "android",
@@ -23,6 +23,7 @@
     ],
     "ios": {
       "supportsTablet": true
-    }
+    },
+    "description": ""
   }
 }
