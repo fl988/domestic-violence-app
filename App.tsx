@@ -5,6 +5,7 @@ import {
   dropUserGoal,
   dropSupportLink,
   dropFrequentlyAskedQuestions,
+  dropCourtDateReminder,
 } from "db/DropScripts";
 import styles from "styles/Styles";
 import SplashScreen from "components/SplashScreen";
@@ -42,6 +43,7 @@ export default class App extends Component {
     await dropUserGoal();
     await dropSupportLink();
     await dropFrequentlyAskedQuestions();
+    await dropCourtDateReminder();
     await db.dropLearningModules();
     await db.dropUser(); //delete user table.
     await db.dropCondtion();

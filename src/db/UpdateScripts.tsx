@@ -17,7 +17,7 @@ export const updateUserGoalDescById = (
             resolve(true);
           },
           (tx, error) => {
-            console.log("updateUserGoalDescById ERROR! = " + error);
+            // console.log("updateUserGoalDescById ERROR! = " + error);
             resolve(false);
             return null;
           }
@@ -43,11 +43,11 @@ export const updateUserGoalActiveById = (
             userGoalId,
           ],
           (tx, rs) => {
-            console.log("SUCCESS!");
+            // console.log("SUCCESS!");
             resolve(true);
           },
           (tx, error) => {
-            console.log("updateUserGoalActiveById ERROR! = " + error);
+            // console.log("updateUserGoalActiveById ERROR! = " + error);
             resolve(false);
             return null;
           }

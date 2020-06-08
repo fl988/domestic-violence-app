@@ -32,7 +32,7 @@ export const insertConditionRecord = (
           [condNumber, condSummary, condText, conditionSelected, condMandatory],
           (tx, success) => {/* success */ resolve(true);}, // prettier-ignore
           (tx, error) => {
-            console.log("error insertConditionRecord = " + error);
+            // console.log("error insertConditionRecord = " + error);
             return false;
           }
         );
@@ -91,7 +91,48 @@ export const insertUserGoal = (userGoalDesc: string): Promise<boolean> => {
             resolve(true);
           },
           (tx, error) => {
-            console.log("insertUserGoal ERROR! = " + error);
+            // console.log("insertUserGoal ERROR! = " + error);
+            resolve(false);
+            return false;
+          }
+        );
+      });
+    } catch (error) {}
+  });
+};
+
+/**
+ * "CREATE TABLE IF NOT EXISTS courtDateReminder (" +
+    "courtDateReminderId INTEGER PRIMARY KEY NOT NULL, " +
+    "courtDateReminderDesc TEXT DEFAULT '', " +
+    "courtDateReminderActive BOOLEAN DEFAULT 0, " +
+    "startTimestamp TEXT DEFAULT (datetime('now','localtime')), " +
+    "endTimestamp TEXT DEFAULT '0000-00-00 00:00:00', " +
+    "insertTimestamp TEXT DEFAULT (datetime('now','localtime')) " +
+    ");",
+ */
+
+/**
+ *
+ * @param courtDateReminderDesc
+ * @param endTimestamp
+ */
+export const insertCourtDateReminder = (
+  courtDateReminderDesc: string,
+  endTimestamp: string
+): Promise<boolean> => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      db.transaction(async (tx) => {
+        tx.executeSql(
+          "INSERT INTO courtDateReminder(courtDateReminderDesc, courtDateReminderActive, endTimestamp) " +
+            "VALUES(?,?,?); ",
+          [courtDateReminderDesc, 1, endTimestamp],
+          async (tx, success) => {
+            resolve(true);
+          },
+          (tx, error) => {
+            // console.log("insertUserGoal ERROR! = " + error);
             resolve(false);
             return false;
           }
@@ -182,7 +223,7 @@ export const insertSupportLink = (
             supportLinkImageFileName,
           ],
           (tx, success) => {
-            console.log("insertSupportLink SUCCESS!");
+            // console.log("insertSupportLink SUCCESS!");
             resolve(true);
           },
           (tx, error) => {
@@ -213,11 +254,11 @@ export const insertFrequentlyAskedQuestion = (
               "VALUES(?,?); ",
             [faqQuestion, faqAnswer],
             (tx, success) => {
-              console.log("insertFrequentlyAskedQuestion SUCCESS!");
+              // console.log("insertFrequentlyAskedQuestion SUCCESS!");
               resolve(true);
             },
             (tx, error) => {
-              console.log(error);
+              // console.log(error);
               resolve(false);
               return false;
             }

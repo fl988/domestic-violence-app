@@ -75,7 +75,6 @@ export default class EditGoal extends Component<IProps, IState> {
   }
 
   async loadData() {
-    console.log(this.props.route.params.userGoalId);
     let rsUserGoal = await grabUserGoalById(this.props.route.params.userGoalId);
     let item = rsUserGoal.rows.item(0);
     this.setState({
@@ -179,8 +178,6 @@ export default class EditGoal extends Component<IProps, IState> {
         this.errorMsgHandler("Failed to save goal.", 3);
         this.screenLoader(false);
       } else {
-        //this is a function from GoalSettings that is currently binded. Will refresh the page first.
-        this.props.route.params.refreshData();
         //after refresh we go back.
         setTimeout(() => {
           this.props.navigation.navigate(Constants.HOME_SCREEN_GOALS);

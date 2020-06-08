@@ -38,7 +38,12 @@ const Stack = createStackNavigator();
 import * as Constants from "constants/Constants";
 import styles from "styles/Styles";
 import db from "db/User";
-import { grabAllArticles } from "db/SelectScripts";
+import {
+  grabAllArticles,
+  grabLatestCourtDateReminder,
+  getDifferenceInDaysVsNow,
+  debugPrintScript,
+} from "db/SelectScripts";
 import { fetchArticlesAndSave } from "db/FetchAndSaveScripts";
 import MyAVO from "components/home-dashboard/my-avo/MyAVO";
 import LearningModule from "components/home-dashboard/learning-modules/LearningModule";
@@ -52,7 +57,6 @@ import GoalSettings from "components/home-dashboard/my-goals/GoalSettings";
 import CreateGoal from "components/home-dashboard/my-goals/CreateGoal";
 import EditGoal from "components/home-dashboard/my-goals/EditGoal";
 import ViewGoalHistory from "components/home-dashboard/my-goals/ViewGoalHistory";
-import { debugPrintScript } from "db/SelectScripts";
 
 /* ***************************************************************************************** */
 // Interface
@@ -65,6 +69,7 @@ interface IState {
   numberOfModules: number;
   appState?: any;
   articleOfTheDay: ReactFragment;
+  courtDateReminder: string;
 }
 
 export default class HomeScreen extends Component<IProps, IState> {
@@ -75,6 +80,7 @@ export default class HomeScreen extends Component<IProps, IState> {
       numberOfModules: 0,
       appState: AppState.currentState,
       articleOfTheDay: <></>,
+      courtDateReminder: "",
     };
   }
 
@@ -93,7 +99,24 @@ export default class HomeScreen extends Component<IProps, IState> {
   }
 
   async callFunctions() {
-    //fetch learning modules.
+    let rsCDM: SQLResultSet = await grabLatestCourtDateReminder();
+    if (rsCDM !== null) {
+      if (rsCDM.rows.length > 0) {
+        let i = rsCDM.rows.item(0);
+        let remaining = await getDifferenceInDaysVsNow(
+          i.courtDateReminderId,
+          i.endTimestamp
+        );
+        this.setState({
+          courtDateReminder:
+            "\n\nYou have a court date due in " +
+            parseInt(remaining) +
+            " day" +
+            (parseInt(remaining) <= 1 ? "" : "s."),
+        });
+      }
+    }
+
     await this.fetchLeaningModules();
     await this.fetchArticles();
   }
@@ -134,11 +157,22 @@ export default class HomeScreen extends Component<IProps, IState> {
     }
   }
 
-  fetchUserInitials = () => {
+  getUserInitials = () => {
     if (this.state.initials !== "") {
-      return <>{"Hello " + this.state.initials + "!"}</>;
+      return <Text>{"Hello " + this.state.initials + "!"}</Text>;
     } else {
-      return <>{"Hello There!"}</>;
+      return <Text>{"Hello There!"}</Text>;
+    }
+  };
+
+  courtDateReminderComponent = () => {
+    if (
+      this.state.courtDateReminder.length > 0 &&
+      this.state.courtDateReminder !== ""
+    ) {
+      return <Text>{this.state.courtDateReminder}</Text>;
+    } else {
+      return <></>;
     }
   };
 
@@ -168,7 +202,8 @@ export default class HomeScreen extends Component<IProps, IState> {
             >
               <Right style={styles.homeDashboardGreeterRightContent}>
                 <Text style={styles.homeDashboardContent}>
-                  <this.fetchUserInitials />
+                  <this.getUserInitials />
+                  <this.courtDateReminderComponent />
                 </Text>
               </Right>
             </ImageBackground>

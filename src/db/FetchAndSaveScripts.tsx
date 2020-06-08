@@ -32,7 +32,7 @@ export const fetchArticlesAndSave = (): Promise<boolean> => {
 
         resolve(true);
       } else {
-        console.log("FAILED TO CREATE A TABLE ARTICLES");
+        // console.log("FAILED TO CREATE A TABLE ARTICLES");
       }
     } catch (error) {}
   });

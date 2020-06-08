@@ -27,7 +27,6 @@ interface IState {
   expanded?: boolean;
   isChecked?: boolean;
 }
-
 export default class Accordion extends Component<IProps, IState> {
   constructor(props: IProps) {
     super(props);
@@ -54,7 +53,6 @@ export default class Accordion extends Component<IProps, IState> {
     }
 
     db.updateUserConditions(conditionNum, this.state.isChecked);
-    // db.grabUserDetailsOnConsole();
   };
 
   checkBoxComponent = () => {

@@ -11,11 +11,11 @@ export const dropUserGoal = (): Promise<boolean> => {
           "DROP TABLE IF EXISTS userGoal; ",
           [],
           (tx, success) => {
-            console.log("dropUserGoal SUCCES!");
+            // console.log("dropUserGoal SUCCES!");
             resolve(true);
           },
           (tx, error) => {
-            console.log("dropUserGoal ERROR! = " + error);
+            // console.log("dropUserGoal ERROR! = " + error);
             resolve(false);
             return false;
           }
@@ -36,11 +36,11 @@ export const dropSupportLink = (): Promise<boolean> => {
           "DROP TABLE IF EXISTS supportLink; ",
           [],
           (tx, success) => {
-            console.log("dropSupportLink SUCCES!");
+            // console.log("dropSupportLink SUCCES!");
             resolve(true);
           },
           (tx, error) => {
-            console.log("dropSupportLink ERROR! = " + error);
+            // console.log("dropSupportLink ERROR! = " + error);
             resolve(false);
             return false;
           }
@@ -61,11 +61,36 @@ export const dropFrequentlyAskedQuestions = (): Promise<boolean> => {
           "DROP TABLE IF EXISTS frequentlyAskedQuestions; ",
           [],
           (tx, success) => {
-            console.log("dropFrequentlyAskedQuestions SUCCES!");
+            // console.log("dropFrequentlyAskedQuestions SUCCES!");
             resolve(true);
           },
           (tx, error) => {
-            console.log("dropFrequentlyAskedQuestions ERROR! = " + error);
+            // console.log("dropFrequentlyAskedQuestions ERROR! = " + error);
+            resolve(false);
+            return false;
+          }
+        );
+      });
+    } catch (error) {}
+  });
+};
+
+/**
+ * return Promise:boolean
+ */
+export const dropCourtDateReminder = (): Promise<boolean> => {
+  return new Promise((resolve, reject) => {
+    try {
+      db.transaction((tx) => {
+        tx.executeSql(
+          "DROP TABLE IF EXISTS courtDateReminder; ",
+          [],
+          (tx, success) => {
+            // console.log("dropCourtDateReminder SUCCES!");
+            resolve(true);
+          },
+          (tx, error) => {
+            // console.log("dropCourtDateReminder ERROR! = " + error);
             resolve(false);
             return false;
           }

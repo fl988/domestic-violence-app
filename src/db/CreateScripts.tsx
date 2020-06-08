@@ -19,11 +19,11 @@ export const createArticles = (): Promise<boolean> => {
             ");",
           [],
           (tx, success) => {
-            console.log("createArticles SUCCESS! = " + success);
+            // console.log("createArticles SUCCESS! = " + success);
             resolve(true);
           },
           (tx, error) => {
-            console.log("createArticles ERROR! = " + error);
+            // console.log("createArticles ERROR! = " + error);
             resolve(false);
             return false;
           }
@@ -66,11 +66,43 @@ export const createUserGoal = (): Promise<boolean> => {
             ");",
           [],
           (tx, success) => {
-            console.log("createUserGoal SUCCESS! = " + success);
+            // console.log("createUserGoal SUCCESS! = " + success);
             resolve(true);
           },
           (tx, error) => {
-            console.log("createUserGoal ERROR! = " + error);
+            // console.log("createUserGoal ERROR! = " + error);
+            resolve(false);
+            return false;
+          }
+        );
+      });
+    } catch (error) {}
+  });
+};
+
+/**
+ *
+ */
+export const createCourtDateReminder = (): Promise<boolean> => {
+  return new Promise((resolve, reject) => {
+    try {
+      db.transaction((tx) => {
+        tx.executeSql(
+          "CREATE TABLE IF NOT EXISTS courtDateReminder (" +
+            "courtDateReminderId INTEGER PRIMARY KEY NOT NULL, " +
+            "courtDateReminderDesc TEXT DEFAULT '', " +
+            "courtDateReminderActive BOOLEAN DEFAULT 0, " +
+            "startTimestamp TEXT DEFAULT (datetime('now','localtime')), " +
+            "endTimestamp TEXT DEFAULT '0000-00-00 00:00:00', " +
+            "insertTimestamp TEXT DEFAULT (datetime('now','localtime')) " +
+            ");",
+          [],
+          (tx, success) => {
+            // console.log("createCourtDateReminder SUCCESS! = " + success);
+            resolve(true);
+          },
+          (tx, error) => {
+            // console.log("createCourtDateReminder ERROR! = " + error);
             resolve(false);
             return false;
           }
@@ -128,11 +160,11 @@ export const createUserGoalHistory = (): Promise<boolean> => {
 
           [],
           (tx, success) => {
-            console.log("createUserGoalHistory SUCCESS! = " + success);
+            // console.log("createUserGoalHistory SUCCESS! = " + success);
             resolve(true);
           },
           (tx, error) => {
-            console.log("createUserGoalHistory ERROR! = " + error);
+            // console.log("createUserGoalHistory ERROR! = " + error);
             resolve(false);
             return false;
           }
@@ -164,11 +196,11 @@ export const createSupportLink = (): Promise<boolean> => {
             ");",
           [],
           (tx, success) => {
-            console.log("createSupportLink SUCCESS! = " + success);
+            // console.log("createSupportLink SUCCESS! = " + success);
             resolve(true);
           },
           (tx, error) => {
-            console.log("createSupportLink ERROR! = " + error);
+            // console.log("createSupportLink ERROR! = " + error);
             resolve(false);
             return false;
           }
@@ -194,11 +226,11 @@ export const createFrequentlyAskedQuestions = (): Promise<boolean> => {
             ");",
           [],
           (tx, success) => {
-            console.log("createFrequentlyAskedQuestions SUCCESS! = " + success);
+            // console.log("createFrequentlyAskedQuestions SUCCESS! = " + success);
             resolve(true);
           },
           (tx, error) => {
-            console.log("createFrequentlyAskedQuestions ERROR! = " + error);
+            // console.log("createFrequentlyAskedQuestions ERROR! = " + error);
             resolve(false);
             return false;
           }
@@ -225,11 +257,11 @@ export const createCondition = (): Promise<boolean> => {
             ");",
           [],
           (tx, success) => {
-            console.log("createSupportLink SUCCESS! = " + success);
+            // console.log("createSupportLink SUCCESS! = " + success);
             resolve(true);
           },
           (tx, error) => {
-            console.log("createSupportLink ERROR! = " + error);
+            // console.log("createSupportLink ERROR! = " + error);
             resolve(false);
             return false;
           }

@@ -8,6 +8,7 @@ import {
   createSupportLink,
   createUserGoal,
   createFrequentlyAskedQuestions,
+  createCourtDateReminder,
 } from "db/CreateScripts";
 
 export const grabAllArticles = (): Promise<SQLResultSet> => {
@@ -21,7 +22,7 @@ export const grabAllArticles = (): Promise<SQLResultSet> => {
             resolve(rs);
           },
           (tx, error) => {
-            console.log("grabAllArticles ERROR! = " + error);
+            // console.log("grabAllArticles ERROR! = " + error);
             resolve(null);
             return null;
           }
@@ -43,17 +44,14 @@ export const grabSingleArticleByUrl = (url: string): Promise<boolean> => {
           "SELECT count(*) as count FROM articles WHERE url LIKE ? ;",
           [url],
           (tx, rs) => {
-            console.log("rs.rows.item(0).count = " + rs.rows.item(0).count);
             if (rs.rows.item(0).count > 0) {
-              console.log("WE GO SOME1");
               resolve(rs.rows.item(0).url == url);
             } else {
-              console.log("WE GO SOME2 = " + url);
               resolve(false);
             }
           },
           (tx, error) => {
-            console.log("grabSingleArticleByUrl ERROR! = " + error);
+            // console.log("grabSingleArticleByUrl ERROR! = " + error);
             resolve(false);
             return null;
           }
@@ -190,6 +188,37 @@ export const formatGoalHistoryAsJSONObj = (
   });
 };
 
+interface courtDateReminderObjStructure {
+  courtDateReminderId: number;
+  courtDateReminderDesc: number;
+  endTimestampFormatted: string;
+  remaining: string;
+}
+export const formatCourtDateReminderRSAsJSONObj = (
+  rs: SQLResultSet
+): Promise<courtDateReminderObjStructure[]> => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let objArr = [];
+      for (let x = 0; x < rs.rows.length; x++) {
+        let i = rs.rows.item(x);
+        let formattedDate = await grabReadableTimestamp(i.endTimestamp);
+        let remaining = await getDifferenceInDaysVsNow(
+          i.courtDateReminderId,
+          i.endTimestamp
+        );
+        objArr.push({
+          courtDateReminderId: i.courtDateReminderId,
+          courtDateReminderDesc: i.courtDateReminderDesc,
+          endTimestampFormatted: formattedDate,
+          remaining: remaining,
+        });
+      }
+      resolve(objArr);
+    } catch (error) {}
+  });
+};
+
 /**
  *
  * @param userGoalId
@@ -251,6 +280,42 @@ export const grabUserGoalById = (userGoalId: number): Promise<SQLResultSet> => {
 //   });
 // };
 
+export const getDifferenceInDaysVsNow = (
+  courtDateReminderId: number,
+  endTimestamp: string
+): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    try {
+      let questionItemsArr = [];
+      db.transaction(
+        (tx) => {
+          tx.executeSql(
+            "SELECT julianday(?) - julianday(datetime('now','localtime')) as days FROM courtDateReminder " +
+              "WHERE courtDateReminderId = ? " +
+              "" +
+              "; ",
+            [endTimestamp, courtDateReminderId],
+            (txSuccess, rs) => {
+              let item = rs.rows.item(0);
+              resolve(item.days);
+            },
+            (txSuccess, err) => {
+              console.log(err);
+              return true;
+            }
+          );
+        },
+        async (tx) => {
+          // TRANSACTION ERROR CAUGHT.
+          // This means that this table is not exist. We create then create it.
+          // await createUserGoal();
+          resolve("");
+        }
+      );
+    } catch (error) {}
+  });
+};
+
 export const grabReadableTimestamp = (timestamp: string): Promise<string> => {
   return new Promise((resolve, reject) => {
     try {
@@ -272,6 +337,42 @@ export const grabReadableTimestamp = (timestamp: string): Promise<string> => {
               let item = rs.rows.item(0);
               let result = item.day + " " + item.month + " " + item.year;
               resolve(result);
+            },
+            (txSuccess, err) => {
+              console.log(err);
+              return true;
+            }
+          );
+        },
+        async (tx) => {
+          // TRANSACTION ERROR CAUGHT.
+          // This means that this table is not exist. We create then create it.
+          // await createUserGoal();
+          resolve("");
+        }
+      );
+    } catch (error) {}
+  });
+};
+
+export const formatMonthFromDatePicker = (month: string): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    try {
+      let questionItemsArr = [];
+      db.transaction(
+        (tx) => {
+          tx.executeSql(
+            "SELECT " +
+              "CASE ? " +
+              "when 'Jan' then '01' when 'Feb' then '02' when 'Mar' then '03' " +
+              "when 'Apr' then '04' when 'May' then '05' when 'Jun' then '06' " +
+              "when 'Jul' then '07' when 'Aug' then '08' when 'Sep' then '09' " +
+              "when 'Oct' then '10' when 'Nov' then '11' when 'Dec' then '12' " +
+              "else '' end as month; ",
+            [month],
+            (txSuccess, rs) => {
+              let item = rs.rows.item(0);
+              resolve(item.month);
             },
             (txSuccess, err) => {
               console.log(err);
@@ -423,7 +524,6 @@ export const grabSingleSupportLinkByUrl = (
             }
           },
           (tx, error) => {
-            console.log("grabSingleSupportLinkByUrl ERROR! = " + error);
             resolve(false);
             return null;
           }
@@ -474,6 +574,61 @@ export const grabUserSelectedConditions = (): Promise<SQLResultSet> => {
           // TRANSACTION ERROR CAUGHT.
           // This means that this table is not exist. We create then create it.
           await createCondition();
+          resolve(null);
+        }
+      );
+    } catch (error) {}
+  });
+};
+
+/**
+ *
+ */
+export const grabCourtDateReminder = (): Promise<SQLResultSet> => {
+  return new Promise((resolve, reject) => {
+    try {
+      db.transaction(
+        (tx) => {
+          tx.executeSql(
+            "SELECT * FROM courtDateReminder order by endTimestamp; ",
+            [],
+            (txSuccess, rs) => {
+              // Resultset will be returned even there are no records.
+              // We handle this empty table where ever we using this.
+              resolve(rs);
+            }
+          );
+        },
+        async (tx) => {
+          // TRANSACTION ERROR CAUGHT.
+          // This means that this table is not exist. We create then create it.
+          await createCourtDateReminder();
+          resolve(null);
+        }
+      );
+    } catch (error) {}
+  });
+};
+
+export const grabLatestCourtDateReminder = (): Promise<SQLResultSet> => {
+  return new Promise((resolve, reject) => {
+    try {
+      db.transaction(
+        (tx) => {
+          tx.executeSql(
+            "SELECT * FROM courtDateReminder ORDER BY endTimestamp LIMIT 1; ",
+            [],
+            (txSuccess, rs) => {
+              // Resultset will be returned even there are no records.
+              // We handle this empty table where ever we using this.
+              resolve(rs);
+            }
+          );
+        },
+        async (tx) => {
+          // TRANSACTION ERROR CAUGHT.
+          // This means that this table is not exist. We create then create it.
+          await createCourtDateReminder();
           resolve(null);
         }
       );

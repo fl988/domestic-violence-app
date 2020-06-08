@@ -30,17 +30,17 @@ class User {
     return new Promise((resolve, reject) => {
       try {
         db.transaction((tx) => {
-          console.log("ACTUAL START");
+          //console.log("ACTUAL START");
           tx.executeSql(
             "INSERT INTO " +
               " learningModules(moduleTitle, moduleSummary, moduleContent, quizTopic) " +
               " VALUES(?,?,?,?)",
             [moduleTitle, moduleSummary, moduleContent, quizTopic],
             (tx, rs) => {
-              console.log("SUCCESS insertLearningModules INSERT");
+              //console.log("SUCCESS insertLearningModules INSERT");
             },
             (tx, err) => {
-              console.log("err insertLearningModules INSERT: " + err);
+              //console.log("err insertLearningModules INSERT: " + err);
               return false;
             }
           );
@@ -49,15 +49,15 @@ class User {
             "SELECT * FROM learningModules ORDER BY learningModuleId DESC LIMIT 1;",
             [],
             (tx, rs) => {
-              console.log(
-                "DATA INSERT ARE = " + rs.rows.item(0).learningModuleId
-              );
+              // console.log(
+              //   "DATA INSERT ARE = " + rs.rows.item(0).learningModuleId
+              // );
               resolve(rs.rows.item(0).learningModuleId);
             },
             (tx, err) => {
-              console.log(
-                "DATA INSERT insertLearningModuleRecord FAIL = " + err
-              );
+              // console.log(
+              //   "DATA INSERT insertLearningModuleRecord FAIL = " + err
+              // );
               return false;
             }
           );
@@ -84,7 +84,8 @@ class User {
           questionStatement,
           questionAnswer,
         ];
-        let questionField = "questionStatement", answerField = "questionAnswer"; //prettier-ignore
+        let questionField = "questionStatement",
+          answerField = "questionAnswer";
         if (qType == Constants.QTYPE_MULTIPLE_CHOICE) {
           parameters = [
             learningModuleId,
@@ -100,15 +101,21 @@ class User {
         db.transaction((tx) => {
           tx.executeSql(
             "INSERT INTO " +
-              " questions(learningModuleId, qType, questionLabel, " + questionField + ", " + answerField + ") " +
+              " questions(learningModuleId, qType, questionLabel, " +
+              questionField +
+              ", " +
+              answerField +
+              ") " +
               " VALUES(?,?,?,?,?)",
             parameters,
-          (tx, success) => { console.log("insertQuestion SUCCESS!") /* success */}, // prettier-ignore
+            (tx, success) => {
+              //console.log("insertQuestion SUCCESS!"); /* success */
+            },
             (tx, error) => {
-              console.log("error insertConditionRecord = " + error);
+              //console.log("error insertConditionRecord = " + error);
               return false;
             }
-          ); //prettier-ignore
+          );
 
           tx.executeSql(
             "SELECT * FROM questions where learningModuleId = ? and qType = ? ORDER BY questionId DESC LIMIT 1;",
@@ -138,9 +145,11 @@ class User {
               " answers(questionId, qType, answer) " +
               " VALUES(?,?,?)",
             [questionId, qType, answer],
-            (tx, rs) => { console.log("insertAnswers SUCCESS!")}, // prettier-ignore
+            (tx, rs) => {
+              //console.log("insertAnswers SUCCESS!");
+            },
             (tx, err) => {
-              console.log("insertAnswers FAIL!: " + err);
+              //console.log("insertAnswers FAIL!: " + err);
               return false;
             }
           );
@@ -168,8 +177,18 @@ class User {
           tx.executeSql(
             "SELECT * FROM learningModules;",
             [],
-            (trans, rs) => {/*console.log("learningModules exist "+ (rs.rows.length > 0 ? "" : "but EMPTY! ") +": " + rs.rows.length);*/ resolve(rs.rows.length > 0); }, // prettier-ignore
-            (tx, error) => {console.log("learningModules checkForLearningModuleData does NOT EXIST!."); resolve(false); return false;} // prettier-ignore
+            (trans, rs) => {
+              /*//console.log("learningModules exist "+ (rs.rows.length > 0 ? "" : "but EMPTY! ") +": " + rs.rows.length);*/
+
+              resolve(rs.rows.length > 0);
+            },
+            (tx, error) => {
+              // console.log(
+              //   "learningModules checkForLearningModuleData does NOT EXIST!."
+              // );
+              resolve(false);
+              return false;
+            }
           );
         });
       } catch (error) {}
@@ -183,8 +202,15 @@ class User {
           tx.executeSql(
             "SELECT * FROM learningModules WHERE learningModuleId = ? ;",
             [learningModuleId],
-            (trans, rs) => { resolve(rs); }, // prettier-ignore
-            (tx, error) => { console.log("learningModules grabLearningModuleById does NOT EXIST!."); return false;} // prettier-ignore
+            (trans, rs) => {
+              resolve(rs);
+            },
+            (tx, error) => {
+              // console.log(
+              //   "learningModules grabLearningModuleById does NOT EXIST!."
+              // );
+              return false;
+            }
           );
         });
       } catch (error) {}
@@ -198,8 +224,15 @@ class User {
           tx.executeSql(
             "SELECT * FROM learningModules ORDER by learningModuleId DESC;",
             [],
-            (trans, rs) => { resolve(rs); }, // prettier-ignore
-            (tx, error) => {console.log("learningModules grabAllLearningModulesData does NOT EXIST!."); return false;} // prettier-ignore
+            (trans, rs) => {
+              resolve(rs);
+            },
+            (tx, error) => {
+              // console.log(
+              //   "learningModules grabAllLearningModulesData does NOT EXIST!."
+              // );
+              return false;
+            }
           );
         });
       } catch (error) {}
@@ -212,12 +245,15 @@ class User {
   ): Promise<questionJSONArray> {
     return new Promise(async (resolve, reject) => {
       try {
-        let questionItemsArr = [], existingRecord = true; //prettier-ignore
+        let questionItemsArr = [],
+          existingRecord = true;
 
-        let rs = await this.grabExistingLearningModuleQuestionsById(learningModuleId); //prettier-ignore
+        let rs = await this.grabExistingLearningModuleQuestionsById(
+          learningModuleId
+        );
         if (rs == null) {
           //If no existing learning module questions, we then just grab all questions without any answers yet.
-          rs = await this.grabLearningModuleQuestionsById(learningModuleId); //prettier-ignore
+          rs = await this.grabLearningModuleQuestionsById(learningModuleId);
           existingRecord = false;
         }
 
@@ -225,7 +261,10 @@ class User {
         //Firstly check for existing learning module questions that already has some user answers.
         for (let x = 0; x < rs.rows.length; x++) {
           let item: any = rs.rows.item(x);
-          let question = "", choices = [{}], questionNumber = -1, qTypeInt = parseInt(item.qType); //prettier-ignore
+          let question = "",
+            choices = [{}],
+            questionNumber = -1,
+            qTypeInt = parseInt(item.qType);
 
           if (existingRecord) {
             if (qTypeInt == Constants.QTYPE_TRUE_OR_FALSE) {
@@ -237,22 +276,33 @@ class User {
               ];
             } else {
               question = item.question;
-              let rsAnswers = await this.grabQuestionAnswersByIdAndQType(item.questionId, qTypeInt); //prettier-ignore
+              let rsAnswers = await this.grabQuestionAnswersByIdAndQType(
+                item.questionId,
+                qTypeInt
+              );
               if (rsAnswers != null && rsAnswers.rows.length > 0) {
                 for (let y = 0; y < rsAnswers.rows.length; y++) {
                   let answerItem = rsAnswers.rows.item(y);
                   if (item.userAnswer == answerItem.answer) {
                     questionNumber = y;
                   }
-                  choices[y] = { label: answerItem.answer, value: answerItem.answer }; //prettier-ignore
+                  choices[y] = {
+                    label: answerItem.answer,
+                    value: answerItem.answer,
+                  };
                 }
               }
             }
           } else {
-            let rsUserAnswer = await this.grabUserAnswerByIdAndQId( learningModuleId, item.questionId ); //prettier-ignore
+            let rsUserAnswer = await this.grabUserAnswerByIdAndQId(
+              learningModuleId,
+              item.questionId
+            );
             if (qTypeInt == Constants.QTYPE_TRUE_OR_FALSE) {
               if (rsUserAnswer.rows.length > 0) {
-                questionNumber = Helper.ctb(rsUserAnswer.rows.item(0).questionNumber); //prettier-ignore
+                questionNumber = Helper.ctb(
+                  rsUserAnswer.rows.item(0).questionNumber
+                );
               }
               question = item.questionStatement;
               choices = [
@@ -261,14 +311,23 @@ class User {
               ];
             } else {
               question = item.question;
-              let rsAnswers = await this.grabQuestionAnswersByIdAndQType(item.questionId, qTypeInt); //prettier-ignore
+              let rsAnswers = await this.grabQuestionAnswersByIdAndQType(
+                item.questionId,
+                qTypeInt
+              );
               if (rsAnswers != null && rsAnswers.rows.length > 0) {
                 for (let y = 0; y < rsAnswers.rows.length; y++) {
                   let answerItem = rsAnswers.rows.item(y);
-                  if (rsUserAnswer.rows.length > 0 && rsUserAnswer.rows.item(0).questionNumber == y) {
-                  questionNumber = rsUserAnswer.rows.item(0).questionNumber;
-                } //prettier-ignore
-                  choices[y] = { label: answerItem.answer, value: answerItem.answer, }; //prettier-ignore
+                  if (
+                    rsUserAnswer.rows.length > 0 &&
+                    rsUserAnswer.rows.item(0).questionNumber == y
+                  ) {
+                    questionNumber = rsUserAnswer.rows.item(0).questionNumber;
+                  }
+                  choices[y] = {
+                    label: answerItem.answer,
+                    value: answerItem.answer,
+                  };
                 }
               }
             }
@@ -299,12 +358,17 @@ class User {
       try {
         let rsUserAnswer = await this.grabUserAnswerById(learningModuleId);
         let rsQuestions = await this.grabQuestionsById(learningModuleId);
-        if (rsUserAnswer.rows.length > 0 && (rsUserAnswer.rows.length == rsQuestions.rows.length)) {
-          let existingLMQWUA = await this.grabExistingLearningModuleQuestionsWithUserAnswers(learningModuleId);
+        if (
+          rsUserAnswer.rows.length > 0 &&
+          rsUserAnswer.rows.length == rsQuestions.rows.length
+        ) {
+          let existingLMQWUA = await this.grabExistingLearningModuleQuestionsWithUserAnswers(
+            learningModuleId
+          );
           resolve(existingLMQWUA);
         } else {
           resolve(null);
-        } //prettier-ignore
+        }
       } catch (error) {}
     });
   }
@@ -323,7 +387,12 @@ class User {
           (trans, rs) => {
             resolve(rs);
           },
-          (tx, error) => {console.log("either learningModules or questions does NOT EXIST!. " + error); return false;} // prettier-ignore
+          (tx, error) => {
+            // console.log(
+            //   "either learningModules or questions does NOT EXIST!. " + error
+            // );
+            return false;
+          }
         );
       });
     });
@@ -345,7 +414,12 @@ class User {
             (trans, rs) => {
               resolve(rs);
             },
-            (tx, error) => {console.log("either learningModules or questions does NOT EXIST!. " + error); return false;} // prettier-ignore
+            (tx, error) => {
+              // console.log(
+              //   "either learningModules or questions does NOT EXIST!. " + error
+              // );
+              return false;
+            }
           );
         });
       } catch (err) {}
@@ -369,7 +443,12 @@ class User {
             (trans, rs) => {
               resolve(rs);
             },
-            (tx, error) => {console.log("either learningModules or questions does NOT EXIST!. " + error); return false;} // prettier-ignore
+            (tx, error) => {
+              // console.log(
+              //   "either learningModules or questions does NOT EXIST!. " + error
+              // );
+              return false;
+            }
           );
         });
       } catch (err) {}
@@ -383,8 +462,13 @@ class User {
           tx.executeSql(
             "SELECT * FROM questions WHERE learningModuleId = ? ;",
             [learningModuleId],
-            (trans, rs) => { resolve(rs); }, // prettier-ignore
-            (tx, error) => {console.log("answers table does NOT EXIST!. " + error); return false;} // prettier-ignore
+            (trans, rs) => {
+              resolve(rs);
+            },
+            (tx, error) => {
+              //console.log("answers table does NOT EXIST!. " + error);
+              return false;
+            }
           );
         });
       } catch (error) {}
@@ -401,8 +485,13 @@ class User {
           tx.executeSql(
             "SELECT * FROM questions WHERE learningModuleId = ? AND questionId = ? ORDER BY questionId ASC;",
             [learningModuleId, questionId],
-            (trans, rs) => { resolve(rs); }, // prettier-ignore
-            (tx, error) => { console.log("answers table does NOT EXIST!. " + error); return false;} // prettier-ignore
+            (trans, rs) => {
+              resolve(rs);
+            },
+            (tx, error) => {
+              //console.log("answers table does NOT EXIST!. " + error);
+              return false;
+            }
           );
         });
       } catch (error) {}
@@ -421,8 +510,13 @@ class User {
               "FROM answers " +
               "WHERE questionId = ? AND qType = ? ;",
             [questionId, qType],
-            (trans, rs) => { resolve(rs); }, // prettier-ignore
-            (tx, error) => {console.log("answers table does NOT EXIST!. " + error); return false;} // prettier-ignore
+            (trans, rs) => {
+              resolve(rs);
+            },
+            (tx, error) => {
+              //console.log("answers table does NOT EXIST!. " + error);
+              return false;
+            }
           );
         });
       } catch (error) {}
@@ -431,10 +525,10 @@ class User {
 
   async fetchLearningModulesData() {
     try {
-      console.log("---- No learning modules data found. ----") //prettier-ignore
+      //console.log("---- No learning modules data found. ----");
       let rsUser = await this.grabUserType();
       let userTypeId = rsUser.rows.item(0).userTypeId;
-      console.log("---- fetching new learning modules from contentful");
+      //console.log("---- fetching new learning modules from contentful");
 
       const contentful = require("contentful/dist/contentful.browser.min.js");
       const client = contentful.createClient({
@@ -544,7 +638,9 @@ class User {
 
   saveLearningModulesData(jsonData: any) {
     return new Promise(async (resolve, reject) => {
-      console.log( "---- saving new learning modules from contentful into mysql" ); //prettier-ignore
+      // console.log(
+      //   "---- saving new learning modules from contentful into mysql"
+      // );
       // console.log(jsonData);
       try {
         //Loop through Modules
@@ -559,7 +655,9 @@ class User {
 
           //Loop through Questions
           let qs = jd[x].quizzes;
-          console.log(jd[x].moduleTitle + " has a total of " + qs.length + " quizzes.") //prettier-ignore
+          // console.log(
+          //   jd[x].moduleTitle + " has a total of " + qs.length + " quizzes."
+          // );
           for (let y = 0; y < qs.length; y++) {
             let questionId: number = 0;
             if (qs[y].qType == Constants.QTYPE_TRUE_OR_FALSE) {
@@ -622,8 +720,12 @@ class User {
           tx.executeSql(
             "SELECT strftime('%Y','now') as year, strftime( '%m','now' ) as month;",
             [],
-            (trans, rs) => { resolve(rs)}, // prettier-ignore
-            (tx, error) => { return false;} // prettier-ignore
+            (trans, rs) => {
+              resolve(rs);
+            },
+            (tx, error) => {
+              return false;
+            }
           );
         });
       } catch (error) {}
@@ -638,8 +740,14 @@ class User {
           tx.executeSql(
             "SELECT userSetUp FROM user;",
             [],
-            (trans, rs) => { resolve(rs.rows.item(0).userSetUp == true); }, // prettier-ignore
-            (tx, error) => { console.log("checkUserSetUp FAIL = " + error); resolve(false); return false;} // prettier-ignore
+            (trans, rs) => {
+              resolve(rs.rows.item(0).userSetUp == true);
+            },
+            (tx, error) => {
+              //console.log("checkUserSetUp FAIL = " + error);
+              resolve(false);
+              return false;
+            }
           );
         });
       } catch (error) {}
@@ -655,8 +763,13 @@ class User {
           tx.executeSql(
             "SELECT completeOnboarding FROM user;",
             [],
-            (trans, rs) => { resolve(rs.rows.item(0).completeOnboarding == true); }, // prettier-ignore
-            (tx, error) => { resolve(false); return false; } // prettier-ignore
+            (trans, rs) => {
+              resolve(rs.rows.item(0).completeOnboarding == true);
+            },
+            (tx, error) => {
+              resolve(false);
+              return false;
+            }
           );
         });
       } catch (error) {}
@@ -677,7 +790,7 @@ class User {
               resolve(rs);
             },
             (tx, error) => {
-              console.log("error grabUserConditionsAsArray = " + error);
+              //console.log("error grabUserConditionsAsArray = " + error);
               return false;
             }
           );
@@ -713,7 +826,7 @@ class User {
               resolve(conditionArr);
             },
             (tx, error) => {
-              console.log("error grabUserConditionsAsArray = " + error);
+              //console.log("error grabUserConditionsAsArray = " + error);
               return false;
             }
           );
@@ -731,9 +844,11 @@ class User {
           tx.executeSql(
             "SELECT * FROM user;",
             [],
-            (trans, rs) => { resolve(rs); }, // prettier-ignore
+            (trans, rs) => {
+              resolve(rs);
+            },
             (tx, error) => {
-              console.log("error grabUserDetails = " + error);
+              //console.log("error grabUserDetails = " + error);
               return false;
             }
           );
@@ -751,9 +866,11 @@ class User {
           tx.executeSql(
             "SELECT * FROM condition;",
             [],
-            (trans, rs) => { resolve(rs); }, // prettier-ignore
+            (trans, rs) => {
+              resolve(rs);
+            },
             (tx, error) => {
-              console.log("error grabConditionDetails = " + error);
+              //console.log("error grabConditionDetails = " + error);
               return false;
             }
           );
@@ -771,9 +888,11 @@ class User {
           tx.executeSql(
             "SELECT * FROM condition where conditionNumber = ? ;",
             [condNumber],
-            (trans, rs) => { resolve(rs); }, // prettier-ignore
+            (trans, rs) => {
+              resolve(rs);
+            },
             (tx, error) => {
-              console.log("error grabConditionDetails = " + error);
+              //console.log("error grabConditionDetails = " + error);
               return false;
             }
           );
@@ -798,8 +917,15 @@ class User {
               "completeOnboarding BOOLEAN DEFAULT 0 " +
               ");",
             [],
-            (tx, success) => { console.log("createUser SUCCESS! = " + success); resolve(true); /* success */}, // prettier-ignore
-            (tx, error) => { console.log("createUser ERROR! = " + error); resolve(false); return false; } // prettier-ignore
+            (tx, success) => {
+              //console.log("createUser SUCCESS! = " + success);
+              resolve(true); /* success */
+            },
+            (tx, error) => {
+              //console.log("createUser ERROR! = " + error);
+              resolve(false);
+              return false;
+            }
           );
         });
       } catch (error) {}
@@ -824,8 +950,15 @@ class User {
               "FOREIGN KEY(userId) REFERENCES user(userId) " +
               ");",
             [],
-            (tx, success) => {console.log("SUCCESS createCondition! = " + success); resolve(true); /* success */}, // prettier-ignore
-            (tx, error) => { console.log("error createCondition = " + error); resolve(false); return false; } // prettier-ignore
+            (tx, success) => {
+              //console.log("SUCCESS createCondition! = " + success);
+              resolve(true); /* success */
+            },
+            (tx, error) => {
+              //console.log("error createCondition = " + error);
+              resolve(false);
+              return false;
+            }
           );
         });
       } catch (error) {}
@@ -837,14 +970,16 @@ class User {
   dropUser(): Promise<boolean> {
     return new Promise((resolve, reject) => {
       try {
-        console.log("1.1");
+        //console.log("1.1");
         db.transaction((tx) => {
           tx.executeSql(
             "DROP TABLE IF EXISTS user",
             [],
-            (tx, success) => { resolve(true); /* success */}, // prettier-ignore
+            (tx, success) => {
+              resolve(true); /* success */
+            },
             (tx, error) => {
-              console.log("error insertUserDefaultRecord = " + error);
+              //console.log("error insertUserDefaultRecord = " + error);
               resolve(false);
               return false;
             }
@@ -863,9 +998,11 @@ class User {
           tx.executeSql(
             "DROP TABLE IF EXISTS condition",
             [],
-            (tx, success) => { resolve(true); /* success */}, // prettier-ignore
+            (tx, success) => {
+              resolve(true); /* success */
+            },
             (tx, error) => {
-              console.log("error insertUserDefaultRecord = " + error);
+              //console.log("error insertUserDefaultRecord = " + error);
               resolve(false);
               return false;
             }
@@ -886,9 +1023,11 @@ class User {
               " user(initials, dob, userTypeId) " +
               " VALUES('','','')",
             [],
-            (tx, success) => { resolve(true); /* success */}, // prettier-ignore
+            (tx, success) => {
+              resolve(true); /* success */
+            },
             (tx, error) => {
-              console.log("error insertUserDefaultRecord = " + error);
+              //console.log("error insertUserDefaultRecord = " + error);
               resolve(false);
               return false;
             }
@@ -914,9 +1053,11 @@ class User {
             " condition(conditionNumber, conditionSummary, conditionText, conditionSelected, conditionMandatory) " +
             " VALUES(?,?,?,?,?)",
           [condNumber, condSummary, condText, conditionSelected, condMandatory],
-          (tx, success) => {/* success */}, // prettier-ignore
+          (tx, success) => {
+            /* success */
+          },
           (tx, error) => {
-            console.log("error insertConditionRecord = " + error);
+            //console.log("error insertConditionRecord = " + error);
             return false;
           }
         );
@@ -932,7 +1073,7 @@ class User {
             resolve(rs.rows.length);
           }),
             (tx, error) => {
-              console.log("getConditionRecordCount FAIL = " + error);
+              //console.log("getConditionRecordCount FAIL = " + error);
             };
         });
       } catch (error) {}
@@ -949,7 +1090,7 @@ class User {
             "SELECT * FROM user; ",
             [],
             async (tx, rs) => {
-              //console.log("item:", rs.rows.length);
+              ////console.log("item:", rs.rows.length);
               if (rs.rows.length == 0) {
                 // No rows found on the 'user' table. We then drop if user table exist, create user table then insert a default record.
                 await this.dropUser();
@@ -1015,8 +1156,13 @@ class User {
           tx.executeSql(
             "SELECT initials FROM user;",
             [],
-            (trans, rs) => { resolve(rs.rows.item(0).initials.toString()); }, // prettier-ignore
-            (tx, error) => { resolve(""); return false; } // prettier-ignore
+            (trans, rs) => {
+              resolve(rs.rows.item(0).initials.toString());
+            },
+            (tx, error) => {
+              resolve("");
+              return false;
+            }
           );
         });
       } catch (error) {}
@@ -1025,8 +1171,8 @@ class User {
 
   /****************************************************************************************************************************************************/
   async setUpLearningModules() {
-    console.log("\n\n");
-    console.log("+++++++++++++ BEGIN SET UP +++++++++++++");
+    //console.log("\n\n");
+    //console.log("+++++++++++++ BEGIN SET UP +++++++++++++");
     await this.dropLearningModules();
     await this.dropQuestions();
     await this.dropQuestionType();
@@ -1042,8 +1188,8 @@ class User {
     await this.createUserPerformance();
 
     await this.insertQuestionTypeRecord();
-    console.log("+++++++++++++ END SET UP +++++++++++++");
-    console.log("\n\n");
+    //console.log("+++++++++++++ END SET UP +++++++++++++");
+    //console.log("\n\n");
   }
 
   createLearningModules() {
@@ -1064,8 +1210,14 @@ class User {
               "insertTimestamp TEXT DEFAULT (datetime('now','localtime')) " +
               ");",
             [],
-            (tx, success) => {console.log("createLearningModules SUCCESS!"); resolve(true);/* success */}, // prettier-ignore
-            (tx, error) => { console.log("error createLearningModules = " + error); return false; } // prettier-ignore
+            (tx, success) => {
+              //console.log("createLearningModules SUCCESS!");
+              resolve(true); /* success */
+            },
+            (tx, error) => {
+              //console.log("error createLearningModules = " + error);
+              return false;
+            }
           );
         });
       } catch (error) {}
@@ -1092,8 +1244,14 @@ class User {
               "FOREIGN KEY(learningModuleId) REFERENCES learningModules(learningModuleId)" +
               ");",
             [],
-            (tx, success) => {console.log("createQuestions SUCCESS!"); resolve(true);/* success */}, // prettier-ignore
-            (tx, error) => { console.log("error createQuestions = " + error); return false; } // prettier-ignore
+            (tx, success) => {
+              //console.log("createQuestions SUCCESS!");
+              resolve(true); /* success */
+            },
+            (tx, error) => {
+              //console.log("error createQuestions = " + error);
+              return false;
+            }
           );
         });
       } catch (error) {}
@@ -1112,8 +1270,14 @@ class User {
               "qType INT DEFAULT 0 " +
               ");",
             [],
-            (tx, success) => {console.log("createQuestionType SUCCESS!"); resolve(true);/* success */}, // prettier-ignore
-            (tx, error) => { console.log("error createQuestionType = " + error); return false; } // prettier-ignore
+            (tx, success) => {
+              //console.log("createQuestionType SUCCESS!");
+              resolve(true); /* success */
+            },
+            (tx, error) => {
+              //console.log("error createQuestionType = " + error);
+              return false;
+            }
           );
         });
       } catch (error) {}
@@ -1135,8 +1299,14 @@ class User {
               "FOREIGN KEY(questionId) REFERENCES questions(questionId)" +
               ");",
             [],
-            (tx, success) => {console.log("createAnswers SUCCESS!"); resolve(true);/* success */}, // prettier-ignore
-            (tx, error) => { console.log("error createAnswers = " + error); return false; } // prettier-ignore
+            (tx, success) => {
+              //console.log("createAnswers SUCCESS!");
+              resolve(true); /* success */
+            },
+            (tx, error) => {
+              //console.log("error createAnswers = " + error);
+              return false;
+            }
           );
         });
       } catch (error) {}
@@ -1163,8 +1333,14 @@ class User {
               "FOREIGN KEY(questionId) REFERENCES questions(questionId) " +
               ");",
             [],
-            (tx, success) => {console.log("createUserAnswer SUCCESS!"); resolve(true);/* success */}, // prettier-ignore
-            (tx, error) => { console.log("error createUserAnswer = " + error); return false; } // prettier-ignore
+            (tx, success) => {
+              //console.log("createUserAnswer SUCCESS!");
+              resolve(true); /* success */
+            },
+            (tx, error) => {
+              //console.log("error createUserAnswer = " + error);
+              return false;
+            }
           );
         });
       } catch (error) {}
@@ -1185,8 +1361,14 @@ class User {
               "FOREIGN KEY(learningModuleId) REFERENCES learningModules(learningModuleId) " +
               ");",
             [],
-            (tx, success) => {console.log("createUserPerformance SUCCESS!"); resolve(true);/* success */}, // prettier-ignore
-            (tx, error) => { console.log("error createUserPerformance = " + error); return false; } // prettier-ignore
+            (tx, success) => {
+              //console.log("createUserPerformance SUCCESS!");
+              resolve(true); /* success */
+            },
+            (tx, error) => {
+              //console.log("error createUserPerformance = " + error);
+              return false;
+            }
           );
         });
       } catch (error) {}
@@ -1198,26 +1380,41 @@ class User {
       try {
         db.transaction((tx) => {
           tx.executeSql(
-            "INSERT INTO questionType(qType) VALUES(1)" , 
+            "INSERT INTO questionType(qType) VALUES(1)",
             [],
-            (tx, success) => { console.log("questionType insert1 SUCCESS! = " + success.rows.length); resolve(true); },
-            (tx, err) => { console.log("insert err"); return false; }
-          ); // prettier-ignore
+            (tx, success) => {
+              // console.log(
+              //   "questionType insert1 SUCCESS! = " + success.rows.length
+              // );
+              resolve(true);
+            },
+            (tx, err) => {
+              //console.log("insert err");
+              return false;
+            }
+          );
           tx.executeSql(
-            "INSERT INTO questionType(qType) VALUES(2)", [],
-            (tx, success) => { console.log("questionType insert2 SUCCESS!"); resolve(true);},
-            (tx, err) => { console.log("insert err"); return false; }
-          ); // prettier-ignore
+            "INSERT INTO questionType(qType) VALUES(2)",
+            [],
+            (tx, success) => {
+              //console.log("questionType insert2 SUCCESS!");
+              resolve(true);
+            },
+            (tx, err) => {
+              //console.log("insert err");
+              return false;
+            }
+          );
           tx.executeSql(
             "SELECT * FROM questionType ORDER BY questionTypeId DESC LIMIT 1;",
             [],
             (tx, success) => {
-              console.log(
-                "DATA INSERT ARE = " + success.rows.item(0).questionTypeId
-              );
+              // console.log(
+              //   "DATA INSERT ARE = " + success.rows.item(0).questionTypeId
+              // );
             },
             (tx, err) => {
-              console.log("DATA INSERT FAIL = " + err);
+              //console.log("DATA INSERT FAIL = " + err);
               return false;
             }
           );
@@ -1235,11 +1432,11 @@ class User {
             "DROP TABLE IF EXISTS learningModules",
             [],
             (t, s) => {
-              console.log("drop learningModules");
+              //console.log("drop learningModules");
               resolve(true);
             },
             (t, e) => {
-              console.log("fail drop learningModules: " + e);
+              //console.log("fail drop learningModules: " + e);
               return false;
             }
           );
@@ -1255,11 +1452,11 @@ class User {
             "DROP TABLE IF EXISTS questions",
             [],
             (t, s) => {
-              console.log("drop questions");
+              //console.log("drop questions");
               resolve(true);
             },
             (t, e) => {
-              console.log("fail drop questions: " + e);
+              //console.log("fail drop questions: " + e);
               return false;
             }
           );
@@ -1275,11 +1472,11 @@ class User {
             "DROP TABLE IF EXISTS questionType",
             [],
             (t, s) => {
-              console.log("drop questionType");
+              //console.log("drop questionType");
               resolve(true);
             },
             (t, e) => {
-              console.log("fail drop questionType: " + e);
+              //console.log("fail drop questionType: " + e);
               return false;
             }
           );
@@ -1295,11 +1492,11 @@ class User {
             "DROP TABLE IF EXISTS answers",
             [],
             (t, s) => {
-              console.log("drop answers");
+              //console.log("drop answers");
               resolve(true);
             },
             (t, e) => {
-              console.log("fail drop answers: " + e);
+              //console.log("fail drop answers: " + e);
               return false;
             }
           );
@@ -1316,11 +1513,11 @@ class User {
             "DROP TABLE IF EXISTS userAnswer",
             [],
             (t, s) => {
-              console.log("drop userAnswer");
+              //console.log("drop userAnswer");
               resolve(true);
             },
             (t, e) => {
-              console.log("fail drop userAnswer: " + e);
+              //console.log("fail drop userAnswer: " + e);
               return false;
             }
           );
@@ -1337,11 +1534,11 @@ class User {
             "DROP TABLE IF EXISTS userPerformance",
             [],
             (t, s) => {
-              console.log("drop userPerformance");
+              //console.log("drop userPerformance");
               resolve(true);
             },
             (t, e) => {
-              console.log("fail drop userPerformance: " + e);
+              //console.log("fail drop userPerformance: " + e);
               return false;
             }
           );
@@ -1391,8 +1588,8 @@ class User {
         tx.executeSql(
           "UPDATE condition SET conditionSelected = ? WHERE conditionNumber = ?;",
           [!conditionValue, conditionNum]
-          //(tx, success) => {console.log("updateUserConditions success: " + success);}, // prettier-ignore
-          // (tx, error) => {console.log("updateUserConditions error: " + error);/* fail */ return false;} // prettier-ignore
+          //(tx, success) => {//console.log("updateUserConditions success: " + success);},
+          // (tx, error) => {//console.log("updateUserConditions error: " + error);/* fail */ return false;}
         );
       });
     } catch (error) {}
@@ -1405,8 +1602,13 @@ class User {
         tx.executeSql(
           "UPDATE USER SET userSetUp = 1 WHERE userId = 1;",
           [],
-          (tx, success) => {/* success */}, // prettier-ignore
-          (tx, error) => {/* fail */ console.log("updateUserSetUp FAIL!" + error); return false;} // prettier-ignore
+          (tx, success) => {
+            /* success */
+          },
+          (tx, error) => {
+            /* fail */ //console.log("updateUserSetUp FAIL!" + error);
+            return false;
+          }
         );
       });
     } catch (error) {}
@@ -1421,12 +1623,12 @@ class User {
           [v],
           (tx, success) => {
             /* success */
-            console.log(success);
+            // console.log(success);
             return true;
           },
           (tx, error) => {
             /* fail */
-            console.log(error);
+            // console.log(error);
             return false;
           }
         );
@@ -1444,7 +1646,10 @@ class User {
             (trans, rs) => {
               resolve(rs);
             },
-            (tx, error) => {console.log("grabUserAnswerById error: " + error);/* fail */ return false;} // prettier-ignore
+            (tx, error) => {
+              //console.log("grabUserAnswerById error: " + error);
+              /* fail */ return false;
+            }
           );
         });
       } catch (err) {}
@@ -1464,7 +1669,10 @@ class User {
             (trans, rs) => {
               resolve(rs);
             },
-            (tx, error) => {console.log("grabUserAnswerById error: " + error);/* fail */ return false;} // prettier-ignore
+            (tx, error) => {
+              //console.log("grabUserAnswerById error: " + error);
+              /* fail */ return false;
+            }
           );
         });
       } catch (err) {}
@@ -1482,7 +1690,10 @@ class User {
             (trans, rs) => {
               resolve(true);
             },
-            (tx, error) => {console.log("deleteUserAnswerById error: " + error);/* fail */ return false;} // prettier-ignore
+            (tx, error) => {
+              //console.log("deleteUserAnswerById error: " + error);
+              /* fail */ return false;
+            }
           );
         });
       } catch (err) {}
@@ -1499,7 +1710,10 @@ class User {
             (trans, rs) => {
               resolve(true);
             },
-            (tx, error) => {console.log("deleteCondition error: " + error);/* fail */ return false;} // prettier-ignore
+            (tx, error) => {
+              //console.log("deleteCondition error: " + error);
+              /* fail */ return false;
+            }
           );
         });
       } catch (err) {}
@@ -1516,7 +1730,10 @@ class User {
             (trans, rs) => {
               resolve(true);
             },
-            (tx, error) => {console.log("deleteUserPerformanceById error: " + error);/* fail */ return false;} // prettier-ignore
+            (tx, error) => {
+              //console.log("deleteUserPerformanceById error: " + error);
+              /* fail */ return false;
+            }
           );
         });
       } catch (err) {}
@@ -1539,7 +1756,12 @@ class User {
           thisUserAnswer = userAnswer; //string value for Multiple choice
         }
 
-        let isSameAnswer = await this.comparePrevAndCurrentAnswers(thisUserAnswer, lmId, qId, qType); //prettier-ignore
+        let isSameAnswer = await this.comparePrevAndCurrentAnswers(
+          thisUserAnswer,
+          lmId,
+          qId,
+          qType
+        );
         if (isSameAnswer) {
           resolve(false);
           return false;
@@ -1552,7 +1774,10 @@ class User {
               "WHERE learningModuleId = ? AND questionId = ? AND qType = ? ;",
             [thisUserAnswer, qNum, lmId, qId, qType],
             (tx, success) => {},
-            (tx, error) => {console.log("updateUserAnswer ERROR!: " + error);/* fail */ return false;} // prettier-ignore
+            (tx, error) => {
+              //console.log("updateUserAnswer ERROR!: " + error);
+              /* fail */ return false;
+            }
           );
 
           //Above code will somehow always execute even if there are no existing record(s),
@@ -1563,15 +1788,29 @@ class User {
             [lmId, qId, qType],
             async (trans, rs) => {
               if (rs == null || rs.rows.length == 0) {
-                let insertUserAnswer = await this.insertUserAnswer(userAnswer, lmId, qId, qType, qNum); // prettier-ignore
+                let insertUserAnswer = await this.insertUserAnswer(
+                  userAnswer,
+                  lmId,
+                  qId,
+                  qType,
+                  qNum
+                );
               }
               let isAnswerCorrect = await this.checkUserAnswersV2(lmId, qId);
-              let updateUserAnswer = await this.updateUserAnswerV2(isAnswerCorrect, lmId, qId, qType); // prettier-ignore
+              let updateUserAnswer = await this.updateUserAnswerV2(
+                isAnswerCorrect,
+                lmId,
+                qId,
+                qType
+              );
 
               await this.markingQuizScoreProcess(lmId, false);
               resolve(true);
             },
-            (tx, error) => {console.log("updateUserAnswer select ERROR: " + error);/* fail */ return false;} // prettier-ignore
+            (tx, error) => {
+              //console.log("updateUserAnswer select ERROR: " + error);
+              /* fail */ return false;
+            }
           );
         }, null);
       } catch (error) {}
@@ -1594,7 +1833,10 @@ class User {
             (tx, success) => {
               resolve(true);
             },
-            (tx, error) => {console.log("updateUserAnswer ERROR!: " + error);/* fail */ return false;} // prettier-ignore
+            (tx, error) => {
+              //console.log("updateUserAnswer ERROR!: " + error);
+              /* fail */ return false;
+            }
           );
         });
       } catch (err) {}
@@ -1619,7 +1861,7 @@ class User {
               resolve(true);
             },
             (trans, err) => {
-              console.log("updateUserAnswer insert ERROR!: " + err);
+              //console.log("updateUserAnswer insert ERROR!: " + err);
               return false;
             }
           );
@@ -1656,7 +1898,10 @@ class User {
 
               resolve(false);
             },
-            (tx, error) => {console.log("updateUserAnswer select ERROR: " + error);/* fail */ return false;} // prettier-ignore
+            (tx, error) => {
+              //console.log("updateUserAnswer select ERROR: " + error);
+              /* fail */ return false;
+            }
           );
         });
       } catch (err) {}
@@ -1667,8 +1912,10 @@ class User {
   checkIfAllQuestionsAreAnswered(learningModuleId: number): Promise<boolean> {
     return new Promise(async (resolve, reject) => {
       try {
-        let rsUA = await this.grabUserAnswerByLeaningModuleId(learningModuleId); //prettier-ignore
-        let rsLMQ = await this.grabLearningModuleQuestionsById(learningModuleId); //prettier-ignore
+        let rsUA = await this.grabUserAnswerByLeaningModuleId(learningModuleId);
+        let rsLMQ = await this.grabLearningModuleQuestionsById(
+          learningModuleId
+        );
 
         resolve(rsUA.rows.length == rsLMQ.rows.length);
       } catch (err) {}
@@ -1687,7 +1934,10 @@ class User {
             (trans, rs) => {
               resolve(rs);
             },
-            (tx, error) => {console.log("updateUserAnswer error: " + error);/* fail */ return false;} // prettier-ignore
+            (tx, error) => {
+              //console.log("updateUserAnswer error: " + error);
+              /* fail */ return false;
+            }
           );
         });
       } catch (err) {}
@@ -1727,8 +1977,10 @@ class User {
   ): Promise<boolean> {
     return new Promise(async (resolve, reject) => {
       try {
-        let rsUserAnswers = await this.grabExistingLearningModuleQuestionsWithUserAnswers( learningModuleId ); //prettier-ignore
-        let rsQuestions = await this.grabQuestionsById( learningModuleId ); //prettier-ignore
+        let rsUserAnswers = await this.grabExistingLearningModuleQuestionsWithUserAnswers(
+          learningModuleId
+        );
+        let rsQuestions = await this.grabQuestionsById(learningModuleId);
         if (rsUserAnswers != null && rsUserAnswers.rows.length > 0) {
           //Firstly, we want to know if the user has either fully or partially completed the module questions.
           let userScore = rsQuestions.rows.length - rsUserAnswers.rows.length;
@@ -1747,7 +1999,10 @@ class User {
               //We now check if the user's answer are all correct.
               if (userScore == rsQuestions.rows.length) {
                 //if all are correct we then set the module to finished.
-                await this.updateLearningModuleCompletion(true, learningModuleId); //prettier-ignore
+                await this.updateLearningModuleCompletion(
+                  true,
+                  learningModuleId
+                );
                 resolve(true);
               }
             } else {
@@ -1756,7 +2011,10 @@ class User {
                 rsUserAnswers,
                 rsQuestions
               );
-              await this.updateLearningModuleCompletion(false, learningModuleId); //prettier-ignore
+              await this.updateLearningModuleCompletion(
+                false,
+                learningModuleId
+              );
               resolve(true);
             }
           } else {
@@ -1780,7 +2038,7 @@ class User {
   ): Promise<boolean> {
     return new Promise(async (resolve, reject) => {
       try {
-        // console.log("Checking Answers");
+        // //console.log("Checking Answers");
         let userScore = 0;
         for (let x = 0; x < rsUserAnswers.rows.length; x++) {
           let item = rsUserAnswers.rows.item(x);
@@ -1788,10 +2046,12 @@ class User {
 
           if (item.qType == Constants.QTYPE_TRUE_OR_FALSE) {
             //True or False
-            if (Helper.ctb(item.userAnswer) == Helper.ctb(item.questionAnswer)){
+            if (
+              Helper.ctb(item.userAnswer) == Helper.ctb(item.questionAnswer)
+            ) {
               answerIsCorrect = true;
               userScore++;
-            } //prettier-ignore
+            }
           } else {
             //Multiple Choice
             if (item.userAnswer == item.answer) {
@@ -1817,15 +2077,20 @@ class User {
   checkUserAnswersV2(lmId: number, qId: number): Promise<boolean> {
     return new Promise(async (resolve, reject) => {
       try {
-        let rsUserAnswers = await this.grabExistingLearningModuleQuestionsWithUserAnswersSingle( lmId, qId ); //prettier-ignore
+        let rsUserAnswers = await this.grabExistingLearningModuleQuestionsWithUserAnswersSingle(
+          lmId,
+          qId
+        );
         if (rsUserAnswers.rows.length > 0) {
           let item = rsUserAnswers.rows.item(0);
           let isAnswerCorrect = false;
           if (item.qType == Constants.QTYPE_TRUE_OR_FALSE) {
             //True or False
-            if (Helper.ctb(item.userAnswer) == Helper.ctb(item.questionAnswer)){
+            if (
+              Helper.ctb(item.userAnswer) == Helper.ctb(item.questionAnswer)
+            ) {
               isAnswerCorrect = true;
-            } //prettier-ignore
+            }
           } else {
             //Multiple Choice
             if (item.userAnswer == item.answer) {
@@ -1847,7 +2112,7 @@ class User {
   ): Promise<boolean> {
     return new Promise((resolve, reject) => {
       try {
-        // console.log("updateLearningModuleCompletion finished = " + finished);
+        // //console.log("updateLearningModuleCompletion finished = " + finished);
         db.transaction((tx) => {
           tx.executeSql(
             "UPDATE learningModules SET finished = ? " +
@@ -1856,7 +2121,10 @@ class User {
             (tx, success) => {
               resolve(true);
             },
-            (tx, error) => {console.log("updateLearningModuleCompletion ERROR!: " + error);/* fail */ return false;} // prettier-ignore
+            (tx, error) => {
+              //console.log("updateLearningModuleCompletion ERROR!: " + error);
+              /* fail */ return false;
+            }
           );
         });
       } catch (err) {}
@@ -1881,7 +2149,10 @@ class User {
               //   "updateUserPerformance SUCCESS!: " + success.rows.length
               // );
             },
-            (tx, error) => {console.log("updateUserPerformance ERROR!: " + error);/* fail */ return false;} // prettier-ignore
+            (tx, error) => {
+              //console.log("updateUserPerformance ERROR!: " + error);
+              /* fail */ return false;
+            }
           );
 
           tx.executeSql(
@@ -1903,15 +2174,23 @@ class User {
                       userScoreDeno,
                       userScoreValue,
                     ],
-                    (tx, success) => { resolve(true);}, // prettier-ignore
-                    (tx, error) => { console.log("updateUserAnswer insert ERROR!"); return false; } // prettier-ignore
+                    (tx, success) => {
+                      resolve(true);
+                    },
+                    (tx, error) => {
+                      //console.log("updateUserAnswer insert ERROR!");
+                      return false;
+                    }
                   );
                 });
               } else {
                 resolve(true);
               }
             },
-            (tx, error) => {console.log("updateUserPerformance select ERROR: " + error);/* fail */ return false;} // prettier-ignore
+            (tx, error) => {
+              //console.log("updateUserPerformance select ERROR: " + error);
+              /* fail */ return false;
+            }
           );
         });
       } catch (err) {}
@@ -1928,7 +2207,10 @@ class User {
             (trans, rs) => {
               resolve(rs);
             },
-            (tx, error) => {console.log("grabUserPerformance select ERROR: " + error);/* fail */ return false;} // prettier-ignore
+            (tx, error) => {
+              //console.log("grabUserPerformance select ERROR: " + error);
+              /* fail */ return false;
+            }
           );
         });
       } catch (err) {}
@@ -1943,14 +2225,14 @@ class User {
             "SELECT * from user ;",
             [],
             (trans, rs) => {
-              console.log(
-                "rs.rows.item(0).userTypeId= " + rs.rows.item(0).userTypeId
-              );
-              console.log(rs);
+              // console.log(
+              //   "rs.rows.item(0).userTypeId= " + rs.rows.item(0).userTypeId
+              // );
+              // console.log(rs);
               resolve(rs);
             },
             (tx, error) => {
-              console.log("grabUserType select ERROR: " + error);
+              //console.log("grabUserType select ERROR: " + error);
               return false;
             }
           );
@@ -1984,7 +2266,7 @@ class User {
             if (rs != null) {
               for (let x = 0; x < rs.rows.length; x++) {
                 let item = rs.rows.item(x);
-                console.log(item);
+                // console.log(item);
               }
             }
           });
@@ -1999,8 +2281,8 @@ class User {
         db.transaction((tx) => {
           tx.executeSql("SELECT * FROM condition;", [], (trans, rs) => {
             if (rs != null) {
-              console.log("**************************************************");
-              console.log(rs.rows.length);
+              //console.log("**************************************************");
+              // console.log(rs.rows.length);
               // for (let x = 0; x < rs.rows.length; x++) {
               //   let item = rs.rows.item(x);
               //   console.log(item);
@@ -2023,7 +2305,7 @@ class User {
             [],
             (trans, rs) => {
               if (rs != null) {
-                console.log("number of rows: " + rs.rows.item(0).cnt);
+                //console.log("number of rows: " + rs.rows.item(0).cnt);
                 resolve(rs);
               }
             }

@@ -23,6 +23,29 @@ export const deleteUserGoal = (userGoalId: number): Promise<boolean> => {
   });
 };
 
+export const deleteCourtDateReminder = (
+  courtDateReminderId: number
+): Promise<boolean> => {
+  return new Promise((resolve, reject) => {
+    try {
+      db.transaction((tx) => {
+        tx.executeSql(
+          "DELETE from courtDateReminder WHERE courtDateReminderId = ? ;",
+          [courtDateReminderId],
+          async (tx, rs) => {
+            // await deleteUserGoalSettings(userGoalId);
+            resolve(true);
+          },
+          (tx, error) => {
+            resolve(false);
+            return false;
+          }
+        );
+      });
+    } catch (err) {}
+  });
+};
+
 // export const deleteUserGoalSettings = (
 //   userGoalId: number
 // ): Promise<boolean> => {

@@ -89,7 +89,6 @@ export class SupportLinks extends Component<IProps, IState> {
     this.setState({
       supportLinkItems: objArr,
     });
-    console.log(this.state.supportLinkItems[0].supportLinkImageURL);
   };
 
   Modal = () => {
@@ -148,7 +147,6 @@ export class SupportLinks extends Component<IProps, IState> {
                 style={styles.supportLinkTouch}
                 activeOpacity={0.5}
                 onPress={() => {
-                  //   console.log(item.supportLinkTitle);
                   this.setState({ idx: idx });
                   this.modalVisibleHandler(true);
                 }}

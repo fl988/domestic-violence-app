@@ -34,6 +34,7 @@ const Drawer = createDrawerNavigator();
 import * as Constants from "constants/Constants";
 import * as api from "contentful-api/ContentfulData";
 import HomeScreen from "components/home-dashboard/HomeScreen";
+import CourtDateReminders from "components/home-dashboard/CourtDateReminders";
 import SettingsScreen from "components/home-dashboard/SettingsScreen";
 import FAQ from "components/home-dashboard/FAQ";
 import CustomModal from "components/user-setup/CustomModal";
@@ -155,10 +156,33 @@ export default class HomeDashboard extends React.Component<IProps, IState> {
                   <Text
                     style={{ color: Constants.COLOUR_WHITE, paddingLeft: 8 }}
                   >
-                    {"Home"}
+                    {Constants.LEFT_NAV_HOME}
                   </Text>
                 </View>
               ),
+            }}
+          />
+          <Drawer.Screen
+            name={Constants.LEFT_NAV_COURT_DATE_REMINDERS}
+            component={CourtDateReminders}
+            options={{
+              drawerLabel: ({}) => (
+                <View style={styles.drawerScreen}>
+                  <Icon
+                    name="calendar-check-o"
+                    type="font-awesome"
+                    color="white"
+                  />
+                  <Text
+                    style={{ color: Constants.COLOUR_WHITE, paddingLeft: 8 }}
+                  >
+                    {Constants.LEFT_NAV_COURT_DATE_REMINDERS}
+                  </Text>
+                </View>
+              ),
+            }}
+            initialParams={{
+              refreshHomeScreenHandler: this.refreshHomeScreenHandler,
             }}
           />
           <Drawer.Screen
@@ -171,7 +195,7 @@ export default class HomeDashboard extends React.Component<IProps, IState> {
                   <Text
                     style={{ color: Constants.COLOUR_WHITE, paddingLeft: 8 }}
                   >
-                    {"Settings"}
+                    {Constants.LEFT_NAV_SETTINGS}
                   </Text>
                 </View>
               ),
