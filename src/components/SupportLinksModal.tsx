@@ -32,14 +32,14 @@ const CustomModal = (props) => {
         </Text>
       )}
 
-      {props.supportLinkNumber !== "" ||
-        (props.supportLinkAdditionalHeading !== "" && (
-          <Text style={styles.number}>
-            {props.supportLinkAdditionalHeading == ""
-              ? props.supportLinkNumber
-              : ""}
-          </Text>
-        ))}
+      {(props.supportLinkNumber !== "" ||
+        props.supportLinkAdditionalHeading !== "") && (
+        <Text style={styles.number}>
+          {props.supportLinkAdditionalHeading == ""
+            ? props.supportLinkNumber
+            : ""}
+        </Text>
+      )}
     </View>
   );
 
