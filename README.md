@@ -6,11 +6,13 @@ For Android Phone Users
 - Next open the Expo client app then use the QR code scanner and scan the QR code on this link 
 	- https://expo.io/@febbelicious/domestic-violence-app
 
+
 For iOS Phone Users
 - Download the Expo client app
 	- https://apps.apple.com/au/app/expo-client/id982107779
 - Due to restrictions on Apple we wont be able to use the QR code that is provided on the previous link. It's only available to Android users.
 - We will instead do it on a Mac computer. Follow the steps below.
+	
 	
 For Windows
 - Download and install the following softwares
@@ -24,6 +26,7 @@ For Windows
 	- The structure of the folder will look like => "domestic-violence-app-master/domestic-violence-master"
 - Once inside the folder "domestic-violence-master", on terminal type "npm install", this will install all the node modules of the project.
 - When everything is installed, type "npm start" or "expo start". This will launch expo on browser and will then display a QR code which can be scanned by your expo client app on your phone.
+
 
 For Mac
 - Download and install the following softwares
@@ -41,11 +44,13 @@ For Mac
 - Once inside the folder type "npm install", this will install all the node modules of the project.
 - When everything is installed, type "npm start" or "expo start". This will launch expo on browser and will then display a QR code which can be scanned by your expo client app on your phone.
 
+
 Alternatively we can clone this instead on VS code
 - git clone https://github.com/fl988/domestic-violence-app.git
 - go inside the folder "domestic-violence-app" where all the configuration files are located for npm usage.
 - npm install
 - npm start
+
 
 NOTE: These are the important versions that will work with the app. To check installed versions type eg: "npm list expo", "npm list expo-cli", "npm list react-native"
 - expo@37.0.11 
