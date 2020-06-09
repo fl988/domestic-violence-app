@@ -16,7 +16,7 @@ export const grabAllArticles = (): Promise<SQLResultSet> => {
     try {
       db.transaction((tx) => {
         tx.executeSql(
-          "SELECT * FROM articles;",
+          "SELECT * FROM articles ORDER BY RANDOM() LIMIT 1;",
           [],
           (tx, rs) => {
             resolve(rs);

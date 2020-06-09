@@ -165,7 +165,7 @@ export class SupportLinks extends Component<IProps, IState> {
                     }}
                     source={{
                       uri: "https:" + item.supportLinkImageURL,
-                      method: "POST",
+                      //   method: "POST", //iOS doesn't like this.
                       //   cache: "only-if-cached", //for iOS only.
                     }}
                   />

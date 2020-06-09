@@ -2,12 +2,12 @@
 import * as React from "react";
 import * as Constants from "constants/Constants";
 import { Component } from "react";
-import { View, Text, Image, Linking, TouchableHighlight } from "react-native";
+import { View, Text, Image, Linking } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 
 //My components
 import styles from "styles/Styles";
-import { grabAllArticles } from "db/SelectScripts";
+import { grabAllArticles, debugPrintScript } from "db/SelectScripts";
 import { TouchableOpacity } from "react-native-gesture-handler";
 
 interface IProps {}
@@ -32,6 +32,8 @@ export default class ArticleOfTheDay extends Component<IProps, IState> {
   }
 
   async fetchContentful() {
+    await debugPrintScript("SELECT * FROM articles ORDER BY RANDOM();");
+
     let rs = await grabAllArticles();
     if (rs != null && rs.rows.length > 0) {
       let item = rs.rows.item(0);
