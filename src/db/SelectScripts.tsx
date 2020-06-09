@@ -316,6 +316,39 @@ export const getDifferenceInDaysVsNow = (
   });
 };
 
+export const getDifferenceInDaysVsNowArticle = (
+  endTimestamp: string
+): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    try {
+      let questionItemsArr = [];
+      db.transaction(
+        (tx) => {
+          tx.executeSql(
+            "SELECT julianday(?) - julianday(datetime('now','localtime')) as days FROM articles order by insertTimestamp" +
+              "; ",
+            [endTimestamp],
+            (txSuccess, rs) => {
+              let item = rs.rows.item(0);
+              resolve(item.days);
+            },
+            (txSuccess, err) => {
+              console.log(err);
+              return true;
+            }
+          );
+        },
+        async (tx) => {
+          // TRANSACTION ERROR CAUGHT.
+          // This means that this table is not exist. We create then create it.
+          // await createUserGoal();
+          resolve("");
+        }
+      );
+    } catch (error) {}
+  });
+};
+
 export const grabReadableTimestamp = (timestamp: string): Promise<string> => {
   return new Promise((resolve, reject) => {
     try {

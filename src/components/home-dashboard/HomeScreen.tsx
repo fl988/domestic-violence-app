@@ -42,7 +42,7 @@ import {
   grabAllArticles,
   grabLatestCourtDateReminder,
   getDifferenceInDaysVsNow,
-  debugPrintScript,
+  getDifferenceInDaysVsNowArticle,
 } from "db/SelectScripts";
 import { fetchArticlesAndSave } from "db/FetchAndSaveScripts";
 import MyAVO from "components/home-dashboard/my-avo/MyAVO";
@@ -142,8 +142,38 @@ export default class HomeScreen extends Component<IProps, IState> {
   }
 
   async fetchArticles() {
+    let date = new Date().getUTCDate();
+    let month = new Date().getUTCMonth() + 1;
+    let year = new Date().getUTCFullYear();
+    let hours = new Date().getHours(); //To get the Current Hours
+    let min = new Date().getMinutes(); //To get the Current Minutes
+    let sec = new Date().getSeconds(); //To get the Current Seconds
+    let nowTimestamp =
+      year.toString() +
+      "-" +
+      (month.toString().length <= 1
+        ? "0" + month.toString()
+        : month.toString()) +
+      "-" +
+      (date.toString().length <= 1 ? "0" + date.toString() : date.toString()) +
+      " " +
+      hours +
+      ":" +
+      min +
+      ":" +
+      sec;
+
+    // Grab articles
     let rs = await grabAllArticles();
     if (rs != null && rs.rows.length > 0) {
+      // get the date difference
+      let dateDiff = await getDifferenceInDaysVsNowArticle(
+        rs.rows.item(0).insertTimestamp
+      );
+      // if the latest article is greater than 1 week then we fetch the new ones from contentful if there is.
+      if (parseInt(dateDiff) > 7) {
+        let success = await fetchArticlesAndSave();
+      }
       this.setState({
         articleOfTheDay: <ArticleOfTheDay />,
       });
