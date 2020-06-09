@@ -1,4 +1,5 @@
 import React, { Component, ReactFragment } from "react";
+import * as Constants from "constants/Constants";
 import {
   Modal,
   View,
@@ -7,15 +8,13 @@ import {
   TouchableOpacity,
   Image,
   ActivityIndicator,
+  StyleSheet,
 } from "react-native";
+import { Text } from "react-native-elements";
 import { Container, Content } from "native-base";
-import * as Helper from "components/Helper";
 import { fetchSupportLinksAndSave } from "contentful-api/ContentfulData";
-import {
-  debugPrintScript,
-  grabSupportLinks,
-  formatSupportLinkRS,
-} from "db/SelectScripts";
+import { grabSupportLinks, formatSupportLinkRS } from "db/SelectScripts";
+import { BLANK_IMG_PLACEHOLDER } from "images/Images";
 
 import styles from "styles/Styles";
 import SupportLinksModal from "components/SupportLinksModal";
@@ -35,6 +34,7 @@ interface IState {
   modalVisible: boolean;
   idx: number;
   screenLoader: ReactFragment;
+  valid: boolean;
 }
 
 export class SupportLinks extends Component<IProps, IState> {
@@ -45,6 +45,7 @@ export class SupportLinks extends Component<IProps, IState> {
       modalVisible: false,
       idx: 0,
       screenLoader: false,
+      valid: true,
     };
   }
 
@@ -154,16 +155,27 @@ export class SupportLinks extends Component<IProps, IState> {
                   }}
                 >
                   <Image
-                    style={{
-                      flex: 1,
-                      borderRadius: 8,
-                    }}
-                    source={{
-                      uri: "https:" + item.supportLinkImageURL,
-                      //   method: "POST", //iOS doesn't like this.
-                      //   cache: "only-if-cached", //for iOS only.
-                    }}
+                    onError={() => this.setState({ valid: false })}
+                    style={
+                      this.state.valid
+                        ? localStyle.imgValid
+                        : localStyle.imgInvalid
+                    }
+                    source={
+                      this.state.valid
+                        ? { uri: "https:" + item.supportLinkImageURL }
+                        : BLANK_IMG_PLACEHOLDER
+                    }
                   />
+                  <Text
+                    h4
+                    style={{
+                      alignSelf: "center",
+                      color: Constants.COLOUR_WHITE,
+                    }}
+                  >
+                    {item.supportLinkTitle}
+                  </Text>
                 </View>
               </TouchableOpacity>
             ))}
@@ -177,3 +189,15 @@ export class SupportLinks extends Component<IProps, IState> {
 }
 
 export default SupportLinks;
+
+const localStyle = StyleSheet.create({
+  imgValid: {
+    flex: 1,
+    borderRadius: 8,
+  },
+  imgInvalid: {
+    alignSelf: "center",
+    flex: 1,
+    borderRadius: 8,
+  },
+});
