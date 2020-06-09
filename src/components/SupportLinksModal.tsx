@@ -28,7 +28,7 @@ const CustomModal = (props) => {
 
       {props.supportLinkTitle !== "" && (
         <Text style={styles.title}>
-          {props.supportLinkTitle !== "" ? props.supportLinkTitle : "HAHA1"}
+          {props.supportLinkTitle !== "" ? props.supportLinkTitle : "Support"}
         </Text>
       )}
 
