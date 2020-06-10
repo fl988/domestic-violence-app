@@ -195,6 +195,33 @@ class User {
     });
   }
 
+  checkIfDataAlreadyExistsInLearningModule(
+    moduleTitle: string,
+    moduleContent: string
+  ): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      try {
+        db.transaction((tx) => {
+          tx.executeSql(
+            "SELECT * FROM learningModules where moduleTitle like ? and moduleContent like ?;",
+            [moduleTitle, moduleContent],
+            (trans, rs) => {
+              /*//console.log("learningModules exist "+ (rs.rows.length > 0 ? "" : "but EMPTY! ") +": " + rs.rows.length);*/
+              resolve(rs.rows.length > 0);
+            },
+            (tx, error) => {
+              // console.log(
+              //   "learningModules checkForLearningModuleData does NOT EXIST!."
+              // );
+              resolve(false);
+              return false;
+            }
+          );
+        });
+      } catch (error) {}
+    });
+  }
+
   grabLearningModuleById(learningModuleId: number): Promise<SQLResultSet> {
     return new Promise((resolve, reject) => {
       try {
@@ -646,62 +673,69 @@ class User {
         //Loop through Modules
         let jd = jsonData;
         for (let x = 0; x < jd.length; x++) {
-          let learningModuleId: number = await this.insertLearningModules(
+          let isRecordExisting = await this.checkIfDataAlreadyExistsInLearningModule(
             jd[x].moduleTitle,
-            jd[x].moduleSummary,
-            jd[x].moduleContent,
-            jd[x].quizTopic
+            jd[x].moduleContent
           );
 
-          //Loop through Questions
-          let qs = jd[x].quizzes;
-          // console.log(
-          //   jd[x].moduleTitle + " has a total of " + qs.length + " quizzes."
-          // );
-          for (let y = 0; y < qs.length; y++) {
-            let questionId: number = 0;
-            if (qs[y].qType == Constants.QTYPE_TRUE_OR_FALSE) {
-              //T or F question type
-              questionId = await this.insertQuestion(
-                learningModuleId,
-                qs[y].qType,
-                qs[y].questionLable,
-                qs[y].questionStatement,
-                qs[y].questionAnswer,
-                "",
-                ""
-              );
+          if (!isRecordExisting) {
+            let learningModuleId: number = await this.insertLearningModules(
+              jd[x].moduleTitle,
+              jd[x].moduleSummary,
+              jd[x].moduleContent,
+              jd[x].quizTopic
+            );
 
-              //Save the answer
-              let answerId: number = await this.insertAnswers(
-                questionId,
-                qs[y].qType,
-                jd[x].questionAnswer
-              );
-            } else {
-              //Multiple choice question type
-              questionId = await this.insertQuestion(
-                learningModuleId,
-                qs[y].qType,
-                qs[y].questionLable,
-                "",
-                null,
-                qs[y].question,
-                qs[y].answer
-              );
+            //Loop through Questions
+            let qs = jd[x].quizzes;
+            // console.log(
+            //   jd[x].moduleTitle + " has a total of " + qs.length + " quizzes."
+            // );
+            for (let y = 0; y < qs.length; y++) {
+              let questionId: number = 0;
+              if (qs[y].qType == Constants.QTYPE_TRUE_OR_FALSE) {
+                //T or F question type
+                questionId = await this.insertQuestion(
+                  learningModuleId,
+                  qs[y].qType,
+                  qs[y].questionLable,
+                  qs[y].questionStatement,
+                  qs[y].questionAnswer,
+                  "",
+                  ""
+                );
 
-              //Loop through Answers
-              //Save all of the answers
-              let qa = qs[y].answers;
-              for (let z = 0; z < qa.length; z++) {
+                //Save the answer
                 let answerId: number = await this.insertAnswers(
                   questionId,
                   qs[y].qType,
-                  qa[z]
+                  jd[x].questionAnswer
                 );
+              } else {
+                //Multiple choice question type
+                questionId = await this.insertQuestion(
+                  learningModuleId,
+                  qs[y].qType,
+                  qs[y].questionLable,
+                  "",
+                  null,
+                  qs[y].question,
+                  qs[y].answer
+                );
+
+                //Loop through Answers
+                //Save all of the answers
+                let qa = qs[y].answers;
+                for (let z = 0; z < qa.length; z++) {
+                  let answerId: number = await this.insertAnswers(
+                    questionId,
+                    qs[y].qType,
+                    qa[z]
+                  );
+                }
               }
-            }
-          } //end for loop questions
+            } //end for loop questions
+          }
         } //end for loop modules
         resolve(true);
       } catch (err) {}

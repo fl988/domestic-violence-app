@@ -1,24 +1,18 @@
 /* *************************************** */
 // Import Modules
-import React, { Component, ReactComponentElement, ReactFragment } from "react";
+import React, { Component, ReactFragment } from "react";
 import {
   View,
   Text,
   ScrollView,
   TouchableOpacity,
-  Dimensions,
   ActivityIndicator,
+  RefreshControl,
 } from "react-native";
-import { Container, Header, Content, Left, Right, Body } from "native-base";
+import { Container, Content, Left, Body } from "native-base";
 import { LinearGradient } from "expo-linear-gradient";
 import { Icon } from "react-native-elements";
 // import { DrawerActions } from "@react-navigation/native";
-import {
-  NavigationState,
-  NavigationParams,
-  NavigationScreenProp,
-} from "react-navigation"; //React Navigation with TypeScript => https://dev.to/andreasbergqvist/react-navigation-with-typescript-29ka
-import { useNavigation, useNavigationState } from "@react-navigation/native";
 /* *************************************** */
 // Import Custom Components
 import * as Constants from "constants/Constants";
@@ -26,8 +20,6 @@ import styles from "styles/Styles";
 import db from "db/User";
 import CircularProgress from "components/home-dashboard/learning-modules/CircularProgress";
 import CustomModal from "components/user-setup/CustomModal";
-
-const PAGE_WIDTH = Dimensions.get("window").width;
 
 /* *************************************** */
 // Interface
@@ -49,6 +41,7 @@ interface IProps {
 interface IState {
   modalVisible: boolean;
   pages: enumJsonArr;
+  refreshing: boolean;
 }
 
 export default class LearningModule extends Component<IProps, IState> {
@@ -81,6 +74,7 @@ export default class LearningModule extends Component<IProps, IState> {
           locked: true,
         },
       ],
+      refreshing: false,
     };
   }
 
@@ -122,6 +116,15 @@ export default class LearningModule extends Component<IProps, IState> {
         pages: pagesObjArr,
       });
     }
+  }
+
+  async fetchLeaningModules() {
+    //fetch learning modules data
+    let jsonData = await db.fetchLearningModulesData(); //fetch then save the data
+
+    //save learning modules data
+    await db.saveLearningModulesData(JSON.parse(jsonData));
+    this.init();
   }
 
   reRenderComponentWhenBack = () => {
@@ -211,6 +214,14 @@ export default class LearningModule extends Component<IProps, IState> {
 
           <ScrollView
             contentContainerStyle={styles.learningModulePageContainer}
+            refreshControl={
+              <RefreshControl
+                refreshing={this.state.refreshing}
+                onRefresh={() => {
+                  this.fetchLeaningModules();
+                }}
+              />
+            }
           >
             <View style={{ paddingTop: 10 }}>{/*SPACING*/}</View>
             {this.mainComponent()}
