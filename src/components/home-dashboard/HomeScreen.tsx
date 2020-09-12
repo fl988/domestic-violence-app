@@ -353,26 +353,8 @@ export default class HomeScreen extends Component<IProps, IState> {
     headerTintColor: "white",
     headerTitleStyle: {
       color: "white",
+      width: width / 2,
     },
-  });
-
-  //Constants.MODULE
-  moduleHeaderOptions = ({ navigation }) => ({
-    headerStyle: { backgroundColor: Constants.COLOUR_EBONY },
-    headerTintColor: "white",
-    headerTitleStyle: {
-      color: "white",
-    },
-    headerLeft: () => (
-      <View style={{ marginLeft: 10 }}>
-        <Icon
-          name="arrow-left"
-          type="material-community"
-          color="white"
-          onPress={() => navigation.goBack()}
-        />
-      </View>
-    ),
   });
 }
 
