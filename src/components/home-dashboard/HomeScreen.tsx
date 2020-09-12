@@ -313,7 +313,10 @@ export default class HomeScreen extends Component<IProps, IState> {
               options={this.learningModuleHeaderOptions}
             />
           </Stack.Navigator>
-          <QuickHelp redoTutorial={this.props.route.params.redoTutorial} />
+          <QuickHelp
+            navigation={this.props.navigation}
+            redoTutorial={this.props.route.params.redoTutorial}
+          />
 
           {/* END */}
           {/* *************************** */}

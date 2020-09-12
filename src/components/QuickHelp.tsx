@@ -10,13 +10,20 @@ import {
   Linking,
   Dimensions,
 } from "react-native";
-import { NavigationRoute } from "react-navigation";
+import * as Constants from "constants/Constants";
 
 const PAGE_HEIGHT = Dimensions.get("window").height;
 const PAGE_WIDTH = Dimensions.get("window").width;
 
+import {
+  NavigationState,
+  NavigationParams,
+  NavigationScreenProp,
+} from "react-navigation"; //React Navigation with TypeScript => https://dev.to/andreasbergqvist/react-navigation-with-typescript-29ka
+
 interface IProps {
   redoTutorial?: Function;
+  navigation: NavigationScreenProp<NavigationState, NavigationParams>;
 }
 interface IState {
   modalVisible: boolean;
@@ -57,7 +64,7 @@ export default class QuickHelp extends Component<IProps, IState> {
     <View style={styles.modalBody}>
       <Text style={styles.bodyText}>
         {
-          "Quick Help is where the users can ask help for tutorials for the app, call 000 for evemgency and go to help service for any support. Users can also find a link to the online dictionary website so they can search about words that they don't know about."
+          "Quick Help is where the users can ask help for tutorials for the app, call 000 for emergency and go to help services for any support. \n\nUsers can also find a link to the online dictionary website so they can search about words that they don't know about."
         }
       </Text>
     </View>
@@ -96,7 +103,7 @@ export default class QuickHelp extends Component<IProps, IState> {
             style={styles.element1}
             onPress={() => Linking.openURL("https://www.beyondblue.org.au/")}
           >
-            I am experiecing homelessness
+            I am experiencing homelessness
           </Text>
         </TouchableOpacity>
 
@@ -106,6 +113,18 @@ export default class QuickHelp extends Component<IProps, IState> {
             onPress={() => Linking.openURL("https://www.wordreference.com/")}
           >
             Online Dictionary
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.action3}>
+          <Text
+            style={styles.element1}
+            onPress={() =>
+              this.props.navigation.navigate(Constants.HOME_SCREEN_SUPPORT) ||
+              this.modalVisibleHandler(!this.state.modalVisible)
+            }
+          >
+            Go to Support Page
           </Text>
         </TouchableOpacity>
       </View>

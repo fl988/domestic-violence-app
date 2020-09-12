@@ -8,14 +8,9 @@ import { View, Text, TouchableOpacity } from "react-native";
 //My components
 import * as Constants from "constants/Constants";
 import styles from "styles/Styles";
-import {
-  NavigationState,
-  NavigationParams,
-  NavigationScreenProp,
-} from "react-navigation"; //React Navigation with TypeScript => https://dev.to/andreasbergqvist/react-navigation-with-typescript-29ka
 
 interface IProps {
-  navigation: NavigationScreenProp<NavigationState, NavigationParams>;
+  navigation: any;
 }
 interface IState {}
 
