@@ -8,7 +8,6 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   RefreshControl,
-  SafeAreaView,
 } from "react-native";
 import { Container, Content, Left, Body } from "native-base";
 import { LinearGradient } from "expo-linear-gradient";
@@ -212,32 +211,32 @@ export default class LearningModule extends Component<IProps, IState> {
 
           {/* END */}
           {/* *************************** */}
-          <SafeAreaView style={styles.container}>
-            <ScrollView
-              contentContainerStyle={styles.learningModulePageContainer}
-              refreshControl={
-                <RefreshControl
-                  refreshing={this.state.refreshing}
-                  onRefresh={() => {
-                    this.fetchLeaningModules();
-                  }}
-                />
-              }
-            >
-              <View style={{ paddingTop: 10 }}>{/*SPACING*/}</View>
-              {this.mainComponent()}
-              <CustomModal
-                action={this.someAction}
-                modalVisible={this.state.modalVisible}
-                modalVisibleHandler={this.modalVisibleHandler}
-                modalHeader={"Confirmation"}
-                modalBody={
-                  "\n\n\nYou have not completed the previous module yet.\n\n\n\n\n"
-                }
-                styleVersion={2}
+
+          <ScrollView
+            nestedScrollEnabled={true}
+            contentContainerStyle={styles.learningModulePageContainer}
+            refreshControl={
+              <RefreshControl
+                refreshing={this.state.refreshing}
+                onRefresh={() => {
+                  this.fetchLeaningModules();
+                }}
               />
-            </ScrollView>
-          </SafeAreaView>
+            }
+          >
+            <View style={{ paddingTop: 10 }}>{/*SPACING*/}</View>
+            {this.mainComponent()}
+            <CustomModal
+              action={this.someAction}
+              modalVisible={this.state.modalVisible}
+              modalVisibleHandler={this.modalVisibleHandler}
+              modalHeader={"Confirmation"}
+              modalBody={
+                "\n\n\nYou have not completed the previous module yet.\n\n\n\n\n"
+              }
+              styleVersion={2}
+            />
+          </ScrollView>
         </Content>
       </Container>
     );

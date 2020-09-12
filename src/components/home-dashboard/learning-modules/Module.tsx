@@ -89,7 +89,10 @@ export default class Module extends Component<IProps, IState> {
                 {this.state.moduleSummary}
               </Text>
               <Body>
-                <ScrollView onContentSizeChange={this.setScrollHeight}>
+                <ScrollView
+                  onContentSizeChange={this.setScrollHeight}
+                  nestedScrollEnabled={true}
+                >
                   <TouchableWithoutFeedback>
                     <>
                       <Text style={styles.learningModulePageBody}>
