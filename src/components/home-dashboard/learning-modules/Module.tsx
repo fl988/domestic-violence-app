@@ -74,8 +74,8 @@ export default class Module extends Component<IProps, IState> {
 
   render() {
     return (
-      <ScrollView>
-        <Container style={styles.bgPurple1}>
+      <Container style={styles.bgPurple1}>
+        <ScrollView>
           <Content
             contentContainerStyle={styles.learningModulePageContainer}
             nestedScrollEnabled={true}
@@ -120,8 +120,8 @@ export default class Module extends Component<IProps, IState> {
               </Left>
             </LinearGradient>
           </Content>
-        </Container>
-      </ScrollView>
+        </ScrollView>
+      </Container>
     );
   }
 }
