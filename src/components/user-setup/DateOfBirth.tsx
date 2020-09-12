@@ -36,6 +36,8 @@ const DateOfBirth = (props) => {
     }
   };
 
+  const currentDate: Date = new Date();
+
   /***********************************************************************************/
   // Functional components
   const showDatePicker = () => {
@@ -137,6 +139,8 @@ const DateOfBirth = (props) => {
           onConfirm={handleConfirm}
           onCancel={hideDatePicker}
           mode="date"
+          locale="en_AU"
+          maximumDate={currentDate}
         />
       </View>
     </>

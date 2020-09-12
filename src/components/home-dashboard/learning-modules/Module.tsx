@@ -1,14 +1,18 @@
 /* *************************************** */
 // Import Modules
 import React, { Component } from "react";
-import { View, Text, ScrollView } from "react-native";
-import { Container, Header, Content, Left, Body } from "native-base";
+import {
+  View,
+  Text,
+  ScrollView,
+  Dimensions,
+  TouchableWithoutFeedback,
+} from "react-native";
+import { Container, Content, Left, Body } from "native-base";
 import { LinearGradient } from "expo-linear-gradient";
-import { Icon } from "react-native-elements";
 import CustomTextInput from "components/user-setup/CustomTextInput";
 
 import {
-  NavigationBackAction,
   NavigationState,
   NavigationParams,
   NavigationScreenProp,
@@ -33,6 +37,7 @@ interface IState {
   quizTopic: string;
   moduleContent: string;
   locked: boolean;
+  scrollHeight: number;
 }
 
 export default class Module extends Component<IProps, IState> {
@@ -45,6 +50,7 @@ export default class Module extends Component<IProps, IState> {
       quizTopic,
       moduleContent,
       locked,
+      scrollHeight,
     } = props.route.params;
 
     this.state = {
@@ -54,6 +60,7 @@ export default class Module extends Component<IProps, IState> {
       quizTopic: quizTopic,
       moduleContent: moduleContent,
       locked: locked,
+      scrollHeight: scrollHeight,
     };
   }
 
@@ -62,6 +69,8 @@ export default class Module extends Component<IProps, IState> {
       learningModuleId: this.state.learningModuleId,
     });
   };
+
+  setScrollHeight = (width, height) => this.setState({ scrollHeight: height });
 
   render() {
     return (
@@ -80,21 +89,25 @@ export default class Module extends Component<IProps, IState> {
                 {this.state.moduleSummary}
               </Text>
               <Body>
-                <ScrollView>
-                  <Text style={styles.learningModulePageBody}>
-                    {this.state.moduleContent}
-                  </Text>
-                  <CustomTextInput
-                    editable={false}
-                    onPress={() => this.quizHandler()}
-                    colors={["#101726", "#101726", "#101726"]}
-                    rightIcon={"arrow-right"}
-                    rightIconType={"font-awesome"} //the type of the icon you're using.
-                    rightIconColor={"white"} //you can put simple color words or hex or rgb.
-                    textInputPlaceholder={"Proceed to Quizzes"}
-                    textInputPlaceholderColor={"white"}
-                    value={null}
-                  />
+                <ScrollView onContentSizeChange={this.setScrollHeight}>
+                  <TouchableWithoutFeedback>
+                    <>
+                      <Text style={styles.learningModulePageBody}>
+                        {this.state.moduleContent}
+                      </Text>
+                      <CustomTextInput
+                        editable={false}
+                        onPress={() => this.quizHandler()}
+                        colors={["#101726", "#101726", "#101726"]}
+                        rightIcon={"arrow-right"}
+                        rightIconType={"font-awesome"} //the type of the icon you're using.
+                        rightIconColor={"white"} //you can put simple color words or hex or rgb.
+                        textInputPlaceholder={"Proceed to Quizzes"}
+                        textInputPlaceholderColor={"white"}
+                        value={null}
+                      />
+                    </>
+                  </TouchableWithoutFeedback>
                 </ScrollView>
               </Body>
             </Left>
