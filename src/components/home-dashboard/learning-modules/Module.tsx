@@ -74,49 +74,54 @@ export default class Module extends Component<IProps, IState> {
 
   render() {
     return (
-      <Container style={styles.bgPurple1}>
-        <Content contentContainerStyle={styles.learningModulePageContainer}>
-          {/* *************************** */}
-          {/* START */}
-          <View style={{ paddingTop: 10 }}>{/* Empty Space */}</View>
-
-          <LinearGradient
-            colors={Constants.LINEAR_GRADIENT_MAIN}
-            style={[styles.learningModulePageContent]}
+      <ScrollView>
+        <Container style={styles.bgPurple1}>
+          <Content
+            contentContainerStyle={styles.learningModulePageContainer}
+            nestedScrollEnabled={true}
           >
-            <Left>
-              <Text style={styles.learningModulePageHeader}>
-                {this.state.moduleSummary}
-              </Text>
-              <Body>
-                <ScrollView
-                  onContentSizeChange={this.setScrollHeight}
-                  nestedScrollEnabled={true}
-                >
-                  <TouchableWithoutFeedback>
-                    <>
-                      <Text style={styles.learningModulePageBody}>
-                        {this.state.moduleContent}
-                      </Text>
-                      <CustomTextInput
-                        editable={false}
-                        onPress={() => this.quizHandler()}
-                        colors={["#101726", "#101726", "#101726"]}
-                        rightIcon={"arrow-right"}
-                        rightIconType={"font-awesome"} //the type of the icon you're using.
-                        rightIconColor={"white"} //you can put simple color words or hex or rgb.
-                        textInputPlaceholder={"Proceed to Quizzes"}
-                        textInputPlaceholderColor={"white"}
-                        value={null}
-                      />
-                    </>
-                  </TouchableWithoutFeedback>
-                </ScrollView>
-              </Body>
-            </Left>
-          </LinearGradient>
-        </Content>
-      </Container>
+            {/* *************************** */}
+            {/* START */}
+            <View style={{ paddingTop: 10 }}>{/* Empty Space */}</View>
+
+            <LinearGradient
+              colors={Constants.LINEAR_GRADIENT_MAIN}
+              style={[styles.learningModulePageContent]}
+            >
+              <Left>
+                <Text style={styles.learningModulePageHeader}>
+                  {this.state.moduleSummary}
+                </Text>
+                <Body>
+                  <ScrollView
+                    onContentSizeChange={this.setScrollHeight}
+                    nestedScrollEnabled={true}
+                  >
+                    <TouchableWithoutFeedback>
+                      <>
+                        <Text style={styles.learningModulePageBody}>
+                          {this.state.moduleContent}
+                        </Text>
+                        <CustomTextInput
+                          editable={false}
+                          onPress={() => this.quizHandler()}
+                          colors={["#101726", "#101726", "#101726"]}
+                          rightIcon={"arrow-right"}
+                          rightIconType={"font-awesome"} //the type of the icon you're using.
+                          rightIconColor={"white"} //you can put simple color words or hex or rgb.
+                          textInputPlaceholder={"Proceed to Quizzes"}
+                          textInputPlaceholderColor={"white"}
+                          value={null}
+                        />
+                      </>
+                    </TouchableWithoutFeedback>
+                  </ScrollView>
+                </Body>
+              </Left>
+            </LinearGradient>
+          </Content>
+        </Container>
+      </ScrollView>
     );
   }
 }
