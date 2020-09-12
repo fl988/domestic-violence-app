@@ -189,6 +189,8 @@ export class CourtDateReminders extends Component<IProps, IState> {
             this.setState({ isDatePickerVisible: false });
           }}
           mode="date"
+          locale="en_AU"
+          minimumDate={new Date()}
         />
       </View>
     );
