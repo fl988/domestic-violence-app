@@ -114,7 +114,7 @@ const CustomOnboarding = (props) => {
       image: <Image style={styles.image} source={Onbording_quick} />,
       subTitleStyles: styles.subtitleSpecial,
       subtitle:
-        'In Quick Help page, you can go back to where you had tutorials to get to know more about the app thorough "I need help with the app", you can also call 000 by using "I have an emergency" and you can go to support page where you can ask for help if you are experiencing homelessness by using "I am experiencing homelessness".',
+        'In Quick Help page, you can: \n - Go back to where you had tutorials to get to know more about the app by tapping "I need help with the app". \n - Call 000 by tapping "I have an emergency". \n - Can go to support page where you can ask for help if you are experiencing homelessness by tapping "I am experiencing homelessness".',
     },
     {
       title: "Home in Hamburger menu",
@@ -228,9 +228,12 @@ const styles = StyleSheet.create({
   },
   subtitleSpecial: {
     color: "white",
-    textAlign: "center",
+    textAlign: "left",
     alignSelf: "center",
     position: "absolute",
-    top: PAGE_HEIGHT / 8,
+    top: PAGE_HEIGHT / 20,
+    backgroundColor: "rgba(0, 0, 0, 0.3)",
+    borderRadius: 2,
+    padding: 8,
   },
 });
